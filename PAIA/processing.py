@@ -48,6 +48,25 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
                     yield c
 
 
+def var_dump(var, prefix=''):
+    """
+    You know you're a php developer when the first thing you ask for
+    when learning a new language is 'Where's var_dump?????'
+    https://stackoverflow.com/a/21791626
+    """
+    my_type = '[' + var.__class__.__name__ + '(' + str(len(var)) + ')]:'
+    print(prefix, my_type, sep='')
+    prefix += '    '
+    for i in var:
+        if type(i) in (list, tuple, dict, set):
+            var_dump(i, prefix)
+        else:
+            if isinstance(var, dict):
+                print(prefix, i, ': (', var[i].__class__.__name__, ') ', var[i], sep='')
+            else:
+                print(prefix, '(', i.__class__.__name__, ') ', i, sep='')
+
+
 def __read_shapefile(shapefile: AnyStr) -> list:
     with fiona.open(shapefile, "r") as shapefile:
         shapes = [feature["geometry"] for feature in shapefile]
