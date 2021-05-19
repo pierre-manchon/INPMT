@@ -6,8 +6,10 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
-from PAIA.plotting import plot_shape
-from PAIA.processing import get_categories, raster_crop, read_shapefile_as_dataframe
+from .plotting import plot_shape
+from .processing import get_categories
+from .raster import raster_crop
+from .vector import read_shapefile_as_dataframe
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -46,8 +48,19 @@ for x in zip(df.NAME, df.AREA, df.coords):
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
 
+# https://stackoverflow.com/questions/39995839/gis-calculate-distance-between-point-and-polygon-border
 # load every layers
 # Illustrer difference Gabon/Afrique (proportion occsol/pays = Surface catégories/surface pays)
 # Stats pour Afrique, Zone présence Anophèles, Pays (polygonize dominant vectors)
-# Lister les variables calculables: proportion par buffer
+# Lister lesx variables calculables: proportion par buffer
 # Lien proximité/pop/parcs/anophèles
+
+"""
+QGIS
+Convertir les pixels urbains de l'occsol en polygone mono parties.
+CODE
+Associer puis séparer les villages gros des villages petits.
+Dans le premier cas, mesurer dans un premier temps la distance entre le bord de l'aire urbaine et le parc. Puis, dans
+un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
+Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec la bordure du parc. 
+"""
