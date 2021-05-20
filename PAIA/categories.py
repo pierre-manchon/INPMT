@@ -6,7 +6,7 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
-from PAIA.processing import get_categories, get_urban_extent
+from PAIA.processing import get_urban_extent
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -44,7 +44,8 @@ for x in zip(df.NAME, df.AREA, df.coords):
     else:
         pass
 """
-get_urban_extent(path_urbain_gabon)
+gdf = get_urban_extent(path_urbain_gabon, 360000, 90000)
+
 
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
@@ -62,7 +63,8 @@ Convertir les pixels urbains de l'occsol en polygone
 CODE
 Convertir ces polygones en mono parties.
 Associer puis séparer les villages gros des villages petits.
-Dans le premier cas, mesurer dans un premier temps la distance entre le bord de l'aire urbaine et le parc. Puis, dans
-un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
-Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec la bordure du parc. 
+
+Dans le premier cas, mesurer dans un premier temps la distance entre le bord de l'aire urbaine et le parc.
+Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec la bordure du parc.
+Puis, dans un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
 """

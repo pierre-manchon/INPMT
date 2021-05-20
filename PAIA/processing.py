@@ -4,11 +4,12 @@ import rasterio
 import rasterio.mask
 from datetime import datetime
 from numpy import ndarray
+from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
-from .decorators import timer
-from .utils import __get_value_count, __gather, format_dataset_output
-from .vector import merge_touching
-from .raster import read_pixels, read_pixels_from_array
+from PAIA.decorators import timer
+from PAIA.utils import __get_value_count, __gather, format_dataset_output
+from PAIA.vector import merge_touching, __read_shapefile_as_geodataframe, fill_holes
+from PAIA.raster import read_pixels, read_pixels_from_array
 
 
 @timer
@@ -64,18 +65,26 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
 
 
 @timer
-def get_urban_extent(shapefile) -> None:
-    directory = os.path.dirname(shapefile)
-    output_path = os.path.join(directory, 'test.shp')
-
+def get_urban_extent(
+        shapefile: AnyStr,
+        villages_separation: SupportsInt,
+        fill_treshold: SupportsInt,
+        export: bool = False
+) -> GeoDataFrame:
     merging_result = merge_touching(shapefile=shapefile)
 
     result = []
     for poly in merging_result.geometry:
-        if poly.area <= 360000:
+        if poly.area <= villages_separation:
             result.append("small")
         else:
             result.append("large")
 
     merging_result["Size"] = result
-    merging_result.to_file(output_path)
+
+    if export:
+        directory = os.path.dirname(shapefile)
+        output_path = os.path.join(directory, 'test_fill.shp')
+        merging_result.to_file(output_path)
+    else:
+        return merging_result
