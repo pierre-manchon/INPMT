@@ -1,4 +1,5 @@
 # -*-coding: utf8 -*
+import os
 import rasterio
 import rasterio.mask
 from datetime import datetime
@@ -6,6 +7,7 @@ from numpy import ndarray
 from typing import AnyStr, SupportsInt
 from .decorators import timer
 from .utils import __get_value_count, __gather, format_dataset_output
+from .vector import merge_touching
 from .raster import read_pixels, read_pixels_from_array
 
 
@@ -59,3 +61,21 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
             o.writelines('{};{};{};{}\n'.format(c, __ctr[c], category_area, percentage))
 
     print('[PAIA]: Report {} generated for layer {}'.format(__output_path, __dataset_name))
+
+
+@timer
+def get_urban_extent(shapefile) -> None:
+    directory = os.path.dirname(shapefile)
+    output_path = os.path.join(directory, 'test.shp')
+
+    merging_result = merge_touching(shapefile=shapefile)
+
+    result = []
+    for poly in merging_result.geometry:
+        if poly.area <= 360000:
+            result.append("small")
+        else:
+            result.append("large")
+
+    merging_result["Size"] = result
+    merging_result.to_file(output_path)

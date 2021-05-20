@@ -7,3 +7,4 @@ Shapely==1.7.1
 Fiona==1.8.19
 matplotlib==3.4.1
 geopandas==0.9.0
+libpysal~=4.4.0

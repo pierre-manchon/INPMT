@@ -6,10 +6,7 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
-from .plotting import plot_shape
-from .processing import get_categories
-from .raster import raster_crop
-from .vector import read_shapefile_as_dataframe
+from PAIA.processing import get_categories, get_urban_extent
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -30,13 +27,15 @@ path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact P
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
 path_occsol_decoupe = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Produit OS/' \
                       r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/mask.tif'
+path_urbain_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
 
-df, sf = read_shapefile_as_dataframe(path_country_boundaries)
 """
+df, sf = read_shapefile_as_dataframe(path_country_boundaries)
+
 In case the following contraption doesn't work, this allows to get coordinates
 for v in sf.__geo_interface__['features']:
     shape = v['geometry']['coordinates']
-"""
+
 for x in zip(df.NAME, df.AREA, df.coords):
     if x[0] != '':
         cr = raster_crop(dataset=path_occsol, shapefile=sf.shp.name)
@@ -44,6 +43,8 @@ for x in zip(df.NAME, df.AREA, df.coords):
         # plot_shape(shapefile=sf, dataframe=df, name=x)
     else:
         pass
+"""
+get_urban_extent(path_urbain_gabon)
 
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
@@ -57,8 +58,9 @@ for x in zip(df.NAME, df.AREA, df.coords):
 
 """
 QGIS
-Convertir les pixels urbains de l'occsol en polygone mono parties.
+Convertir les pixels urbains de l'occsol en polygone
 CODE
+Convertir ces polygones en mono parties.
 Associer puis séparer les villages gros des villages petits.
 Dans le premier cas, mesurer dans un premier temps la distance entre le bord de l'aire urbaine et le parc. Puis, dans
 un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
