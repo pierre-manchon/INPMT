@@ -10,6 +10,7 @@ from PAIA.processing import get_urban_extent
 import pandas as pd
 import geopandas as gpd
 from shapely import speedups
+from shapely.ops import nearest_points
 speedups.disable()
 
 # Really not important tho
@@ -50,14 +51,6 @@ for x in zip(df.NAME, df.AREA, df.coords):
 """
 
 
-def nearest(row, geom_union, df, dftwo, geom1_col='geometry', geom2_col='geometry', src_column=None):
-    from shapely.ops import nearest_points
-    nearest = df[geom2_col] == nearest_points(row[geom1_col], geom_union)[1]
-    # Get the corresponding value from dftwo (matching is based on the geometry)
-    value = dftwo[nearest][src_column].get_values()[0]
-    return value
-
-
 pa = gpd.read_file(path_pa)
 ug = get_urban_extent(path_urbain_gabon, 360000)
 
@@ -68,19 +61,17 @@ for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
     else:
         centros.append([r[0]])
         pass
-
-df = pd.DataFrame(centros, columns=['fid', 'centroid'])
-df['centroid'] = gpd.GeoSeries.from_wkt(df['centroid'])
+del r
+df = pd.DataFrame(centros, columns=['fid', 'centro'])
+del centros
+df['centro'] = gpd.GeoSeries.from_wkt(df['centro'])
 ug = ug.merge(df, on='fid')
 
-unary_union = pa.unary_union
-ug['nearest_id'] = ug.apply(nearest,
-                            geom_union=unary_union,
-                            df=ug,
-                            df2=pa,
-                            geom1_col='centroid',
-                            axis=1)
-
+y = []
+for t in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+    for g in zip(pa.NAME, pa.GIS_AREA, pa.STATUS_YR, pa.geometry):
+        print(nearest_points(t[3], g[3]))
+# https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
 
