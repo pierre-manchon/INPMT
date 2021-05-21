@@ -8,7 +8,7 @@ from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
 from PAIA.utils import __get_value_count, __gather, format_dataset_output
-from PAIA.vector import merge_touching, __read_shapefile_as_geodataframe, fill_holes
+from PAIA.vector import merge_touching
 from PAIA.raster import read_pixels, read_pixels_from_array
 
 
@@ -68,7 +68,6 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
 def get_urban_extent(
         shapefile: AnyStr,
         villages_separation: SupportsInt,
-        fill_treshold: SupportsInt,
         export: bool = False
 ) -> GeoDataFrame:
     merging_result = merge_touching(shapefile=shapefile)
