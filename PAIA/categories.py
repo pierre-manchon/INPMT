@@ -7,6 +7,10 @@ Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
 from PAIA.processing import get_urban_extent
+import pandas as pd
+import geopandas as gpd
+from shapely import speedups
+speedups.disable()
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -44,20 +48,50 @@ for x in zip(df.NAME, df.AREA, df.coords):
     else:
         pass
 """
-gdf = get_urban_extent(path_urbain_gabon, 360000, 90000)
 
+
+def nearest(row, geom_union, df, dftwo, geom1_col='geometry', geom2_col='geometry', src_column=None):
+    from shapely.ops import nearest_points
+    nearest = df[geom2_col] == nearest_points(row[geom1_col], geom_union)[1]
+    # Get the corresponding value from dftwo (matching is based on the geometry)
+    value = dftwo[nearest][src_column].get_values()[0]
+    return value
+
+
+pa = gpd.read_file(path_pa)
+ug = get_urban_extent(path_urbain_gabon, 360000)
+
+centros = []
+for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+    if r[2] == 'small':
+        centros.append([r[0], str(r[3].centroid)])
+    else:
+        centros.append([r[0]])
+        pass
+
+df = pd.DataFrame(centros, columns=['fid', 'centroid'])
+df['centroid'] = gpd.GeoSeries.from_wkt(df['centroid'])
+ug = ug.merge(df, on='fid')
+
+unary_union = pa.unary_union
+ug['nearest_id'] = ug.apply(nearest,
+                            geom_union=unary_union,
+                            df=ug,
+                            df2=pa,
+                            geom1_col='centroid',
+                            axis=1)
 
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
 
-# https://stackoverflow.com/questions/39995839/gis-calculate-distance-between-point-and-polygon-border
-# load every layers
-# Illustrer difference Gabon/Afrique (proportion occsol/pays = Surface catégories/surface pays)
-# Stats pour Afrique, Zone présence Anophèles, Pays (polygonize dominant vectors)
-# Lister lesx variables calculables: proportion par buffer
-# Lien proximité/pop/parcs/anophèles
-
 """
+https://stackoverflow.com/questions/39995839/gis-calculate-distance-between-point-and-polygon-border
+load every layers
+Illustrer difference Gabon/Afrique (proportion occsol/pays = Surface catégories/surface pays)
+Stats pour Afrique, Zone présence Anophèles, Pays (polygonize dominant vectors)
+Lister lesx variables calculables: proportion par buffer
+Lien proximité/pop/parcs/anophèles
+
 QGIS
 Convertir les pixels urbains de l'occsol en polygone
 CODE
