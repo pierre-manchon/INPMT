@@ -10,7 +10,6 @@ from PAIA.processing import get_urban_extent
 import pandas as pd
 import geopandas as gpd
 from shapely import speedups
-from shapely.ops import nearest_points
 speedups.disable()
 
 # Really not important tho
@@ -24,7 +23,7 @@ path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles
 path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
               r'gab_ppp_2020_UNadj_constrained.tif'
 path_pa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
-          r'WDPA_Mar2021_Public_AFRICA_Land.shp'
+          r'WDPA_Mar2021_Public_AFRICA_Land_GABON.shp'
 path_boundaries = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/' \
                   r'Limites administratives/africa_boundary.shp'
 path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
@@ -66,19 +65,22 @@ df = pd.DataFrame(centros, columns=['fid', 'centro'])
 del centros
 df['centro'] = gpd.GeoSeries.from_wkt(df['centro'])
 ug = ug.merge(df, on='fid')
+del df
 
 result = []
-min_dist = 100000
-name = None
-closest_polygon = None
 for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-    for p in zip(pa.NAME, pa.geometry):
-        dist = u[3].distance(p[1])
+    min_dist = 100000
+    name = None
+    for p in zip(pa.WDPA_PID, pa.NAME, pa.GIS_AREA, pa.geometry):
+        dist = p[1].distance(u[3])
         if dist < min_dist:
             min_dist = dist
-            name = p[0]
-            closest_polygon = p[1]
-    result.append([u[0], u[1], u[2], u[3], name, closest_polygon])
+            name = p[1]
+    result.append([u[0], u[1], u[2], u[3], name, dist])
+del dist, min_dist, name, p, u
+df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
+ug.merge(df, on='fid')
+del df
 
 # https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
 # get_categories(dataset=path_occsol_decoupe, band=0)

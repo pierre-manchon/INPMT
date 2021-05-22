@@ -37,31 +37,6 @@ def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
     return gdf
 
 
-def get_distance(shapefile1: AnyStr, shapefile2: AnyStr) -> GeoDataFrame:
-    def get_min_distance(point, lines):
-        return lines.distance(point).min()
-    sf1 = __read_shapefile_as_geodataframe(shapefile1)
-    sf2 = __read_shapefile_as_geodataframe(shapefile2)
-    sf1.to_crs(epsg=3857, inplace=True)
-    sf2.to_crs(epsg=3857, inplace=True)
-    sf1['min_dist_to_lines'] = sf1.geometry.apply(get_min_distance, args=(sf2,))
-    return sf1
-
-
-def get_dist(path, path2):
-    # https://medium.com/analytics-vidhya/calculating-distances-from-points-to-polygon-borders-in-python-a-paris-example-3b597e1ea291
-    # https://gis.stackexchange.com/a/342489
-    t = geopandas.read_file(path)
-    y = geopandas.read_file(path2)
-    for x in t.geometry:
-        for c in y.geometry:
-            tt = geopandas.GeoSeries(x)
-            tt.crs = 3857
-            yy = geopandas.GeoSeries(c)
-            yy.crs = 3857
-            dist = tt.distance(yy)
-
-
 def merge_touching(shapefile: AnyStr) -> GeoDataFrame:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
     gdf = geopandas.read_file(shapefile)
