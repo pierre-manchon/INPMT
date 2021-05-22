@@ -4,6 +4,7 @@ import libpysal
 import pandas as pd
 import geopandas as gpd
 import shapefile as shp
+from os import path
 from shapefile import Reader
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -48,3 +49,16 @@ def merge_touching(shapefile: AnyStr) -> GeoDataFrame:
 def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
     df[column] = gpd.GeoSeries.from_wkt(df[column])
     return df
+
+
+def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> GeoDataFrame:
+    base = gpd.read_file(base)
+    ol = gpd.read_file(overlay)
+    inter_df = gpd.overlay(base, ol, how='intersection')
+    if export:
+        directory = path.dirname(base)
+        output_path = path.join(directory, 'intersected.shp')
+        inter_df.to_file(output_path, index=False)
+        del directory, output_path, inter_df
+    else:
+        return inter_df
