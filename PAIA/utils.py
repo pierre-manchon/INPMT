@@ -2,7 +2,7 @@
 """
 Only functions
 """
-from os.path import join as path_join
+from os import path
 from pathlib import Path
 from collections import Counter
 from typing import AnyStr, List, Generator
@@ -38,7 +38,7 @@ def format_dataset_output(dataset: AnyStr, name: AnyStr):
     """
     __ext = Path(dataset).suffix
     __dataset_name = Path(dataset).name.replace(__ext, '')
-    __output_path = path_join(Path(dataset).parent, ''.join([__dataset_name, '_', name, __ext]))
+    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, '_', name, __ext]))
     return __dataset_name, __ext, __output_path
 
 
@@ -69,3 +69,12 @@ def __get_value_count(pixel_array: List) -> Counter:
     __nb = Counter()
     __nb.update(pixel_array)
     return __nb
+
+
+def if_export(input_data: AnyStr, export: bool = False):
+    if export:
+        directory = path.dirname(input_data)
+        output_path = path.join(directory, 'test_fill.shp')
+        merging_result.to_file(output_path)
+    else:
+        return merging_result
