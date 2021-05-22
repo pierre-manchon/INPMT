@@ -1,14 +1,13 @@
 # -*-coding: utf8 -*
 import fiona
 import libpysal
-import geopandas
 import pandas as pd
+import geopandas as gpd
 import shapefile as shp
-from shapely.geometry import Polygon
 from shapefile import Reader
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt
+from typing import AnyStr
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -33,22 +32,19 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
 
 
 def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
-    gdf = geopandas.read_file(shapefile)
+    gdf = gpd.read_file(shapefile)
     return gdf
 
 
 def merge_touching(shapefile: AnyStr) -> GeoDataFrame:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
-    gdf = geopandas.read_file(shapefile)
+    gdf = gpd.read_file(shapefile)
     W = libpysal.weights.Queen.from_dataframe(gdf)
     components = W.component_labels
     combined_polygons = gdf.dissolve(by=components)
     return combined_polygons
 
 
-def fill_holes(gdf: GeoDataFrame, area: SupportsInt) -> GeoDataFrame:
-    for ring in gdf.interiors:
-        pol = Polygon(ring)
-        if pol.area < area:
-            gdf = gdf.union(pol.buffer(0.3))
-    return gdf
+def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
+    df[column] = gpd.GeoSeries.from_wkt(df[column])
+    return df

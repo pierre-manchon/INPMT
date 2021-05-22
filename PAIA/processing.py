@@ -2,13 +2,15 @@
 import os
 import rasterio
 import rasterio.mask
+import pandas as pd
 from datetime import datetime
 from numpy import ndarray
+from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
 from PAIA.utils import __get_value_count, __gather, format_dataset_output
-from PAIA.vector import merge_touching
+from PAIA.vector import merge_touching, __read_shapefile_as_geodataframe, to_wkt
 from PAIA.raster import read_pixels, read_pixels_from_array
 
 
@@ -78,12 +80,60 @@ def get_urban_extent(
             result.append("small")
         else:
             result.append("large")
+    del poly
 
     merging_result["Size"] = result
+    del result
 
     if export:
         directory = os.path.dirname(shapefile)
         output_path = os.path.join(directory, 'test_fill.shp')
         merging_result.to_file(output_path)
+        del directory, output_path, merging_result
     else:
         return merging_result
+
+
+@timer
+def get_distances(path_pas: AnyStr,
+                  path_urban_areas: AnyStr,
+                  urban_treshold: SupportsInt,
+                  export: bool = False
+                  ) -> DataFrame:
+    pa = __read_shapefile_as_geodataframe(path_pas)
+    ug = get_urban_extent(path_urban_areas, urban_treshold)
+
+    centros = []
+    for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+        if r[2] == 'small':
+            centros.append([r[0], str(r[3].centroid)])
+        else:
+            centros.append([r[0]])
+            pass
+    del r
+    df = pd.DataFrame(centros, columns=['fid', 'centro'])
+    del centros
+    df = to_wkt(df=df, column='centro')
+    ug = ug.merge(df, on='fid')
+    del df
+
+    result = []
+    for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+        min_dist = 100000
+        name = None
+        for p in zip(pa.WDPA_PID, pa.NAME, pa.GIS_AREA, pa.geometry):
+            dist = p[3].distance(u[3])
+            if dist < min_dist:
+                min_dist = dist
+                name = p[1]
+        result.append([u[0], u[1], u[2], u[3], name, min_dist])
+    del dist, min_dist, name, p, u
+    df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
+    del result
+    if export:
+        directory = os.path.dirname(path_urban_areas)
+        output_path = os.path.join(directory, 'distances.xlsx')
+        df.to_excel(output_path, index=False)
+        del directory, output_path, df
+    else:
+        return df

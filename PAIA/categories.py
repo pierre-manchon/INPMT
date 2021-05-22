@@ -6,9 +6,7 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
-from PAIA.processing import get_urban_extent
-import pandas as pd
-import geopandas as gpd
+from PAIA.processing import get_distances
 from shapely import speedups
 speedups.disable()
 
@@ -49,38 +47,10 @@ for x in zip(df.NAME, df.AREA, df.coords):
         pass
 """
 
-
-pa = gpd.read_file(path_pa)
-ug = get_urban_extent(path_urbain_gabon, 360000)
-
-centros = []
-for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-    if r[2] == 'small':
-        centros.append([r[0], str(r[3].centroid)])
-    else:
-        centros.append([r[0]])
-        pass
-del r
-df = pd.DataFrame(centros, columns=['fid', 'centro'])
-del centros
-df['centro'] = gpd.GeoSeries.from_wkt(df['centro'])
-ug = ug.merge(df, on='fid')
-del df
-
-result = []
-for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-    min_dist = 100000
-    name = None
-    for p in zip(pa.WDPA_PID, pa.NAME, pa.GIS_AREA, pa.geometry):
-        dist = p[1].distance(u[3])
-        if dist < min_dist:
-            min_dist = dist
-            name = p[1]
-    result.append([u[0], u[1], u[2], u[3], name, dist])
-del dist, min_dist, name, p, u
-df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
-ug.merge(df, on='fid')
-del df
+get_distances(path_pas=path_pa,
+              path_urban_areas=path_urbain_gabon,
+              urban_treshold=360000,
+              export=True)
 
 # https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
 # get_categories(dataset=path_occsol_decoupe, band=0)
@@ -102,5 +72,5 @@ Associer puis séparer les villages gros des villages petits.
 
 Dans le premier cas, mesurer dans un premier temps la distance entre le bord de l'aire urbaine et le parc.
 Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec la bordure du parc.
-Puis, dans un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
+=> Puis, dans un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
 """
