@@ -37,7 +37,7 @@ path_urbain_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anop
 """
 df, sf = read_shapefile_as_dataframe(path_country_boundaries)
 
-In case the following contraption doesn't work, this allows to get coordinates
+In case the following contraption doesn'u work, this allows to get coordinates
 for v in sf.__geo_interface__['features']:
     shape = v['geometry']['coordinates']
 
@@ -67,10 +67,19 @@ del centros
 df['centro'] = gpd.GeoSeries.from_wkt(df['centro'])
 ug = ug.merge(df, on='fid')
 
-y = []
-for t in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-    for g in zip(pa.NAME, pa.GIS_AREA, pa.STATUS_YR, pa.geometry):
-        print(nearest_points(t[3], g[3]))
+result = []
+min_dist = 100000
+name = None
+closest_polygon = None
+for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+    for p in zip(pa.NAME, pa.geometry):
+        dist = u[3].distance(p[1])
+        if dist < min_dist:
+            min_dist = dist
+            name = p[0]
+            closest_polygon = p[1]
+    result.append([u[0], u[1], u[2], u[3], name, closest_polygon])
+
 # https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
 # get_categories(dataset=path_occsol_decoupe, band=0)
 # raster_crop(dataset=path_occsol, shapefile=path_decoupage)
