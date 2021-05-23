@@ -133,7 +133,7 @@ def get_distances(pas: GeoDataFrame,
     df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
     del result
     if export:
-        _, _, output_path = format_dataset_output(path_urban_areas, '_distances', '.xlsx')
+        _, _, output_path = format_dataset_output(path_urban_areas, 'distances', '.xlsx')
         df.to_excel(output_path, index=False)
         return df
     else:
