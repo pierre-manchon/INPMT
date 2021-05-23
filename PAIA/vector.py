@@ -59,6 +59,7 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> GeoDataFra
         directory = path.dirname(base)
         output_path = path.join(directory, 'intersected.shp')
         inter_df.to_file(output_path, index=False)
-        del directory, output_path, inter_df
+        del directory, output_path
+        return inter_df
     else:
         return inter_df

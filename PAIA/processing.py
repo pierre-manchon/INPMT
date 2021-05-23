@@ -89,7 +89,8 @@ def get_urban_extent(
         directory = os.path.dirname(shapefile)
         output_path = os.path.join(directory, 'test_fill.shp')
         merging_result.to_file(output_path)
-        del directory, output_path, merging_result
+        del directory, output_path
+        return merging_result
     else:
         return merging_result
 
@@ -134,6 +135,7 @@ def get_distances(path_pas: AnyStr,
         directory = os.path.dirname(path_urban_areas)
         output_path = os.path.join(directory, 'distances.xlsx')
         df.to_excel(output_path, index=False)
-        del directory, output_path, df
+        del directory, output_path
+        return df
     else:
         return df
