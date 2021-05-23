@@ -52,11 +52,11 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
 
 
 def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFrame, AnyStr]:
-    base = gpd.read_file(base)
-    ol = gpd.read_file(overlay)
-    inter_df = gpd.overlay(base, ol, how='intersection')
+    gdf_base = gpd.read_file(base)
+    gdf_ol = gpd.read_file(overlay)
+    inter_df = gpd.overlay(gdf_base, gdf_ol, how='intersection')
     if export:
-        _, _, output_path = format_dataset_output(base, '_intersect')
+        _, _, output_path = format_dataset_output(gdf_base, '_intersect')
         inter_df.to_file(output_path, index=False)
         return inter_df, base
     else:
