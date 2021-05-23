@@ -9,6 +9,7 @@ from shapefile import Reader
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
+from PAIA.utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -19,7 +20,7 @@ def __read_shapefile(shapefile: AnyStr) -> list:
 
 def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     """
-    Read a shapefile into a Pandas dataframe with a 'coords'
+    Read a geodataframe into a Pandas dataframe with a 'coords'
     column holding the geometry information. This uses the pyshp
     package
     """
@@ -37,12 +38,11 @@ def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
     return gdf
 
 
-def merge_touching(shapefile: AnyStr) -> GeoDataFrame:
+def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
-    gdf = gpd.read_file(shapefile)
-    W = libpysal.weights.Queen.from_dataframe(gdf)
+    W = libpysal.weights.Queen.from_dataframe(geodataframe)
     components = W.component_labels
-    combined_polygons = gdf.dissolve(by=components)
+    combined_polygons = geodataframe.dissolve(by=components)
     return combined_polygons
 
 
@@ -51,15 +51,13 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
     return df
 
 
-def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> GeoDataFrame:
+def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFrame, AnyStr]:
     base = gpd.read_file(base)
     ol = gpd.read_file(overlay)
     inter_df = gpd.overlay(base, ol, how='intersection')
     if export:
-        directory = path.dirname(base)
-        output_path = path.join(directory, 'intersected.shp')
+        _, _, output_path = format_dataset_output(base, '_intersect')
         inter_df.to_file(output_path, index=False)
-        del directory, output_path
-        return inter_df
+        return inter_df, base
     else:
-        return inter_df
+        return inter_df, base
