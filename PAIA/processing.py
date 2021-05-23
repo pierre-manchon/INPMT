@@ -7,10 +7,10 @@ from datetime import datetime
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt, Optional
+from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
 from PAIA.utils import __get_value_count, __gather, format_dataset_output
-from PAIA.vector import merge_touching, __read_shapefile_as_geodataframe, to_wkt
+from PAIA.vector import merge_touching, to_wkt
 from PAIA.raster import read_pixels, read_pixels_from_array
 
 
@@ -133,7 +133,7 @@ def get_distances(pas: GeoDataFrame,
     df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
     del result
     if export:
-        _, _, output_path = format_dataset_output(path_urban_areas, '_distances')
+        _, _, output_path = format_dataset_output(path_urban_areas, '_distances', '.xlsx')
         df.to_excel(output_path, index=False)
         return df
     else:

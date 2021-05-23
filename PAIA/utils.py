@@ -27,7 +27,7 @@ def var_dump(var, prefix=''):
                 print(prefix, '(', i.__class__.__name__, ') ', i, sep='')
 
 
-def format_dataset_output(dataset: AnyStr, name: AnyStr):
+def format_dataset_output(dataset: AnyStr, name: AnyStr, ext: AnyStr =''):
     """
     :param name:
     :type name:
@@ -38,6 +38,12 @@ def format_dataset_output(dataset: AnyStr, name: AnyStr):
     """
     __ext = Path(dataset).suffix
     __dataset_name = Path(dataset).name.replace(__ext, '')
+
+    if ext != '':
+        __ext = ext
+    else:
+        pass
+
     __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, '_', name, __ext]))
     return __dataset_name, __ext, __output_path
 
