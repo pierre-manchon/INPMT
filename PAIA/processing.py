@@ -123,7 +123,7 @@ def get_distances(pas: GeoDataFrame,
     for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
         min_dist = 100000
         name = None
-        for p in zip(pas.WDPA_PID, pas.NAME, pas.GIS_AREA, pas.geometry):
+        for p in zip(pas.WDPA_PID, pas.ORIG_NAME, pas.GIS_AREA, pas.geometry):
             dist = p[3].distance(u[3])
             if dist < min_dist:
                 min_dist = dist
