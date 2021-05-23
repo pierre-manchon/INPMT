@@ -69,12 +69,3 @@ def __get_value_count(pixel_array: List) -> Counter:
     __nb = Counter()
     __nb.update(pixel_array)
     return __nb
-
-
-def if_export(input_data: AnyStr, export: bool = False):
-    if export:
-        directory = path.dirname(input_data)
-        output_path = path.join(directory, 'test_fill.shp')
-        merging_result.to_file(output_path)
-    else:
-        return merging_result
