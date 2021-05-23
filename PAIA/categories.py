@@ -7,8 +7,7 @@ Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
 from PAIA.processing import get_distances
-from shapely import speedups
-speedups.disable()
+from PAIA.vector import intersect
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -18,18 +17,29 @@ speedups.disable()
 path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
-path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
+path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
               r'gab_ppp_2020_UNadj_constrained.tif'
-path_pa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
-          r'WDPA_Mar2021_Public_AFRICA_Land_GABON.shp'
+path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
+          r'WDPA_Mar2021_Public_AFRICA_Land.shp'
 path_boundaries = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/' \
                   r'Limites administratives/africa_boundary.shp'
 path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                           r'Limites administratives/african_countries_boundaries.shp'
+path_limites_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+                     r'Limites administratives/gabon.shp'
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
 path_occsol_decoupe = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Produit OS/' \
                       r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/mask.tif'
-path_urbain_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
+path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
+
+gdf_pa, _ = intersect(path_pa_africa, path_limites_gabon)
+gdf_urbain_gabon, path_urbain_gabon = intersect(path_urbain, path_limites_gabon)
+
+get_distances(pas=gdf_pa,
+              urban_areas=gdf_urbain_gabon,
+              path_urban_areas=path_urbain_gabon,
+              urban_treshold=360000,
+              export=True)
 
 """
 df, sf = read_shapefile_as_dataframe(path_country_boundaries)
@@ -40,23 +50,16 @@ for v in sf.__geo_interface__['features']:
 
 for x in zip(df.NAME, df.AREA, df.coords):
     if x[0] != '':
-        cr = raster_crop(dataset=path_occsol, shapefile=sf.shp.name)
+        cr = raster_crop(dataset=path_occsol, geodataframe=sf.shp.name)
         get_categories(dataset=cr, shapefile_area=x[1], band=0)
-        # plot_shape(shapefile=sf, dataframe=df, name=x)
+        # plot_shape(geodataframe=sf, dataframe=df, name=x)
     else:
         pass
-"""
 
-get_distances(path_pas=path_pa,
-              path_urban_areas=path_urbain_gabon,
-              urban_treshold=360000,
-              export=True)
-
-# https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
+https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
 # get_categories(dataset=path_occsol_decoupe, band=0)
-# raster_crop(dataset=path_occsol, shapefile=path_decoupage)
+# raster_crop(dataset=path_occsol, geodataframe=path_decoupage)
 
-"""
 https://stackoverflow.com/questions/39995839/gis-calculate-distance-between-point-and-polygon-border
 load every layers
 Illustrer difference Gabon/Afrique (proportion occsol/pays = Surface catégories/surface pays)
