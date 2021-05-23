@@ -7,7 +7,7 @@ from datetime import datetime
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt
+from typing import AnyStr, SupportsInt, Optional
 from PAIA.decorators import timer
 from PAIA.utils import __get_value_count, __gather, format_dataset_output
 from PAIA.vector import merge_touching, __read_shapefile_as_geodataframe, to_wkt
@@ -68,11 +68,12 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
 
 @timer
 def get_urban_extent(
-        shapefile: AnyStr,
+        urban_areas: GeoDataFrame,
+        path_urban_areas: AnyStr,
         villages_separation: SupportsInt,
         export: bool = False
 ) -> GeoDataFrame:
-    merging_result = merge_touching(shapefile=shapefile)
+    merging_result = merge_touching(geodataframe=urban_areas)
 
     result = []
     for poly in merging_result.geometry:
@@ -86,23 +87,23 @@ def get_urban_extent(
     del result
 
     if export:
-        directory = os.path.dirname(shapefile)
-        output_path = os.path.join(directory, 'test_fill.shp')
+        _, _, output_path = format_dataset_output(path_urban_areas, '_urban_extent')
         merging_result.to_file(output_path)
-        del directory, output_path
         return merging_result
     else:
         return merging_result
 
 
 @timer
-def get_distances(path_pas: AnyStr,
+def get_distances(pas: GeoDataFrame,
+                  urban_areas: GeoDataFrame,
                   path_urban_areas: AnyStr,
                   urban_treshold: SupportsInt,
                   export: bool = False
                   ) -> DataFrame:
-    pa = __read_shapefile_as_geodataframe(path_pas)
-    ug = get_urban_extent(path_urban_areas, urban_treshold)
+    ug = get_urban_extent(urban_areas=urban_areas,
+                          path_urban_areas=path_urban_areas,
+                          villages_separation=urban_treshold)
 
     centros = []
     for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
@@ -122,7 +123,7 @@ def get_distances(path_pas: AnyStr,
     for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
         min_dist = 100000
         name = None
-        for p in zip(pa.WDPA_PID, pa.NAME, pa.GIS_AREA, pa.geometry):
+        for p in zip(pas.WDPA_PID, pas.NAME, pas.GIS_AREA, pas.geometry):
             dist = p[3].distance(u[3])
             if dist < min_dist:
                 min_dist = dist
@@ -132,10 +133,8 @@ def get_distances(path_pas: AnyStr,
     df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
     del result
     if export:
-        directory = os.path.dirname(path_urban_areas)
-        output_path = os.path.join(directory, 'distances.xlsx')
+        _, _, output_path = format_dataset_output(path_urban_areas, '_distances')
         df.to_excel(output_path, index=False)
-        del directory, output_path
         return df
     else:
         return df
