@@ -1,5 +1,4 @@
 # -*-coding: utf8 -*
-import os
 import rasterio
 import rasterio.mask
 import pandas as pd
@@ -9,9 +8,9 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
-from PAIA.utils import __get_value_count, __gather, format_dataset_output
-from PAIA.vector import merge_touching, to_wkt
-from PAIA.raster import read_pixels, read_pixels_from_array
+from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output
+from PAIA.utils.vector import merge_touching, to_wkt
+from PAIA.utils.raster import read_pixels, read_pixels_from_array
 
 
 @timer

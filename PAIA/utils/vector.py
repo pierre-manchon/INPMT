@@ -4,12 +4,11 @@ import libpysal
 import pandas as pd
 import geopandas as gpd
 import shapefile as shp
-from os import path
 from shapefile import Reader
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
-from PAIA.utils import format_dataset_output
+from PAIA.utils.utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:

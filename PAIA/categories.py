@@ -7,7 +7,7 @@ Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
 from PAIA.processing import get_distances
-from PAIA.vector import intersect
+from PAIA.utils.vector import intersect
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files

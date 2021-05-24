@@ -5,7 +5,7 @@ import rasterio.mask
 from numpy import ndarray
 from pathlib import Path
 from typing import AnyStr, Generator, Optional
-from .utils import format_dataset_output
+from PAIA.utils import format_dataset_output
 from .vector import __read_shapefile
 
 
@@ -44,7 +44,7 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
 
 def raster_crop(dataset: AnyStr, shapefile: AnyStr, export: bool = False):
     """
-    Crop raster with shapefile boundary
+    Crop raster with geodataframe boundary
     :param export:
     :type export:
     :param dataset:
