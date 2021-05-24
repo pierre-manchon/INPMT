@@ -32,8 +32,14 @@ path_occsol_decoupe = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN An
                       r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/mask.tif'
 path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
 
-gdf_pa, _ = intersect(path_pa_africa, path_limites_gabon)
-gdf_urbain_gabon, path_urbain_gabon = intersect(path_urbain, path_limites_gabon)
+
+def main(path_aoi):
+    gdf_pa, _ = intersect(path_pa_africa, path_aoi)
+    gdf_urban, path_urban = intersect(path_urbain, path_aoi)
+    return gdf_pa, gdf_urban, path_urban
+
+
+gdf_pa, gdf_urbain_gabon, path_urbain_gabon = main(path_limites_gabon)
 
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
