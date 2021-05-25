@@ -41,7 +41,7 @@ def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
     W = libpysal.weights.Queen.from_dataframe(geodataframe)
     components = W.component_labels
-    combined_polygons = geodataframe.dissolve(by=components)
+    combined_polygons = geodataframe.dissolve(by=components, aggfunc='sum')
     return combined_polygons
 
 
