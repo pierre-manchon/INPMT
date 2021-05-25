@@ -5,7 +5,7 @@ import rasterio.mask
 from numpy import ndarray
 from pathlib import Path
 from typing import AnyStr, Generator, Optional
-from PAIA.utils import format_dataset_output
+from PAIA.utils.utils import format_dataset_output
 from .vector import __read_shapefile
 
 
