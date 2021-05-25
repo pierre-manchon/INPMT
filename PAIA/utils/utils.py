@@ -5,6 +5,7 @@ Only functions
 from os import path
 from pathlib import Path
 from collections import Counter
+from configparser import ConfigParser
 from typing import AnyStr, List, Generator
 
 
@@ -75,3 +76,9 @@ def __get_value_count(pixel_array: List) -> Counter:
     __nb = Counter()
     __nb.update(pixel_array)
     return __nb
+
+
+def get_config_value(value):
+    cfgparser = ConfigParser()
+    cfgparser.read('./PAIA/config.cfg')
+    return cfgparser.get('config', value)

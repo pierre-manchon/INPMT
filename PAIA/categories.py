@@ -44,7 +44,6 @@ gdf_pa, gdf_urbain_gabon, path_urbain_gabon = main(path_limites_gabon)
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
               path_urban_areas=path_urbain_gabon,
-              urban_treshold=360000,
               export=True)
 
 """

@@ -8,7 +8,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
-from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output
+from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output, get_config_value
 from PAIA.utils.vector import merge_touching, to_wkt
 from PAIA.utils.raster import read_pixels, read_pixels_from_array
 
@@ -97,9 +97,9 @@ def get_urban_extent(
 def get_distances(pas: GeoDataFrame,
                   urban_areas: GeoDataFrame,
                   path_urban_areas: AnyStr,
-                  urban_treshold: SupportsInt,
                   export: bool = False
                   ) -> DataFrame:
+    urban_treshold = get_config_value('urban_area_treshold')
     ug = get_urban_extent(urban_areas=urban_areas,
                           path_urban_areas=path_urban_areas,
                           villages_separation=urban_treshold)
@@ -120,7 +120,7 @@ def get_distances(pas: GeoDataFrame,
 
     result = []
     for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-        min_dist = 100000
+        min_dist = get_config_value('min_dist')
         name = None
         for p in zip(pas.WDPA_PID, pas.ORIG_NAME, pas.GIS_AREA, pas.geometry):
             dist = p[3].distance(u[3])
