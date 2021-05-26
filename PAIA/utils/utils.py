@@ -1,12 +1,12 @@
 # -*-coding: utf8 -*
 """
-Only functions
+Function for basic processing and miscellanious cases
 """
 from os import path
 from pathlib import Path
 from collections import Counter
 from configparser import ConfigParser
-from typing import AnyStr, List, Generator
+from typing import AnyStr, List, Generator, Union
 
 
 def var_dump(var, prefix=''):
@@ -28,14 +28,16 @@ def var_dump(var, prefix=''):
                 print(prefix, '(', i.__class__.__name__, ') ', i, sep='')
 
 
-def format_dataset_output(dataset: AnyStr, name: AnyStr, ext: AnyStr =''):
+def format_dataset_output(dataset: AnyStr, name: AnyStr, ext: AnyStr = '') -> tuple[str, Union[AnyStr, str], str]:
     """
-    :param name:
-    :type name:
     :param dataset:
-    :type dataset:
-    :return:
-    :rtype:
+    :type dataset: AnyStr
+    :param name: Name of the output file
+    :type name: AnyStr
+    :param ext: Extension of the output file. If blank, then the input file's etension will be used.
+    :type ext: AnyStr
+    :return: Dataset name, dataset extension, output path formatted
+    :rtype: tuple[str, Union[AnyStr, str], str]
     """
     __ext = Path(dataset).suffix
     __dataset_name = Path(dataset).name.replace(__ext, '')

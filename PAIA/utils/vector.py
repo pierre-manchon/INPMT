@@ -1,4 +1,7 @@
 # -*-coding: utf8 -*
+"""
+Functions for basic vector processing
+"""
 import fiona
 import libpysal
 import pandas as pd

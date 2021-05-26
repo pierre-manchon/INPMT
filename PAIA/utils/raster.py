@@ -1,4 +1,7 @@
 # -*-coding: utf8 -*
+"""
+Functions for basic raster processing
+"""
 import os
 import rasterio
 import rasterio.mask

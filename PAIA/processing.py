@@ -72,6 +72,9 @@ def get_urban_extent(
         villages_separation: SupportsInt,
         export: bool = False
 ) -> GeoDataFrame:
+    """
+    # TODO
+    """
     merging_result = merge_touching(geodataframe=urban_areas)
 
     result = []
@@ -99,6 +102,9 @@ def get_distances(pas: GeoDataFrame,
                   path_urban_areas: AnyStr,
                   export: bool = False
                   ) -> DataFrame:
+    """
+    # TODO
+    """
     urban_treshold = get_config_value('urban_area_treshold')
     ug = get_urban_extent(urban_areas=urban_areas,
                           path_urban_areas=path_urban_areas,
