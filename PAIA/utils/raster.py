@@ -65,7 +65,7 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, export: bool = False):
                         "width": output_image.shape[2],
                         "transform": output_transform})
     if export:
-        *_, __output_path = format_dataset_output(dataset, '_cropped')
+        *_, __output_path = format_dataset_output(dataset, 'cropped')
         with rasterio.open(__output_path, "w", **output_meta) as output_file:
             output_file.write(output_image)
             print('[PAIA]: Exported cropped file to {}.'.format(Path(__output_path).as_uri()))

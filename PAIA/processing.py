@@ -44,7 +44,7 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
         __band = __dataset.read()[band]
         __pixel_value = read_pixels(dataset=__dataset, band=__band)
         # Retrieves the directory the dataset is in and joins it the output filename
-        __dataset_name, _, __output_path = format_dataset_output(dataset, '_report')
+        __dataset_name, _, __output_path = format_dataset_output(dataset, 'report')
     elif type(dataset) is ndarray:
         __pixel_value = read_pixels_from_array(dataset=dataset)
         __output_path = r'H:\Logiciels\0_Projets\python\PAIA\reports\{}_report.txt'.format(datetime.now().strftime('%Y%m%d-H%M%S%f'))
@@ -86,7 +86,7 @@ def get_urban_extent(
     del result
 
     if export:
-        _, _, output_path = format_dataset_output(path_urban_areas, '_urban_extent')
+        _, _, output_path = format_dataset_output(path_urban_areas, 'urban_extent')
         merging_result.to_file(output_path)
         return merging_result
     else:
