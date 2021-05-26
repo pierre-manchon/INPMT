@@ -34,9 +34,12 @@ path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles
 
 
 def main(path_aoi):
-    gdf_pa, _ = intersect(path_pa_africa, path_aoi)
-    gdf_urban, path_urban = intersect(path_urbain, path_aoi)
-    return gdf_pa, gdf_urban, path_urban
+    if path_aoi:
+        gdf_pa, _ = intersect(path_pa_africa, path_aoi)
+        gdf_urban, path_urban = intersect(path_urbain, path_aoi)
+        return gdf_pa, gdf_urban, path_urban
+    else:
+        pass
 
 
 gdf_pa, gdf_urbain_gabon, path_urbain_gabon = main(path_limites_gabon)
