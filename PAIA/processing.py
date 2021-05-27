@@ -69,7 +69,7 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
 def get_urban_extent(
         urban_areas: GeoDataFrame,
         path_urban_areas: AnyStr,
-        villages_separation: SupportsInt,
+        urban_treshold: SupportsInt,
         export: bool = False
 ) -> GeoDataFrame:
     """
@@ -79,7 +79,7 @@ def get_urban_extent(
 
     result = []
     for poly in merging_result.geometry:
-        if poly.area <= villages_separation:
+        if poly.area <= urban_treshold:
             result.append("small")
         else:
             result.append("large")
@@ -108,7 +108,7 @@ def get_distances(pas: GeoDataFrame,
     urban_treshold = get_config_value('urban_area_treshold')
     ug = get_urban_extent(urban_areas=urban_areas,
                           path_urban_areas=path_urban_areas,
-                          villages_separation=urban_treshold)
+                          urban_treshold=urban_treshold)
 
     centros = []
     for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
