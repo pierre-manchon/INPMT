@@ -7,7 +7,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt, Counter, Any, Union
 from PAIA.decorators import timer
-from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output, get_config_value
+from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output, get_config_value, read_qml
 from PAIA.utils.vector import merge_touching, to_wkt
 from PAIA.utils.raster import read_pixels
 
@@ -34,15 +34,19 @@ def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False
     :rtype: None
     """
     __pixel_value = 0
+    __val = None
     __dataset = None
     __dataset_name = None
     __output_path = None
+
+    _, _, __qml_path = format_dataset_output(dataset=dataset_path, ext='.qml')
+    __style = read_qml(__qml_path)
 
     __dataset = rasterio.open(dataset_path)
     __band = __dataset.read()[band]
     __pixel_value = read_pixels(dataset=__dataset, band=__band)
     # Retrieves the directory the dataset is in and joins it the output filename
-    __dataset_name, _, __output_path = format_dataset_output(dataset_path, 'report', '.xlsx')
+    __dataset_name, _, __output_path = format_dataset_output(dataset=dataset_path, name='report', ext='.xlsx')
 
     __pixel_array = __gather(pixel_values=__pixel_value)
     __ctr = __get_value_count(pixel_array=__pixel_array)
@@ -55,9 +59,14 @@ def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False
 
     df = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
 
+    for i, row in df.iterrows():
+        for j in __style:
+            if row['Category'] == j['value']:
+                __val = j['label']
+        df.at[i, 'Label'] = __val
+
     if export:
         df.to_excel(__output_path, index=False)
-        print('[PAIA]: Report {} generated for layer {}'.format(__output_path, __dataset_name))
         return df
     else:
         return df
@@ -87,7 +96,7 @@ def get_urban_extent(
     del result
 
     if export:
-        _, _, output_path = format_dataset_output(path_urban_areas, 'urban_extent')
+        _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='urban_extent')
         merging_result.to_file(output_path)
         return merging_result
     else:
@@ -136,7 +145,7 @@ def get_distances(pas: GeoDataFrame,
     df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
     del result
     if export:
-        _, _, output_path = format_dataset_output(path_urban_areas, 'distances', '.xlsx')
+        _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='distances', ext='.xlsx')
         df.to_excel(output_path, index=False)
         return df
     else:

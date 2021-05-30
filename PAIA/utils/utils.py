@@ -102,7 +102,7 @@ def get_config_value(value):
 
 
 def read_qml(path_data: AnyStr) -> List:
-    _, _, path_qml = format_dataset_output(path_data)
+    _, _, path_qml = format_dataset_output(dataset=path_data, ext='.qml')
     xml_data = open(path_qml).read()
     root = ET.XML(xml_data)
     legend = []
