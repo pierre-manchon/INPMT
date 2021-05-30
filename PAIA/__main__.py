@@ -63,6 +63,9 @@ if __name__ == '__main__':
     parser.add_argument("-__ctr", "--license",
                         action="store_true", default=SUPPRESS,
                         help="Show the program's license and exit.")
+    parser.add_argument('-c', '--config',
+                        nargs='?', type=str,
+                        help='Shapefile of the area of interest you want to process')
     parser.add_argument('-i', '--indicator',
                         nargs='?', type=str,
                         help='Shapefile of the area of interest you want to process')
