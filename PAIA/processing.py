@@ -5,10 +5,10 @@ import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt, Counter, Any, Union
+from typing import AnyStr, SupportsInt
 from PAIA.decorators import timer
 from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output, get_config_value, read_qml
-from PAIA.utils.vector import merge_touching, to_wkt
+from PAIA.utils.vector import merge_touching, to_wkt, iter_poly
 from PAIA.utils.raster import read_pixels
 
 
@@ -39,6 +39,8 @@ def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False
     __dataset_name = None
     __output_path = None
 
+    # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to load it into
+    #  qgis export it into a qml file by hand.
     _, _, __qml_path = format_dataset_output(dataset=dataset_path, ext='.qml')
     __style = read_qml(__qml_path)
 
@@ -153,10 +155,11 @@ def get_distances(pas: GeoDataFrame,
 
 
 @timer
-def get_pas_profiles(gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds):
+def get_pas_profiles(gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds):
     # Crop the raster and the vector for every polygon of the pas layer
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
+    """
     dists = get_distances(pas=gdf_pa,
                           urban_areas=gdf_urbain_gabon,
                           path_urban_areas=path_urbain_gabon,
@@ -164,4 +167,7 @@ def get_pas_profiles(gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds):
     cats = get_categories(dataset_path=path_ds,
                           band=0,
                           export=True)
+    """
+    for p in iter_poly(shapefile=gdf_pa, path_shapefile=path_pa):
+        print(p)
     pass

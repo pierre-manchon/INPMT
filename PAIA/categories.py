@@ -18,37 +18,37 @@ from PAIA.utils.raster import raster_crop
 path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
-path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
-                      'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
 path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
               r'gab_ppp_2020_UNadj_constrained.tif'
-path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
-          r'WDPA_Mar2021_Public_AFRICA_Land.shp'
-path_boundaries = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/' \
-                  r'Limites administratives/africa_boundary.shp'
 path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                           r'Limites administratives/african_countries_boundaries.shp'
+path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
+
+
 path_limites_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                      r'Limites administratives/gabon.shp'
-path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
-path_occsol_decoupe = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Produit OS/' \
-                      r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/mask.tif'
+path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
+          r'WDPA_Mar2021_Public_AFRICA_Land.shp'
+# Same as the population raster but the polygonization/Geometry fixing process were passed to speed up the process
+# (you don't need to do it everytime)
 path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
-qml_path = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA_cropped.qml'
+
+path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
+                      'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
 
 
 def main(path_aoi):
     if path_aoi:
-        gdf_pa, _ = intersect(path_pa_africa, path_aoi)
+        gdf_pa, path_pa = intersect(path_pa_africa, path_aoi)
         gdf_urban, path_urban = intersect(path_urbain, path_aoi)
-        path_ds = raster_crop(dataset=path_occsol, shapefile=path_decoupage)
-        return gdf_pa, gdf_urban, path_urban, path_ds
+        path_occsol_cropped = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
+        return gdf_pa, path_pa, gdf_urban, path_urban, path_occsol_cropped
     else:
         pass
 
 
-gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds = main(path_limites_gabon)
-df = get_categories(dataset_path=path_ds, band=0, export=True)
+gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_occsol_cropped = main(path_limites_gabon)
+df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
 """
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
@@ -63,9 +63,10 @@ get_pas_profiles(gdf_pa=gdf_pa,
                  path_ds=path_ds)
 """
 get_pas_profiles(gdf_pa=gdf_pa,
+                 path_pa=path_pa,
                  gdf_urbain_gabon=gdf_urbain_gabon,
                  path_urbain_gabon=path_urbain_gabon,
-                 path_ds=path_ds)
+                 path_ds=path_occsol_cropped)
 """
 df, sf = read_shapefile_as_dataframe(path_country_boundaries)
 
