@@ -2,19 +2,18 @@
 import rasterio
 import rasterio.mask
 import pandas as pd
-from datetime import datetime
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt
+from typing import AnyStr, SupportsInt, Counter, Any, Union
 from PAIA.decorators import timer
 from PAIA.utils.utils import __get_value_count, __gather, format_dataset_output, get_config_value
 from PAIA.utils.vector import merge_touching, to_wkt
-from PAIA.utils.raster import read_pixels, read_pixels_from_array
+from PAIA.utils.raster import read_pixels
 
 
 @timer
-def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -> None:
+def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False) -> DataFrame:
     """
     As an input, i take the dataset path and the band number i want to categorize.
     Then i export the counted values (from the __get_value_count() function).
@@ -39,30 +38,29 @@ def get_categories(dataset: AnyStr, shapefile_area: AnyStr, band: SupportsInt) -
     __dataset_name = None
     __output_path = None
 
-    if type(dataset) is AnyStr:
-        __dataset = rasterio.open(dataset)
-        __band = __dataset.read()[band]
-        __pixel_value = read_pixels(dataset=__dataset, band=__band)
-        # Retrieves the directory the dataset is in and joins it the output filename
-        __dataset_name, _, __output_path = format_dataset_output(dataset, 'report')
-    elif type(dataset) is ndarray:
-        __pixel_value = read_pixels_from_array(dataset=dataset)
-        __output_path = r'H:\Logiciels\0_Projets\python\PAIA\reports\{}_report.txt'.format(datetime.now().strftime('%Y%m%d-H%M%S%f'))
-    else:
-        print('None')
-        pass
+    __dataset = rasterio.open(dataset_path)
+    __band = __dataset.read()[band]
+    __pixel_value = read_pixels(dataset=__dataset, band=__band)
+    # Retrieves the directory the dataset is in and joins it the output filename
+    __dataset_name, _, __output_path = format_dataset_output(dataset_path, 'report')
 
     __pixel_array = __gather(pixel_values=__pixel_value)
     __ctr = __get_value_count(pixel_array=__pixel_array)
+    data = []
+    for c in __ctr:
+        category_area = round(__ctr[c] * (__dataset.res[0] * __dataset.res[1]), 3)
+        raster_area = sum(__ctr.values())
+        percentage = ((__ctr[c] * 100) / raster_area)
+        data.append([c, __ctr[c], category_area, percentage])
 
-    with open(__output_path, "w") as o:
-        o.write('{};{};{};{}\n'.format('Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'))
-        for c in __ctr:
-            category_area = round(__ctr[c] * (__dataset.res[0] * __dataset.res[1]), 3)
-            percentage =((category_area*100) / shapefile_area)
-            o.writelines('{};{};{};{}\n'.format(c, __ctr[c], category_area, percentage))
+    df = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
 
-    print('[PAIA]: Report {} generated for layer {}'.format(__output_path, __dataset_name))
+    if export:
+        df.to_excel(__output_path, index=False)
+        print('[PAIA]: Report {} generated for layer {}'.format(__output_path, __dataset_name))
+        return df
+    else:
+        return df
 
 
 @timer
@@ -143,3 +141,18 @@ def get_distances(pas: GeoDataFrame,
         return df
     else:
         return df
+
+
+@timer
+def get_pas_profiles(gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds):
+    # Crop the raster and the vector for every polygon of the pas layer
+    # Might want use a mask otherwise
+    # Then process and associate result to each polygon
+    dists = get_distances(pas=gdf_pa,
+                          urban_areas=gdf_urbain_gabon,
+                          path_urban_areas=path_urbain_gabon,
+                          export=True)
+    cats = get_categories(dataset_path=path_ds,
+                          band=0,
+                          export=True)
+    pass

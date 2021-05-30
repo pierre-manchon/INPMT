@@ -9,7 +9,7 @@ from numpy import ndarray
 from pathlib import Path
 from typing import AnyStr, Generator, Optional
 from PAIA.utils.utils import format_dataset_output
-from .vector import __read_shapefile
+from PAIA.utils.vector import __read_shapefile
 
 
 def read_pixels(dataset: AnyStr, band: ndarray) -> Generator:
@@ -41,11 +41,10 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
         for r in p:
             for c in r:
                 if c != 255:
-                    print(c)
                     yield c
 
 
-def raster_crop(dataset: AnyStr, shapefile: AnyStr, export: bool = False):
+def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
     """
     Crop raster with geodataframe boundary
     :param export:
@@ -60,20 +59,18 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, export: bool = False):
     __sf = __read_shapefile(shapefile=shapefile)
 
     with rasterio.open(dataset) as src:
-        output_image, output_transform = rasterio.mask.mask(src, __sf, crop=True)
+        cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
         output_meta = src.meta
 
     output_meta.update({"driver": "GTiff",
-                        "height": output_image.shape[1],
-                        "width": output_image.shape[2],
+                        "height": cropped_dataset.shape[1],
+                        "width": cropped_dataset.shape[2],
                         "transform": output_transform})
-    if export:
-        *_, __output_path = format_dataset_output(dataset, 'cropped')
-        with rasterio.open(__output_path, "w", **output_meta) as output_file:
-            output_file.write(output_image)
-            print('[PAIA]: Exported cropped file to {}.'.format(Path(__output_path).as_uri()))
-    else:
-        return output_image
+    *_, __output_path = format_dataset_output(dataset, 'cropped')
+    with rasterio.open(__output_path, "w", **output_meta) as output_file:
+        output_file.write(cropped_dataset)
+        print('[PAIA]: Exported cropped file to {}.'.format(Path(__output_path).as_uri()))
+        return __output_path
 
 
 def export_raster(output_image, *args: Optional[Path]) -> None:

@@ -6,8 +6,9 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
-from PAIA.processing import get_distances
+from PAIA.processing import get_distances, get_categories, get_pas_profiles
 from PAIA.utils.vector import intersect
+from PAIA.utils.raster import raster_crop
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -17,6 +18,8 @@ from PAIA.utils.vector import intersect
 path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
+path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
+                      'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
 path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
               r'gab_ppp_2020_UNadj_constrained.tif'
 path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
@@ -37,18 +40,30 @@ def main(path_aoi):
     if path_aoi:
         gdf_pa, _ = intersect(path_pa_africa, path_aoi)
         gdf_urban, path_urban = intersect(path_urbain, path_aoi)
-        return gdf_pa, gdf_urban, path_urban
+        path_ds = raster_crop(dataset=path_occsol, shapefile=path_decoupage)
+        return gdf_pa, gdf_urban, path_urban, path_ds
     else:
         pass
 
 
-gdf_pa, gdf_urbain_gabon, path_urbain_gabon = main(path_limites_gabon)
-
+gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds = main(path_limites_gabon)
+"""
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
               path_urban_areas=path_urbain_gabon,
               export=True)
+              
+get_categories(dataset_path=path_ds, band=0, export=True)
 
+get_pas_profiles(gdf_pa=gdf_pa,
+                 gdf_urbain_gabon=gdf_urbain_gabon,
+                 path_urbain_gabon=path_urbain_gabon,
+                 path_ds=path_ds)
+"""
+get_pas_profiles(gdf_pa=gdf_pa,
+                 gdf_urbain_gabon=gdf_urbain_gabon,
+                 path_urbain_gabon=path_urbain_gabon,
+                 path_ds=path_ds)
 """
 df, sf = read_shapefile_as_dataframe(path_country_boundaries)
 
@@ -65,8 +80,6 @@ for x in zip(df.NAME, df.AREA, df.coords):
         pass
 
 https://automating-gis-processes.github.io/2017/lessons/L3/nearest-neighbour.html
-# get_categories(dataset=path_occsol_decoupe, band=0)
-# raster_crop(dataset=path_occsol, geodataframe=path_decoupage)
 
 https://stackoverflow.com/questions/39995839/gis-calculate-distance-between-point-and-polygon-border
 load every layers
