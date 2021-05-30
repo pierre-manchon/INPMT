@@ -42,7 +42,7 @@ def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False
     __band = __dataset.read()[band]
     __pixel_value = read_pixels(dataset=__dataset, band=__band)
     # Retrieves the directory the dataset is in and joins it the output filename
-    __dataset_name, _, __output_path = format_dataset_output(dataset_path, 'report')
+    __dataset_name, _, __output_path = format_dataset_output(dataset_path, 'report', '.xlsx')
 
     __pixel_array = __gather(pixel_values=__pixel_value)
     __ctr = __get_value_count(pixel_array=__pixel_array)

@@ -47,6 +47,7 @@ def main(path_aoi):
 
 
 gdf_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds = main(path_limites_gabon)
+df = get_categories(dataset_path=path_ds, band=0, export=True)
 """
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
