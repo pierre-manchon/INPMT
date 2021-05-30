@@ -3,6 +3,8 @@
 Function for basic processing and miscellanious cases
 """
 from os import path
+import xml.etree.ElementTree as ET
+from datetime import datetime
 from pathlib import Path
 from collections import Counter
 from configparser import ConfigParser
@@ -28,7 +30,7 @@ def var_dump(var, prefix=''):
                 print(prefix, '(', i.__class__.__name__, ') ', i, sep='')
 
 
-def format_dataset_output(dataset: AnyStr, name: AnyStr, ext: AnyStr = '') -> tuple[str, Union[AnyStr, str], str]:
+def format_dataset_output(dataset: AnyStr = '', name: AnyStr = '', ext: AnyStr = '') -> tuple[str, Union[AnyStr, str], str]:
     """
     :param dataset:
     :type dataset: AnyStr
@@ -42,12 +44,25 @@ def format_dataset_output(dataset: AnyStr, name: AnyStr, ext: AnyStr = '') -> tu
     __ext = Path(dataset).suffix
     __dataset_name = Path(dataset).name.replace(__ext, '')
 
+    if not Path(dataset).is_dir():
+        __dataset = dataset
+    else:
+        __dataset_name = path.join(dataset, ''.join(['output_', datetime.now().strftime("%Y%m%d%H%M%S")]))
+        if ext == '':
+            raise UserWarning("Custom dataset path must have attribute 'ext' set")
+        pass
+
+    if name != '':
+        __dataset_name = ''.join([__dataset_name, '_'])
+    else:
+        pass
+
     if ext != '':
         __ext = ext
     else:
         pass
 
-    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, '_', name, __ext]))
+    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
     return __dataset_name, __ext, __output_path
 
 
@@ -84,3 +99,19 @@ def get_config_value(value):
     cfgparser = ConfigParser()
     cfgparser.read('./PAIA/config.cfg')
     return cfgparser.get('config', value)
+
+
+def read_qml(path_data: AnyStr) -> List:
+    _, _, path_qml = format_dataset_output(path_data)
+    xml_data = open(path_qml).read()
+    root = ET.XML(xml_data)
+    legend = []
+    for i, child in enumerate(root):
+        if child.tag == 'pipe':
+            for x in child:
+                if x.tag == 'rasterrenderer':
+                    for y in x:
+                        if y.tag == 'colorPalette':
+                            for z in y:
+                                legend.append(z.attrib)
+    return legend
