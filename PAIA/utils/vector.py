@@ -58,7 +58,7 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
     gdf_ol = gpd.read_file(overlay)
     inter_df = gpd.overlay(gdf_base, gdf_ol, how='intersection')
     if export:
-        _, _, output_path = format_dataset_output(gdf_base, 'intersect')
+        _, _, output_path = format_dataset_output(dataset=gdf_base, name='intersect')
         inter_df.to_file(output_path, index=False)
         return inter_df, base
     else:
