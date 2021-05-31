@@ -81,7 +81,7 @@ def __gather(pixel_values: Generator) -> List:
     return __cat
 
 
-def __get_value_count(pixel_array: List) -> Counter:
+def __count_values(pixel_array: List) -> Counter:
     """
     Using a list as an input, i
 
