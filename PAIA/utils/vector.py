@@ -67,26 +67,10 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
         return inter_df, base
 
 
-def iter_poly(shapefile: GeoDataFrame, path_shapefile: AnyStr) -> Iterable:
+def iter_poly(shapefile: GeoDataFrame) -> Iterable:
     __gdf = shapefile
-    _, _, output_path = format_dataset_output(dataset=path_shapefile, name='tmp')
     for i, row in __gdf.iterrows():
         r = gpd.GeoDataFrame(gpd.GeoSeries(row['geometry']))
         r = r.rename(columns={0: 'geometry'}).set_geometry('geometry')
         r.crs = 3857
-        r.to_file(filename=output_path)
-        yield output_path
-
-    try:
-        _, _, remove_path = format_dataset_output(dataset=output_path, ext='.cpg')
-        os.remove(remove_path)
-        _, _, remove_path = format_dataset_output(dataset=output_path, ext='.dbf')
-        os.remove(remove_path)
-        _, _, remove_path = format_dataset_output(dataset=output_path, ext='.prj')
-        os.remove(remove_path)
-        _, _, remove_path = format_dataset_output(dataset=output_path, ext='.shp')
-        os.remove(remove_path)
-        _, _, remove_path = format_dataset_output(dataset=output_path, ext='.shx')
-        os.remove(remove_path)
-    except Exception:
-        pass
+        yield row, r

@@ -9,7 +9,7 @@ from typing import AnyStr, SupportsInt, Counter, Any
 from PAIA.decorators import timer
 from PAIA.utils.utils import __count_values, __gather, format_dataset_output, get_config_value, read_qml
 from PAIA.utils.vector import merge_touching, to_wkt, iter_poly
-from PAIA.utils.raster import read_pixels
+from PAIA.utils.raster import read_pixels, raster_crop
 
 
 def get_urban_extent(
@@ -48,11 +48,11 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     __dataset = None
     __output_path = None
 
-    __dataset = rasterio.open(dataset_path)
-    __band = __dataset.read()[band]
-    __pixel_value = read_pixels(dataset=__dataset, band=__band)
-    __pixel_array = __gather(pixel_values=__pixel_value)
-    __ctr = __count_values(pixel_array=__pixel_array)
+    with rasterio.open(dataset_path) as __dataset:
+        __band = __dataset.read()[band]
+        __pixel_value = read_pixels(dataset=__dataset, band=__band)
+        __pixel_array = __gather(pixel_values=__pixel_value)
+        __ctr = __count_values(pixel_array=__pixel_array)
     return __dataset, __ctr
 
 
@@ -92,7 +92,7 @@ def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False
     #  qgis export it into a qml file by hand.
     _, _, __qml_path = format_dataset_output(dataset=dataset_path, ext='.qml')
     __style = read_qml(__qml_path)
-
+    __val = None
     for i, row in df.iterrows():
         for j in __style:
             if row['Category'] == j['value']:
@@ -159,7 +159,7 @@ def get_distances(pas: GeoDataFrame,
 
 
 @timer
-def get_pas_profiles(gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_ds):
+def get_pas_profiles(gdf_pa, path_pa, path_raster):
     # Crop the raster and the vector for every polygon of the pas layer
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
@@ -172,6 +172,10 @@ def get_pas_profiles(gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_
                           band=0,
                           export=True)
     """
-    for p in iter_poly(shapefile=gdf_pa, path_shapefile=path_pa):
-        print(p)
-    pass
+    _, _, output_path = format_dataset_output(dataset=path_pa, name='tmp')
+
+    for row, p in iter_poly(shapefile=gdf_pa):
+        p.to_file(filename=output_path)
+        path_occsol_cropped = raster_crop(path_raster, output_path)
+        _, ctr = get_pixel_count(path_occsol_cropped, 0)
+        print(row['ORIG_NAME'], len(ctr))
