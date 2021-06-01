@@ -8,7 +8,7 @@ from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt, Counter, Any
 from PAIA.decorators import timer
 from PAIA.utils.utils import __count_values, __gather, format_dataset_output, get_config_value, read_qml
-from PAIA.utils.vector import merge_touching, to_wkt, iter_poly
+from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
 from PAIA.utils.raster import read_pixels, raster_crop
 
 
@@ -159,16 +159,22 @@ def get_distances(pas: GeoDataFrame,
 
 
 @timer
-def get_pas_profiles(shapefile: GeoDataFrame, path_shapefile: AnyStr, path_raster: AnyStr) -> tuple[
-    GeoDataFrame, AnyStr]:
+def get_pas_profiles(
+        goedataframe_aoi: GeoDataFrame,
+        aoi: AnyStr,
+        occsol: AnyStr,
+        population: AnyStr
+) -> tuple[GeoDataFrame, AnyStr]:
     # Crop the raster and the vector for every polygon of the pas layer
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
-    _, _, output_path = format_dataset_output(dataset=path_shapefile, name='tmp')
+    _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
-    for i, row, p in iter_poly(shapefile=shapefile):
+    for i, row, p in iter_poly(shapefile=goedataframe_aoi):
         p.to_file(filename=output_path)
-        path_occsol_cropped = raster_crop(path_raster, output_path)
+        path_occsol_cropped = raster_crop(occsol, output_path)
         _, ctr = get_pixel_count(path_occsol_cropped, 0)
-        shapefile.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
-    return shapefile, path_shapefile
+        goedataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
+        gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
+        goedataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
+    return goedataframe_aoi, aoi
