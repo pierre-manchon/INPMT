@@ -50,7 +50,7 @@ def main(path_aoi):
 
 gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_occsol_cropped = main(path_limites_gabon)
 # df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
-gdf, path = get_pas_profiles(goedataframe_aoi=gdf_pa,
+gdf, path = get_pas_profiles(geodataframe_aoi=gdf_pa,
                              aoi=path_pa,
                              occsol=path_occsol_degrade,
                              population=path_urbain)

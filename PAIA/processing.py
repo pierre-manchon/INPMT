@@ -160,7 +160,7 @@ def get_distances(pas: GeoDataFrame,
 
 @timer
 def get_pas_profiles(
-        goedataframe_aoi: GeoDataFrame,
+        geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
         occsol: AnyStr,
         population: AnyStr
@@ -170,11 +170,11 @@ def get_pas_profiles(
     # Then process and associate result to each polygon
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
-    for i, row, p in iter_poly(shapefile=goedataframe_aoi):
+    for i, row, p in iter_poly(shapefile=geodataframe_aoi):
         p.to_file(filename=output_path)
         path_occsol_cropped = raster_crop(occsol, output_path)
         _, ctr = get_pixel_count(path_occsol_cropped, 0)
-        goedataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
+        geodataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
         gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
-        goedataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
-    return goedataframe_aoi, aoi
+        geodataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
+    return geodataframe_aoi, aoi
