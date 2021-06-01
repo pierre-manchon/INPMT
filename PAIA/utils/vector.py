@@ -73,4 +73,4 @@ def iter_poly(shapefile: GeoDataFrame) -> Iterable:
         r = gpd.GeoDataFrame(gpd.GeoSeries(row['geometry']))
         r = r.rename(columns={0: 'geometry'}).set_geometry('geometry')
         r.crs = 3857
-        yield row, r
+        yield i, row, r

@@ -159,23 +159,16 @@ def get_distances(pas: GeoDataFrame,
 
 
 @timer
-def get_pas_profiles(gdf_pa, path_pa, path_raster):
+def get_pas_profiles(shapefile: GeoDataFrame, path_shapefile: AnyStr, path_raster: AnyStr) -> tuple[
+    GeoDataFrame, AnyStr]:
     # Crop the raster and the vector for every polygon of the pas layer
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
-    """
-    dists = get_distances(pas=gdf_pa,
-                          urban_areas=gdf_urbain_gabon,
-                          path_urban_areas=path_urbain_gabon,
-                          export=True)
-    cats = get_categories(dataset_path=path_ds,
-                          band=0,
-                          export=True)
-    """
-    _, _, output_path = format_dataset_output(dataset=path_pa, name='tmp')
+    _, _, output_path = format_dataset_output(dataset=path_shapefile, name='tmp')
 
-    for row, p in iter_poly(shapefile=gdf_pa):
+    for i, row, p in iter_poly(shapefile=shapefile):
         p.to_file(filename=output_path)
         path_occsol_cropped = raster_crop(path_raster, output_path)
         _, ctr = get_pixel_count(path_occsol_cropped, 0)
-        print(row['ORIG_NAME'], len(ctr))
+        shapefile.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
+    return shapefile, path_shapefile

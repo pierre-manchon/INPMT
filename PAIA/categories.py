@@ -49,26 +49,15 @@ def main(path_aoi):
 
 
 gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_occsol_cropped = main(path_limites_gabon)
-df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
+# df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
+gdf, path = get_pas_profiles(shapefile=gdf_pa,
+                             path_shapefile=path_pa,
+                             path_raster=path_occsol_degrade)
 """
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
               path_urban_areas=path_urbain_gabon,
               export=True)
-              
-get_categories(dataset_path=path_ds, band=0, export=True)
-
-get_pas_profiles(gdf_pa=gdf_pa,
-                 gdf_urbain_gabon=gdf_urbain_gabon,
-                 path_urbain_gabon=path_urbain_gabon,
-                 path_ds=path_ds)
-"""
-get_pas_profiles(gdf_pa=gdf_pa,
-                 path_pa=path_pa,
-                 gdf_urbain_gabon=gdf_urbain_gabon,
-                 path_urbain_gabon=path_urbain_gabon,
-                 path_ds=path_occsol_cropped)
-"""
 df, sf = read_shapefile_as_dataframe(path_country_boundaries)
 
 In case the following contraption doesn'u work, this allows to get coordinates
