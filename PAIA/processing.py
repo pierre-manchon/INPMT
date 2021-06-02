@@ -3,7 +3,7 @@ import rasterio
 import rasterio.mask
 import pandas as pd
 from numpy import ndarray
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt, Counter, Any
 from PAIA.decorators import timer
@@ -138,17 +138,19 @@ def get_distances(pas: GeoDataFrame,
     del df
 
     result = []
-    for u in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
+    for u in ug.values:
         min_dist = get_config_value('min_dist')
         name = None
-        for p in zip(pas.WDPA_PID, pas.ORIG_NAME, pas.GIS_AREA, pas.geometry):
+        for p in pas.values:
             dist = p[3].distance(u[3])
             if dist < min_dist:
                 min_dist = dist
                 name = p[1]
         result.append([u[0], u[1], u[2], u[3], name, min_dist])
     del dist, min_dist, name, p, u
-    df = pd.DataFrame(result, columns=['fid', 'DN', 'Size', 'geometry', 'pa_name', 'distance'])
+    cols = ug.keys().values.tolist()
+    cols.append('distance')
+    df = pd.DataFrame(result, columns=cols)
     del result
     if export:
         _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='distances', ext='.xlsx')
@@ -163,7 +165,8 @@ def get_pas_profiles(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
         occsol: AnyStr,
-        population: AnyStr
+        population: AnyStr,
+        export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     # Crop the raster and the vector for every polygon of the pas layer
     # Might want use a mask otherwise
@@ -177,4 +180,17 @@ def get_pas_profiles(
         geodataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
         gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
         geodataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
-    return geodataframe_aoi, aoi
+        for o, tpx, q in iter_poly(shapefile=gdf_pop_cropped):
+            dist = None
+            for p, yqc, s in iter_poly(shapefile=gdf_pop_cropped):
+                dist = q.distance(s)
+                dist.append(Series(dist))
+            gdf_pop_cropped.at[o, 'mean_distance'] = dist.mean()
+        geodataframe_aoi.at[i, 'mean_distance'] = gdf_pop_cropped['mean_distance'].mean()
+
+    if export:
+        _, _, output_path = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
+        geodataframe_aoi.to_excel(output_path, index=False)
+        return geodataframe_aoi, aoi
+    else:
+        return geodataframe_aoi, aoi
