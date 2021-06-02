@@ -69,9 +69,9 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
 
 
 def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
-    inp, res = overlay.sindex.query_bulk(base.geometry, predicate='intersects')
+    inp, res = base['buffer'].sindex.query_bulk(overlay.geometry, predicate='intersects')
     base['intersects'] = np.isin(np.arange(0, len(base)), inp)
-    gdf = base[base['intersects'] != False]
+    gdf = base[base['intersects'] == True]
     gdf.drop(['intersects'], axis=1, inplace=True)
     return gdf
 
