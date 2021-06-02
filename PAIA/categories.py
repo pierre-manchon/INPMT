@@ -6,8 +6,10 @@ Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
 """
+from typing import Any
+from geopandas import GeoDataFrame
 from PAIA.processing import get_distances, get_categories, get_pas_profiles
-from PAIA.utils.vector import intersect
+from PAIA.utils.vector import intersect, isin
 from PAIA.utils.raster import raster_crop
 
 # Really not important tho
@@ -35,25 +37,32 @@ path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles
 
 path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
                       'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-path_anos = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
+path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
 
 
-def main(path_aoi):
+def main(path_aoi) -> tuple[GeoDataFrame, Any, Any, Any, Any, Any, str]:
     if path_aoi:
-        gdf_pa, path_pa = intersect(path_pa_africa, path_aoi)
-        gdf_urban, path_urban = intersect(path_urbain, path_aoi)
+        # Intersect and crop every layers with the area of interest
+        gdf_pa, path_pa = intersect(base=path_pa_africa, overlay=path_aoi)
+        gdf_anos, path_anos = intersect(base=path_anopheles, overlay=path_aoi)
+        gdf_urban, path_urban = intersect(base=path_urbain, overlay=path_aoi)
         path_occsol_cropped = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
-        return gdf_pa, path_pa, gdf_urban, path_urban, path_occsol_cropped
+
+        # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
+        gdf_pa_intersected = isin(base=gdf_anos, overlay=gdf_pa)
+        return gdf_pa_intersected, path_pa, gdf_anos, path_anos, gdf_urban, path_urban, path_occsol_cropped
     else:
         pass
 
 
-gdf_pa, path_pa, gdf_urbain_gabon, path_urbain_gabon, path_occsol_cropped = main(path_limites_gabon)
+gdf_pa_gabon, path_pa_gabon, gdf_anos_gabon, path_anos_gabon, gdf_urbain_gabon, path_urbain_gabon,\
+ path_occsol_cropped_gabon = main(path_limites_gabon)
 # df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
-gdf, path = get_pas_profiles(geodataframe_aoi=gdf_pa,
-                             aoi=path_pa,
+gdf, path = get_pas_profiles(geodataframe_aoi=gdf_pa_gabon,
+                             aoi=path_pa_gabon,
                              occsol=path_occsol_degrade,
-                             population=path_urbain)
+                             population=path_urbain,
+                             export=False)
 """
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
