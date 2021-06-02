@@ -6,7 +6,7 @@ from numpy import ndarray
 from pandas import DataFrame, Series
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt, Counter, Any
-from PAIA.decorators import timer
+from PAIA.utils.decorators import timer
 from PAIA.utils.utils import __count_values, __gather, format_dataset_output, get_config_value, read_qml
 from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
 from PAIA.utils.raster import read_pixels, raster_crop
