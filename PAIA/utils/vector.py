@@ -5,6 +5,7 @@ Functions for basic vector processing
 import os
 import fiona
 import libpysal
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 import shapefile as shp
@@ -65,6 +66,14 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
         return inter_df, base
     else:
         return inter_df, base
+
+
+def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
+    inp, res = overlay.sindex.query_bulk(base.geometry, predicate='intersects')
+    base['intersects'] = np.isin(np.arange(0, len(base)), inp)
+    gdf = base[base['intersects'] != False]
+    gdf.drop(['intersects'], axis=1, inplace=True)
+    return gdf
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:
