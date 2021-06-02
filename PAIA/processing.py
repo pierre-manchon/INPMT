@@ -166,6 +166,7 @@ def get_pas_profiles(
         aoi: AnyStr,
         occsol: AnyStr,
         population: AnyStr,
+        anopheles: AnyStr,
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     # Crop the raster and the vector for every polygon of the pas layer
@@ -175,18 +176,20 @@ def get_pas_profiles(
 
     for i, row, p in iter_poly(shapefile=geodataframe_aoi):
         p.to_file(filename=output_path)
+        # Habitat diversity
         path_occsol_cropped = raster_crop(occsol, output_path)
         _, ctr = get_pixel_count(path_occsol_cropped, 0)
         geodataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
+        # Population and urban patches
         gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
         geodataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
         for o, tpx, q in iter_poly(shapefile=gdf_pop_cropped):
-            dist = None
-            for p, yqc, s in iter_poly(shapefile=gdf_pop_cropped):
-                dist = q.distance(s)
-                dist.append(Series(dist))
-            gdf_pop_cropped.at[o, 'mean_distance'] = dist.mean()
+            dist = q.distance(gdf_pop_cropped)
+            gdf_pop_cropped.at[o, 'mean_distance'] = dist[0].mean()
         geodataframe_aoi.at[i, 'mean_distance'] = gdf_pop_cropped['mean_distance'].mean()
+        # Anopheles diversity and catching sites
+        gdf_anopheles_cropped, path_anopheles_cropped = intersect(anopheles, output_path)
+        geodataframe_aoi.at[i, 'anopheles_diversity'] = gdf_anopheles_cropped.value_counts(['An gambiae'])[0]
 
     if export:
         _, _, output_path = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
