@@ -1,2 +1,2 @@
 # PAIA
- Protected Areas Impact on Anopheles for Malaria Risk
+ Protected Areas Impact on Anopheles for Malaria Transmission
