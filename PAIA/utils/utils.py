@@ -4,6 +4,7 @@ Function for basic processing and miscellanious cases
 """
 from os import path
 import xml.etree.ElementTree as ET
+from pandas import DataFrame
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
