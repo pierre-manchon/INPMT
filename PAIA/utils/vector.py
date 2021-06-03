@@ -69,12 +69,12 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
 
 
 def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
-    # https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-    inp, res = base['buffer'].sindex.query_bulk(overlay.geometry, predicate='intersects')
-    base['intersects'] = np.isin(np.arange(0, len(base)), inp)
-    gdf = base[base.loc['intersects'] == True]
-    gdf.drop(['intersects'], axis=1, inplace=True)
-    return gdf
+    inp, res = base.loc[:, 'buffer'].sindex.query_bulk(overlay.geometry, predicate='intersects')
+    base.loc[:, 'intersects'] = np.isin(np.arange(0, len(base)), inp)
+    out = base.loc[base.loc[:, 'intersects'] == False].index
+    base.drop(out, inplace=True)
+    base.drop(['intersects'], axis=1, inplace=True)
+    return base
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:
