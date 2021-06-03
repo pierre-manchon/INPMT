@@ -3,7 +3,7 @@ import rasterio
 import rasterio.mask
 import pandas as pd
 from numpy import ndarray
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt, Counter, Any
 from PAIA.utils.decorators import timer
@@ -160,7 +160,6 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-@timer
 def get_pas_profiles(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
@@ -173,23 +172,40 @@ def get_pas_profiles(
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
-
+    geodataframe_aoi['HABITAT_DIVERSITY'] = 0
+    geodataframe_aoi['SUMPOP'] = 0
+    geodataframe_aoi['CATCHING_SITES_NUMBER'] = 0
+    geodataframe_aoi['SPECIES_NUMBER'] = 0
     for i, row, p in iter_poly(shapefile=geodataframe_aoi):
+        # Retrieve the temporary file of the polygons.
         p.to_file(filename=output_path)
+
         # Habitat diversity
         path_occsol_cropped = raster_crop(occsol, output_path)
         _, ctr = get_pixel_count(path_occsol_cropped, 0)
-        geodataframe_aoi.at[i, 'HABITAT_DIVERSITY'] = len(ctr)
+        geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
+
         # Population and urban patches
         gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
-        geodataframe_aoi.at[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
+        geodataframe_aoi.loc[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
+        """
         for o, tpx, q in iter_poly(shapefile=gdf_pop_cropped):
             dist = q.distance(gdf_pop_cropped)
             gdf_pop_cropped.at[o, 'mean_distance'] = dist[0].mean()
         geodataframe_aoi.at[i, 'mean_distance'] = gdf_pop_cropped['mean_distance'].mean()
+        """
+
         # Anopheles diversity and catching sites
         gdf_anopheles_cropped, path_anopheles_cropped = intersect(anopheles, output_path)
-        geodataframe_aoi.at[i, 'anopheles_diversity'] = gdf_anopheles_cropped.value_counts(['An gambiae'])[0]
+        # https://github.com/pandas-dev/pandas/issues/17275#issuecomment-443453423
+        for col in gdf_anopheles_cropped.columns[:-1]:
+            gdf_anopheles_cropped[col] = col.strip().replace(' ', '').replace('.', '_')
+
+        gdf_anopheles_cropped['spnb'] = 0
+        for n in range(len(gdf_anopheles_cropped)):
+            gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
+        geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
+        geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
 
     if export:
         _, _, output_path = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
