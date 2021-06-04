@@ -1,7 +1,9 @@
 # -*-coding: utf8 -*
+import numpy as np
 import rasterio
 import rasterio.mask
 import pandas as pd
+from alive_progress import alive_bar
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -172,40 +174,55 @@ def get_pas_profiles(
     # Might want use a mask otherwise
     # Then process and associate result to each polygon
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
-    geodataframe_aoi['HABITAT_DIVERSITY'] = 0
-    geodataframe_aoi['SUMPOP'] = 0
-    geodataframe_aoi['CATCHING_SITES_NUMBER'] = 0
-    geodataframe_aoi['SPECIES_NUMBER'] = 0
-    for i, row, p in iter_poly(shapefile=geodataframe_aoi):
-        # Retrieve the temporary file of the polygons.
-        p.to_file(filename=output_path)
 
-        # Habitat diversity
-        path_occsol_cropped = raster_crop(occsol, output_path)
-        _, ctr = get_pixel_count(path_occsol_cropped, 0)
-        geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
+    geodataframe_aoi['SUM_POP'] = np.nan
+    geodataframe_aoi['MEAN_DIST'] = np.nan
+    geodataframe_aoi['CATCHING_SITES_NUMBER'] = np.nan
+    geodataframe_aoi['SPECIES_NUMBER'] = np.nan
+    geodataframe_aoi['HABITAT_DIVERSITY'] = np.nan
 
-        # Population and urban patches
-        gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
-        geodataframe_aoi.loc[i, 'SUMPOP'] = gdf_pop_cropped['DN'].sum()
-        """
-        for o, tpx, q in iter_poly(shapefile=gdf_pop_cropped):
-            dist = q.distance(gdf_pop_cropped)
-            gdf_pop_cropped.at[o, 'mean_distance'] = dist[0].mean()
-        geodataframe_aoi.at[i, 'mean_distance'] = gdf_pop_cropped['mean_distance'].mean()
-        """
+    with alive_bar(total=len(geodataframe_aoi)*5) as bar:
 
-        # Anopheles diversity and catching sites
-        gdf_anopheles_cropped, path_anopheles_cropped = intersect(anopheles, output_path)
-        # https://github.com/pandas-dev/pandas/issues/17275#issuecomment-443453423
-        for col in gdf_anopheles_cropped.columns[:-1]:
-            gdf_anopheles_cropped[col] = col.strip().replace(' ', '').replace('.', '_')
+        for i, p in iter_poly(shapefile=geodataframe_aoi):
+            pol_name = geodataframe_aoi.iloc[i]['ORIG_NAME']
+            # Retrieve the temporary file of the polygons.
+            p.to_file(filename=output_path)
 
-        gdf_anopheles_cropped['spnb'] = 0
-        for n in range(len(gdf_anopheles_cropped)):
-            gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
-        geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
-        geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+            # Habitat diversity
+            bar('Habitats')  # Progress bar
+
+            path_occsol_cropped = raster_crop(occsol, output_path)
+            _, ctr = get_pixel_count(path_occsol_cropped, 0)
+            geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
+
+            # Population and urban patches
+            bar('Population')  # Progress bar
+
+            gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
+            geodataframe_aoi.loc[i, 'SUM_POP'] = gdf_pop_cropped['DN'].sum()
+
+            # Distances and urban fragmentation
+            # No need to intersect it again
+            bar('Distances')  # Progress bar
+
+            gdf_pop_cropped['mean_dist'] = np.nan
+            for o in range(0, len(gdf_pop_cropped)):
+                gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
+            geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
+
+            # Anopheles diversity and catching sites
+            bar('Anopheles')  # Progress bar
+
+            gdf_anopheles_cropped, path_anopheles_cropped = intersect(anopheles, output_path)
+            gdf_anopheles_cropped['spnb'] = np.nan
+            for n in range(0, len(gdf_anopheles_cropped)):
+                gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
+            geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
+            geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+
+            # End
+            print('[{}]'.format(pol_name))  # Progress bar
+            bar()  # Progress bar
 
     if export:
         _, _, output_path = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
