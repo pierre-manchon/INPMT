@@ -21,6 +21,6 @@ def timer(function):
         start_time = default_timer()
         result = function(*args, **kwargs)
         elapsed = default_timer() - start_time
-        print('[PAIA]: "{name}" completed in {time}s.'.format(name=function.__name__, time=round(elapsed, 4)))
+        print('"{name}" completed in {time}s.'.format(name=function.__name__, time=round(elapsed, 4)))
         return result
     return wrapper

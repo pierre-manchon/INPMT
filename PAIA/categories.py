@@ -8,7 +8,7 @@ Devpi: PyPI server and packaging/testing/release tool
 """
 from typing import Any
 from geopandas import GeoDataFrame
-from PAIA.processing import get_distances, get_categories, get_pas_profiles
+from PAIA.processing import get_pas_profiles
 from PAIA.utils.utils import get_config_value
 from PAIA.utils.vector import intersect, isin
 from PAIA.utils.raster import raster_crop
@@ -26,16 +26,11 @@ path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anoph�
 path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                           r'Limites administratives/african_countries_boundaries.shp'
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
-
-
 path_limites_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                      r'Limites administratives/gabon.shp'
 path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
           r'WDPA_Mar2021_Public_AFRICA_Land.shp'
-# Same as the population raster but the polygonization/Geometry fixing process were passed to speed up the process
-# (you don't need to do it everytime)
 path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
-
 path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
                       'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
 path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
