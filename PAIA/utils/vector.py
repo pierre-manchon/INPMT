@@ -74,13 +74,13 @@ def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
     out = base.loc[base.loc[:, 'intersects'] == False].index
     base.drop(out, inplace=True)
     base.drop(['intersects'], axis=1, inplace=True)
-    return base
+    __gdf_reindexed = base.reset_index()
+    return __gdf_reindexed
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:
-    __gdf = shapefile
-    for i, row in __gdf.iterrows():
-        r = gpd.GeoDataFrame(gpd.GeoSeries(row['geometry']))
+    for i in range(0, len(shapefile)):
+        r = gpd.GeoDataFrame(gpd.GeoSeries(shapefile.iloc[i]['geometry']))
         r = r.rename(columns={0: 'geometry'}).set_geometry('geometry')
         r.crs = 3857
-        yield i, row, r
+        yield i, r
