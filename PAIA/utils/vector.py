@@ -17,7 +17,7 @@ from PAIA.utils.utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
-    with fiona.open(shapefile, "r") as shapefile:
+    with fiona.open(shapefile) as shapefile:
         shapes = [feature["geometry"] for feature in shapefile]
     return shapes
 
@@ -44,8 +44,8 @@ def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
 
 def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
-    W = libpysal.weights.Queen.from_dataframe(geodataframe)
-    components = W.component_labels
+    w = libpysal.weights.Queen.from_dataframe(geodataframe)
+    components = w.component_labels
     combined_polygons = geodataframe.dissolve(by=components, aggfunc='sum')
     return combined_polygons
 
@@ -60,7 +60,7 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
     gdf_ol = gpd.read_file(overlay)
     gdf_base.crs = 3857
     gdf_ol.crs = 3857
-    inter_df = gpd.overlay(gdf_base, gdf_ol, how='intersection')
+    inter_df = gpd.overlay(gdf_base, gdf_ol)
     inter_df.crs = 3857
 
     if export:

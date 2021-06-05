@@ -46,8 +46,8 @@ def main(path_aoi) -> tuple[Any, Any, Any, Any, Any, Any, str, GeoDataFrame]:
         path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
         gdf_pa_aoi['buffer'] = gdf_pa_aoi.buffer(buff_size)
         # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
-        gdf_pa_gabon_anos = isin(base=gdf_pa_aoi, overlay=gdf_anos_aoi)
-        return gdf_pa_aoi, path_pa_aoi, gdf_anos_aoi, path_anos_aoi, _, path_urban_aoi, path_occsol_aoi, gdf_pa_gabon_anos
+        gdf_pa_aoi_anos = isin(base=gdf_pa_aoi, overlay=gdf_anos_aoi)
+        return gdf_pa_aoi, path_pa_aoi, gdf_anos_aoi, path_anos_aoi, _, path_urban_aoi, path_occsol_aoi, gdf_pa_aoi_anos
     else:
         pass
 

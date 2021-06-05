@@ -61,8 +61,6 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
 def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
     """
     Crop raster with geodataframe boundary
-    :param export:
-    :type export:
     :param dataset:
     :type dataset:
     :param shapefile:

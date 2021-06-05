@@ -30,7 +30,10 @@ def var_dump(var, prefix=''):
                 print(prefix, '(', i.__class__.__name__, ') ', i, sep='')
 
 
-def format_dataset_output(dataset: AnyStr = '', name: AnyStr = '', ext: AnyStr = '') -> tuple[str, Union[AnyStr, str], str]:
+def format_dataset_output(dataset: AnyStr = '',
+                          name: AnyStr = '',
+                          ext: AnyStr = ''
+                          ) -> tuple[str, Union[AnyStr, str], str]:
     """
     :param dataset:
     :type dataset: AnyStr
