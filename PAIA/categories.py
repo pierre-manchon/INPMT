@@ -40,14 +40,14 @@ def main(path_aoi) -> tuple[Any, Any, Any, Any, Any, Any, str, GeoDataFrame]:
     if path_aoi:
         buff_size = int(get_config_value('buff_size'))
         # Intersect and crop every layers with the area of interest
-        gdf_pa_aoi, path_pa = intersect(base=path_pa_africa, overlay=path_aoi, export=True)
-        gdf_anos_aoi, path_anos = intersect(base=path_anopheles, overlay=path_aoi, export=True)
-        _, path_urban = intersect(base=path_urbain, overlay=path_aoi, export=True)
+        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa, overlay=path_aoi, export=True)
+        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles, overlay=path_aoi, export=True)
+        _, path_urban_aoi = intersect(base=path_urbain, overlay=path_aoi, export=True)
         path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
         gdf_pa_aoi['buffer'] = gdf_pa_aoi.buffer(buff_size)
         # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
         gdf_pa_gabon_anos = isin(base=gdf_pa_aoi, overlay=gdf_anos_aoi)
-        return gdf_pa_aoi, path_pa, gdf_anos_aoi, path_anos, _, path_urban, path_occsol_aoi, gdf_pa_gabon_anos
+        return gdf_pa_aoi, path_pa_aoi, gdf_anos_aoi, path_anos_aoi, _, path_urban_aoi, path_occsol_aoi, gdf_pa_gabon_anos
     else:
         pass
 
