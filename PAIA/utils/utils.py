@@ -3,8 +3,7 @@
 Function for basic processing and miscellanious cases
 """
 from os import path
-import xml.etree.ElementTree as ET
-from pandas import DataFrame
+import xml.dom.minidom
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
@@ -102,17 +101,9 @@ def get_config_value(value):
     return cfgparser.get('config', value)
 
 
-def read_qml(path_data: AnyStr) -> List:
-    _, _, path_qml = format_dataset_output(dataset=path_data, ext='.qml')
-    xml_data = open(path_qml).read()
-    root = ET.XML(xml_data)
+def read_qml(path_qml: AnyStr) -> List:
+    xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
-    for i, child in enumerate(root):
-        if child.tag == 'pipe':
-            for x in child:
-                if x.tag == 'rasterrenderer':
-                    for y in x:
-                        if y.tag == 'colorPalette':
-                            for z in y:
-                                legend.append(z.attrib)
+    for item in xml_data.getElementsByTagName('item'):
+        legend.append([item.getAttribute('value'), item.getAttribute('label')])
     return legend
