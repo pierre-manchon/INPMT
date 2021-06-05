@@ -60,12 +60,13 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
     gdf_base = gpd.read_file(base)
     gdf_ol = gpd.read_file(overlay)
     inter_df = gpd.overlay(gdf_base, gdf_ol, how='intersection')
+    inter_df.crs = 3857
     if export:
-        _, _, output_path = format_dataset_output(dataset=gdf_base, name='intersect')
+        _, _, output_path = format_dataset_output(dataset=base, name='intersect')
         inter_df.to_file(output_path, index=False)
-        return inter_df, base
+        return inter_df, output_path
     else:
-        return inter_df, base
+        return inter_df
 
 
 def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
@@ -74,8 +75,7 @@ def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
     out = base.loc[base.loc[:, 'intersects'] == False].index
     base.drop(out, inplace=True)
     base.drop(['intersects'], axis=1, inplace=True)
-    __gdf_reindexed = base.reset_index()
-    return __gdf_reindexed
+    return base.reset_index()
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:

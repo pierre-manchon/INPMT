@@ -162,6 +162,7 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
+@timer
 def get_pas_profiles(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
@@ -198,7 +199,7 @@ def get_pas_profiles(
             # Population and urban patches
             bar('Population')  # Progress bar
 
-            gdf_pop_cropped, path_pop_cropped = intersect(population, output_path)
+            gdf_pop_cropped = intersect(base=population, overlay=output_path)
             geodataframe_aoi.loc[i, 'SUM_POP'] = gdf_pop_cropped['DN'].sum()
 
             # Distances and urban fragmentation
@@ -207,21 +208,27 @@ def get_pas_profiles(
 
             gdf_pop_cropped['mean_dist'] = np.nan
             for o in range(0, len(gdf_pop_cropped)):
+                print(o, gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry']))
                 gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
             geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
+            # print(i, round(gdf_pop_cropped['mean_dist'].mean(), 4))
 
             # Anopheles diversity and catching sites
             bar('Anopheles')  # Progress bar
 
-            gdf_anopheles_cropped, path_anopheles_cropped = intersect(anopheles, output_path)
+            gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path)
             gdf_anopheles_cropped['spnb'] = np.nan
             for n in range(0, len(gdf_anopheles_cropped)):
+                print(n, gdf_anopheles_cropped.iloc[n].str.count('Y').sum())
                 gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
+
             geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
+            # print(i, int(len(gdf_anopheles_cropped)))
             geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+            # print(i, gdf_anopheles_cropped['spnb'].max())
 
             # End
-            print('[{}]'.format(pol_name))  # Progress bar
+            print('{}'.format(pol_name))  # Progress bar
             bar()  # Progress bar
 
     if export:
