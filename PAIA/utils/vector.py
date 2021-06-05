@@ -2,7 +2,6 @@
 """
 Functions for basic vector processing
 """
-import os
 import fiona
 import libpysal
 import numpy as np
@@ -59,8 +58,11 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
 def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFrame, AnyStr]:
     gdf_base = gpd.read_file(base)
     gdf_ol = gpd.read_file(overlay)
+    gdf_base.crs = 3857
+    gdf_ol.crs = 3857
     inter_df = gpd.overlay(gdf_base, gdf_ol, how='intersection')
     inter_df.crs = 3857
+
     if export:
         _, _, output_path = format_dataset_output(dataset=base, name='intersect')
         inter_df.to_file(output_path, index=False)

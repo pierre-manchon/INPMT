@@ -8,7 +8,7 @@ Devpi: PyPI server and packaging/testing/release tool
 """
 from typing import Any
 from geopandas import GeoDataFrame
-from PAIA.processing import get_pas_profiles
+from PAIA.processing import get_pas_profiles, get_pixel_diversity
 from PAIA.utils.utils import get_config_value
 from PAIA.utils.vector import intersect, isin
 from PAIA.utils.raster import raster_crop
@@ -42,24 +42,23 @@ def main(path_aoi) -> tuple[Any, Any, Any, Any, Any, Any, str, GeoDataFrame]:
         # Intersect and crop every layers with the area of interest
         gdf_pa_aoi, path_pa = intersect(base=path_pa_africa, overlay=path_aoi, export=True)
         gdf_anos_aoi, path_anos = intersect(base=path_anopheles, overlay=path_aoi, export=True)
-        gdf_urban_aoi, path_urban = intersect(base=path_urbain, overlay=path_aoi, export=True)
+        _, path_urban = intersect(base=path_urbain, overlay=path_aoi, export=True)
         path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
         gdf_pa_aoi['buffer'] = gdf_pa_aoi.buffer(buff_size)
         # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
         gdf_pa_gabon_anos = isin(base=gdf_pa_aoi, overlay=gdf_anos_aoi)
-        return gdf_pa_aoi, path_pa, gdf_anos_aoi, path_anos, gdf_urban_aoi, path_urban, path_occsol_aoi, gdf_pa_gabon_anos
+        return gdf_pa_aoi, path_pa, gdf_anos_aoi, path_anos, _, path_urban, path_occsol_aoi, gdf_pa_gabon_anos
     else:
         pass
 
 
-gdf_pa_gabon, path_pa, gdf_anos_gabon, path_anos, gdf_urban_gabon, path_urban, path_occsol_gabon, gdf_pa_gabon_anos = main(path_limites_gabon)
-# df = get_categories(dataset_path=path_occsol_cropped, band=0, export=True)
+_, path_pa, _, path_anos, _, path_urban, path_occsol_gabon, gdf_pa_gabon_anos = main(path_limites_gabon)
+df = get_pixel_diversity(dataset_path=path_occsol_gabon, band=0, export=True)
 gdf, path = get_pas_profiles(geodataframe_aoi=gdf_pa_gabon_anos,
                              aoi=path_pa,
                              occsol=path_occsol_gabon,
                              population=path_urban,
-                             anopheles=path_anos,
-                             export=False)
+                             anopheles=path_anos)
 """
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
@@ -74,7 +73,7 @@ for v in sf.__geo_interface__['features']:
 for x in zip(df.NAME, df.AREA, df.coords):
     if x[0] != '':
         cr = raster_crop(dataset=path_occsol, geodataframe=sf.shp.name)
-        get_categories(dataset=cr, shapefile_area=x[1], band=0)
+        get_pixel_diversity(dataset=cr, shapefile_area=x[1], band=0)
         # plot_shape(geodataframe=sf, dataframe=df, name=x)
     else:
         pass

@@ -7,8 +7,8 @@ import rasterio
 import rasterio.mask
 from numpy import ndarray
 from pathlib import Path
-from typing import AnyStr, Generator, Optional
-from PAIA.utils.utils import format_dataset_output
+from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt
+from PAIA.utils.utils import format_dataset_output, __gather, __count_values
 from PAIA.utils.vector import __read_shapefile
 
 
@@ -42,6 +42,20 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
             for c in r:
                 if c != 255:
                     yield c
+
+
+def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Counter]:
+    __pixel_value = 0
+    __val = None
+    __dataset = None
+    __output_path = None
+
+    with rasterio.open(dataset_path) as __dataset:
+        __band = __dataset.read()[band]
+        __pixel_value = read_pixels(dataset=__dataset, band=__band)
+        __pixel_array = __gather(pixel_values=__pixel_value)
+        __ctr = __count_values(pixel_array=__pixel_array)
+    return __dataset, __ctr
 
 
 def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:

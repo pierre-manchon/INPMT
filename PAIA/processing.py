@@ -1,20 +1,19 @@
 # -*-coding: utf8 -*
 import numpy as np
-import rasterio
-import rasterio.mask
 import pandas as pd
 from alive_progress import alive_bar
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr, SupportsInt, Counter, Any
+from typing import AnyStr, SupportsInt
 from PAIA.utils.decorators import timer
-from PAIA.utils.utils import __count_values, __gather, format_dataset_output, get_config_value, read_qml
 from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
-from PAIA.utils.raster import read_pixels, raster_crop
+from PAIA.utils.raster import raster_crop, get_pixel_count
+from PAIA.utils.utils import format_dataset_output, get_config_value, read_qml
 
 
-def get_urban_extent(
+@timer
+def set_urban_profile(
         urban_areas: GeoDataFrame,
         path_urban_areas: AnyStr,
         urban_treshold: SupportsInt,
@@ -44,73 +43,6 @@ def get_urban_extent(
         return merging_result
 
 
-def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Counter]:
-    __pixel_value = 0
-    __val = None
-    __dataset = None
-    __output_path = None
-
-    with rasterio.open(dataset_path) as __dataset:
-        __band = __dataset.read()[band]
-        __pixel_value = read_pixels(dataset=__dataset, band=__band)
-        __pixel_array = __gather(pixel_values=__pixel_value)
-        __ctr = __count_values(pixel_array=__pixel_array)
-    return __dataset, __ctr
-
-
-@timer
-def get_categories(dataset_path: AnyStr, band: SupportsInt, export: bool = False) -> DataFrame:
-    """
-    As an input, i take the dataset path and the band number i want to categorize.
-    Then i export the counted values (from the __count_values() function).
-    To do so, i retrieve the path where the dataset is stored then join it to nameofthedataset_report.txt.
-    That way, i can save the report at the same place where the dataset is stored.
-    After that, i create the file and populate it with the field names then the values with formatted strings:
-        - Number of the category
-        - Number of pixels found
-        - Surface (based on the pixels surface (h*w) and the number of pixels)
-
-    :param shapefile_area:
-    :type shapefile_area:
-    :param dataset:
-    :type dataset:
-    :param band: Specific band from a raster file
-    :type band: ndarray
-    :return: Export the counter to a text file row by row
-    :rtype: None
-    """
-    __dataset, __ctr = get_pixel_count(dataset_path=dataset_path, band=band)
-
-    data = []
-    for c in __ctr:
-        category_area = round(__ctr[c] * (__dataset.res[0] * __dataset.res[1]), 3)
-        raster_area = sum(__ctr.values())
-        percentage = ((__ctr[c] * 100) / raster_area)
-        data.append([c, __ctr[c], category_area, percentage])
-
-    df = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
-
-    # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to load it into
-    #  qgis export it into a qml file by hand.
-    _, _, __qml_path = format_dataset_output(dataset=dataset_path, ext='.qml')
-    __style = read_qml(__qml_path)
-    __val = None
-    for i, row in df.iterrows():
-        for j in __style:
-            if row['Category'] == j['value']:
-                __val = j['label']
-        df.at[i, 'Label'] = __val
-
-    # Retrieves the directory the dataset is in and joins it the output filename
-    _, _, __output_path = format_dataset_output(dataset=dataset_path, name='report', ext='.xlsx')
-
-    if export:
-        df.to_excel(__output_path, index=False)
-        return df
-    else:
-        return df
-
-
 @timer
 def get_distances(pas: GeoDataFrame,
                   urban_areas: GeoDataFrame,
@@ -121,9 +53,9 @@ def get_distances(pas: GeoDataFrame,
     # TODO
     """
     urban_treshold = get_config_value('urban_area_treshold')
-    ug = get_urban_extent(urban_areas=urban_areas,
-                          path_urban_areas=path_urban_areas,
-                          urban_treshold=urban_treshold)
+    ug = set_urban_profile(urban_areas=urban_areas,
+                           path_urban_areas=path_urban_areas,
+                           urban_treshold=urban_treshold)
 
     centros = []
     for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
@@ -163,6 +95,59 @@ def get_distances(pas: GeoDataFrame,
 
 
 @timer
+def get_pixel_diversity(dataset_path: AnyStr, band: SupportsInt, export: bool = False) -> DataFrame:
+    """
+    As an input, i take the dataset path and the band number i want to categorize.
+    Then i export the counted values (from the __count_values() function).
+    To do so, i retrieve the path where the dataset is stored then join it to nameofthedataset_report.txt.
+    That way, i can save the report at the same place where the dataset is stored.
+    After that, i create the file and populate it with the field names then the values with formatted strings:
+        - Number of the category
+        - Number of pixels found
+        - Surface (based on the pixels surface (h*w) and the number of pixels)
+
+    :param shapefile_area:
+    :type shapefile_area:
+    :param dataset:
+    :type dataset:
+    :param band: Specific band from a raster file
+    :type band: ndarray
+    :return: Export the counter to a text file row by row
+    :rtype: None
+    """
+    __dataset, __ctr = get_pixel_count(dataset_path=dataset_path, band=band)
+
+    data = []
+    for c in __ctr:
+        category_area = round(__ctr[c] * (__dataset.res[0] * __dataset.res[1]), 3)
+        raster_area = sum(__ctr.values())
+        percentage = ((__ctr[c] * 100) / raster_area)
+        data.append([c, __ctr[c], category_area, percentage])
+
+    df = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
+
+    # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to load it into
+    #  qgis export it into a qml file by hand.
+    _, _, __qml_path = format_dataset_output(dataset=dataset_path, ext='.qml')
+    __style = read_qml(__qml_path)
+    __val = None
+    for i, row in df.iterrows():
+        for j in __style:
+            if row['Category'] == j[0]:
+                __val = j[1]
+        df.loc[i, 'Label'] = __val
+
+    # Retrieves the directory the dataset is in and joins it the output filename
+    _, _, __output_path = format_dataset_output(dataset=dataset_path, name='report', ext='.xlsx')
+
+    if export:
+        df.to_excel(__output_path, index=False)
+        return df
+    else:
+        return df
+
+
+@timer
 def get_pas_profiles(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
@@ -185,7 +170,6 @@ def get_pas_profiles(
     with alive_bar(total=len(geodataframe_aoi)*5) as bar:
 
         for i, p in iter_poly(shapefile=geodataframe_aoi):
-            pol_name = geodataframe_aoi.iloc[i]['ORIG_NAME']
             # Retrieve the temporary file of the polygons.
             p.to_file(filename=output_path)
 
@@ -205,30 +189,24 @@ def get_pas_profiles(
             # Distances and urban fragmentation
             # No need to intersect it again
             bar('Distances')  # Progress bar
-
             gdf_pop_cropped['mean_dist'] = np.nan
             for o in range(0, len(gdf_pop_cropped)):
-                print(o, gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry']))
                 gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
             geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
-            # print(i, round(gdf_pop_cropped['mean_dist'].mean(), 4))
-
+            
             # Anopheles diversity and catching sites
             bar('Anopheles')  # Progress bar
 
             gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path)
             gdf_anopheles_cropped['spnb'] = np.nan
             for n in range(0, len(gdf_anopheles_cropped)):
-                print(n, gdf_anopheles_cropped.iloc[n].str.count('Y').sum())
                 gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
 
             geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
-            # print(i, int(len(gdf_anopheles_cropped)))
             geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
-            # print(i, gdf_anopheles_cropped['spnb'].max())
 
             # End
-            print('{}'.format(pol_name))  # Progress bar
+            print('{}'.format(geodataframe_aoi.iloc[i]['ORIG_NAME']))  # Progress bar
             bar()  # Progress bar
 
     if export:
