@@ -174,28 +174,28 @@ def get_pas_profiles(
             p.to_file(filename=output_path)
 
             # Habitat diversity
-            bar('Habitats')  # Progress bar
+            bar.text('Habitats')  # Progress bar
 
             path_occsol_cropped = raster_crop(occsol, output_path)
             _, ctr = get_pixel_count(path_occsol_cropped, 0)
             geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
 
             # Population and urban patches
-            bar('Population')  # Progress bar
+            bar.text('Population')  # Progress bar
 
             gdf_pop_cropped = intersect(base=population, overlay=output_path)
             geodataframe_aoi.loc[i, 'SUM_POP'] = gdf_pop_cropped['DN'].sum()
 
             # Distances and urban fragmentation
             # No need to intersect it again
-            bar('Distances')  # Progress bar
+            bar.text('Distances')  # Progress bar
             gdf_pop_cropped['mean_dist'] = np.nan
             for o in range(0, len(gdf_pop_cropped)):
                 gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
             geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
             
             # Anopheles diversity and catching sites
-            bar('Anopheles')  # Progress bar
+            bar.text('Anopheles')  # Progress bar
 
             gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path)
             gdf_anopheles_cropped['spnb'] = np.nan
