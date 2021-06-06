@@ -82,13 +82,25 @@ def app(aoi: AnyStr, export: bool = False) -> tuple[
     with alive_bar(total=11) as bar:
         bar.text('AOI:Intersection')  # Progress bar
         # Intersect and crop every layers with the area of interest
-        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa, overlay=aoi, crs=3857, export=True)
+        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa,
+                                            overlay=aoi,
+                                            crs=3857,
+                                            export=True)
         bar()  # Progress bar
-        gdf_pa_buffered_aoi, path_pa_buffered_aoi = intersect(base=path_pa_buffer_africa, overlay=aoi, crs=3857, export=True)
+        gdf_pa_buffered_aoi, path_pa_buffered_aoi = intersect(base=path_pa_buffer_africa,
+                                                              overlay=aoi,
+                                                              crs=3857,
+                                                              export=True)
         bar()  # Progress bar
-        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles, overlay=aoi, crs=3857, export=True)
+        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles,
+                                                overlay=aoi,
+                                                crs=3857,
+                                                export=True)
         bar()  # Progress bar
-        gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain, overlay=aoi, crs=3857, export=True)
+        gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain,
+                                                  overlay=aoi,
+                                                  crs=3857,
+                                                  export=True)
         bar()  # Progress bar
         path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
         bar()  # Progress bar

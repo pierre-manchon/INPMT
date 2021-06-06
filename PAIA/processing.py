@@ -9,7 +9,7 @@ from typing import AnyStr, SupportsInt
 from PAIA.utils.decorators import timer
 from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
 from PAIA.utils.raster import raster_crop, get_pixel_count
-from PAIA.utils.utils import format_dataset_output, get_config_value, read_qml
+from PAIA.utils.utils import format_dataset_output, getConfigValue, read_qml
 
 
 @timer
@@ -52,7 +52,7 @@ def get_distances(pas: GeoDataFrame,
     """
     # TODO
     """
-    urban_treshold = get_config_value('urban_area_treshold')
+    urban_treshold = getConfigValue('urban_area_treshold')
     ug = set_urban_profile(urban_areas=urban_areas,
                            path_urban_areas=path_urban_areas,
                            urban_treshold=urban_treshold)
@@ -73,7 +73,7 @@ def get_distances(pas: GeoDataFrame,
 
     result = []
     for u in ug.values:
-        min_dist = get_config_value('min_dist')
+        min_dist = getConfigValue('min_dist')
         name = None
         for p in pas.values:
             dist = p[3].distance(u[3])
