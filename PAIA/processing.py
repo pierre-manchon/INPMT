@@ -106,12 +106,12 @@ def get_pixel_diversity(dataset_path: AnyStr, band: SupportsInt, export: bool = 
         - Number of pixels found
         - Surface (based on the pixels surface (h*w) and the number of pixels)
 
-    :param shapefile_area:
-    :type shapefile_area:
-    :param dataset:
-    :type dataset:
+    :param dataset_path: The path to the dataset file
+    :type dataset_path: AnyStr
     :param band: Specific band from a raster file
     :type band: ndarray
+    :param export: Whether the file is saved locally ot kept in cache memory
+    :type export: bool
     :return: Export the counter to a text file row by row
     :rtype: None
     """
@@ -174,6 +174,7 @@ def get_pas_profiles(
             p.to_file(filename=output_path)
 
             # Habitat diversity
+            bar()  # Progress bar
             bar.text('Habitats')  # Progress bar
 
             path_occsol_cropped = raster_crop(occsol, output_path)
@@ -181,32 +182,32 @@ def get_pas_profiles(
             geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
 
             # Population and urban patches
+            bar()  # Progress bar
             bar.text('Population')  # Progress bar
-
-            gdf_pop_cropped = intersect(base=population, overlay=output_path)
+            gdf_pop_cropped = intersect(base=population, overlay=output_path, crs=3857)
             geodataframe_aoi.loc[i, 'SUM_POP'] = gdf_pop_cropped['DN'].sum()
 
             # Distances and urban fragmentation
             # No need to intersect it again
+            bar()  # Progress bar
             bar.text('Distances')  # Progress bar
             gdf_pop_cropped['mean_dist'] = np.nan
             for o in range(0, len(gdf_pop_cropped)):
                 gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
             geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
-            
+
             # Anopheles diversity and catching sites
+            bar()  # Progress bar
             bar.text('Anopheles')  # Progress bar
 
-            gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path)
+            gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path, crs=3857)
             gdf_anopheles_cropped['spnb'] = np.nan
             for n in range(0, len(gdf_anopheles_cropped)):
                 gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
-
             geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
             geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
 
             # End
-            print('{}'.format(geodataframe_aoi.iloc[i]['ORIG_NAME']))  # Progress bar
             bar()  # Progress bar
 
     if export:
