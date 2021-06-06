@@ -5,61 +5,7 @@ PAIA tests
 Tox: tests CI
 Jenkins: Open source automation server
 Devpi: PyPI server and packaging/testing/release tool
-"""
-from typing import Any
-from geopandas import GeoDataFrame
-from PAIA.processing import get_pas_profiles, get_pixel_diversity
-from PAIA.utils.utils import get_config_value
-from PAIA.utils.vector import intersect, isin
-from PAIA.utils.raster import raster_crop
 
-# Really not important tho
-# Use the qgis project to get the list of files and the list of legend files
-# TODO Use a list of files to unpack rather than multiple line vars
-# Appears to be impossible due to qgz project file being a binary type file
-
-path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
-              r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
-              r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
-path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
-              r'gab_ppp_2020_UNadj_constrained.tif'
-path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
-                          r'Limites administratives/african_countries_boundaries.shp'
-path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
-path_limites_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
-                     r'Limites administratives/gabon.shp'
-path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
-          r'WDPA_Mar2021_Public_AFRICA_Land.shp'
-path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
-path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
-                      'ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
-
-
-def main(path_aoi) -> tuple[Any, Any, Any, Any, Any, Any, str, GeoDataFrame]:
-    if path_aoi:
-        buff_size = int(get_config_value('buff_size'))
-        # Intersect and crop every layers with the area of interest
-        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa, overlay=path_aoi, export=True)
-        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles, overlay=path_aoi, export=True)
-        _, path_urban_aoi = intersect(base=path_urbain, overlay=path_aoi, export=True)
-        path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=path_aoi)
-        gdf_pa_aoi['buffer'] = gdf_pa_aoi.buffer(buff_size)
-        # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
-        gdf_pa_aoi_anos = isin(base=gdf_pa_aoi, overlay=gdf_anos_aoi)
-        return gdf_pa_aoi, path_pa_aoi, gdf_anos_aoi, path_anos_aoi, _, path_urban_aoi, path_occsol_aoi, gdf_pa_aoi_anos
-    else:
-        pass
-
-
-_, path_pa, _, path_anos, _, path_urban, path_occsol_gabon, gdf_pa_gabon_anos = main(path_limites_gabon)
-df = get_pixel_diversity(dataset_path=path_occsol_gabon, band=0, export=True)
-gdf, path = get_pas_profiles(geodataframe_aoi=gdf_pa_gabon_anos,
-                             aoi=path_pa,
-                             occsol=path_occsol_gabon,
-                             population=path_urban,
-                             anopheles=path_anos)
-"""
 get_distances(pas=gdf_pa,
               urban_areas=gdf_urbain_gabon,
               path_urban_areas=path_urbain_gabon,
@@ -97,3 +43,78 @@ Dans le premier cas, mesurer dans un premier temps la distance entre le bord de 
 Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec la bordure du parc.
 => Puis, dans un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
 """
+from pandas import DataFrame
+from geopandas import GeoDataFrame
+from typing import Any, AnyStr, Union
+from alive_progress import alive_bar
+from PAIA.processing import get_pas_profiles, get_pixel_diversity
+from PAIA.utils.vector import intersect, is_of_interest
+from PAIA.utils.raster import raster_crop
+
+# Really not important tho
+# Use the qgis project to get the list of files and the list of legend files
+# TODO Use a list of files to unpack rather than multiple line vars
+# Appears to be impossible due to qgz project file being a binary type file
+
+
+def app(aoi: AnyStr) -> tuple[
+    DataFrame, GeoDataFrame, Union[Union[str, bytes], Any], GeoDataFrame, Union[Union[str, bytes], Any]]:
+    path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
+                     r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land.shp'
+    path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
+                  r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
+                  r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
+    path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
+                      r'gab_ppp_2020_UNadj_constrained.tif'
+    path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+                              r'Limites administratives/african_countries_boundaries.shp'
+    path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
+
+    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
+                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
+    path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
+    path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
+                          r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
+
+    with alive_bar(total=9) as bar:
+        bar.text('Intersection')  # Progress bar
+
+        # Intersect and crop every layers with the area of interest
+        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa, overlay=aoi, crs=3857, export=True)
+        bar()  # Progress bar
+        gdf_pa_buffered_aoi, path_pa_buffered_aoi = intersect(base=path_pa_buffer_africa, overlay=aoi, crs=3857, export=True)
+        bar()  # Progress bar
+        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles, overlay=aoi, crs=3857, export=True)
+        bar()  # Progress bar
+        _, path_urban_aoi = intersect(base=path_urbain, overlay=aoi, crs=3857, export=True)
+        bar()  # Progress bar
+        path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
+        bar()  # Progress bar
+        # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
+        gdf_pa_aoi_anos = is_of_interest(base=gdf_pa_aoi, interest=gdf_anos_aoi)
+        # gdf_pa_buffered_aoi = is_of_interest(base=gdf_pa_buffered_aoi, interest=gdf_pa_aoi_anos)
+        bar()  # Progress bar
+        bar.text('Pixel diversity')  # Progress bar
+        df = get_pixel_diversity(dataset_path=path_occsol_aoi, band=0, export=True)
+        bar()  # Progress bar
+        bar.text('Pas profiles')  # Progress bar
+        gdf_profiles_pas, path_profiles_pas = get_pas_profiles(geodataframe_aoi=gdf_pa_aoi_anos,
+                                                               aoi=path_pa_aoi,
+                                                               occsol=path_occsol_aoi,
+                                                               population=path_urban_aoi,
+                                                               anopheles=path_anos_aoi)
+        bar()  # Progress bar
+        gdf_profiles_buffer, path_profiles_buffer = get_pas_profiles(geodataframe_aoi=gdf_pa_buffered_aoi,
+                                                                     aoi=path_pa_buffered_aoi,
+                                                                     occsol=path_occsol_aoi,
+                                                                     population=path_urban_aoi,
+                                                                     anopheles=path_anos_aoi)
+        bar()  # Progress bar
+
+    return df, gdf_profiles_pas, path_profiles_pas, gdf_profiles_buffer, path_profiles_buffer
+
+
+if __name__ == '__main__':
+    df, gdf_pas, _, gdf_buffers, _ = app(aoi=r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles/'
+                                             r'Administratif/Limites administratives/gabon.shp')
