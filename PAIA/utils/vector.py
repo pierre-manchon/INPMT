@@ -4,7 +4,6 @@ Functions for basic vector processing
 """
 import fiona
 import libpysal
-import numpy as np
 import pandas as pd
 import geopandas as gpd
 import shapefile as shp
@@ -13,7 +12,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
 from collections import Iterable
-from PAIA.utils.utils import format_dataset_output, get_config_value
+from PAIA.utils.utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -71,7 +70,7 @@ def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> 
         return inter_df
 
 
-def is_of_interest(base: AnyStr, interest: AnyStr) -> GeoDataFrame:
+def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
     base['intersects'] = False
     for w, x in iter_poly(shapefile=base):
         for y, z in iter_poly(shapefile=interest):
