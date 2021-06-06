@@ -98,10 +98,19 @@ def __count_values(pixel_array: List) -> Counter:
     return __nb
 
 
-def get_config_value(value):
+def getConfigValue(value):
     cfgparser = ConfigParser()
     cfgparser.read('./PAIA/config.cfg')
     return cfgparser.get('config', value)
+
+
+def setConfigValue(var, value):
+    config_path = './PAIA/config.cfg'
+    config = ConfigParser(comment_prefixes='///', allow_no_value=True)
+    config.read_file(open(config_path))
+    config['config'][var] = value
+    with open(config_path, 'w') as configfile:
+        config.write(configfile)
 
 
 def read_qml(path_qml: AnyStr) -> List:

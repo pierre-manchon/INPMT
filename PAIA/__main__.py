@@ -26,6 +26,7 @@ from sys import argv, stderr, exit
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
 from argparse import ArgumentParser, SUPPRESS, ArgumentTypeError
+from PAIA.utils.utils import getConfigValue, setConfigValue
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         if path.isdir(normalized_dirpath):
             return normalized_dirpath
         else:
-            raise ArgumentTypeError('[PAIA]: "{}" is not a valid path {}'.format(dirpath, '\n'))
+            raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, '\n'))
 
     parser = ArgumentParser(prog='$ python {}'.format(cfgparser.get('setup', 'name')),
                             description='',
@@ -91,4 +92,4 @@ if __name__ == '__main__':
     else:
         indicator = 'all'
 
-    print("[PAIA]: Area of interest: {}, Indicator: {}".format(aoi, indicator))
+    print("Area of interest: {}, Indicator: {}".format(aoi, indicator))
