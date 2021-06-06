@@ -13,7 +13,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
 from collections import Iterable
-from PAIA.utils.utils import format_dataset_output
+from PAIA.utils.utils import format_dataset_output, get_config_value
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -55,13 +55,13 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
     return df
 
 
-def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFrame, AnyStr]:
+def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> [GeoDataFrame, AnyStr]:
     gdf_base = gpd.read_file(base)
     gdf_ol = gpd.read_file(overlay)
-    gdf_base.crs = 3857
-    gdf_ol.crs = 3857
+    gdf_base.crs = crs
+    gdf_ol.crs = crs
     inter_df = gpd.overlay(gdf_base, gdf_ol)
-    inter_df.crs = 3857
+    inter_df.crs = crs
 
     if export:
         _, _, output_path = format_dataset_output(dataset=base, name='intersect')
@@ -71,13 +71,17 @@ def intersect(base: AnyStr, overlay: AnyStr, export: bool = False) -> [GeoDataFr
         return inter_df
 
 
-def isin(base: GeoDataFrame, overlay: GeoDataFrame) -> GeoDataFrame:
-    inp, res = base.loc[:, 'buffer'].sindex.query_bulk(overlay.geometry, predicate='intersects')
-    base.loc[:, 'intersects'] = np.isin(np.arange(0, len(base)), inp)
-    out = base.loc[base.loc[:, 'intersects'] == False].index
-    base.drop(out, inplace=True)
+def is_of_interest(base: AnyStr, interest: AnyStr) -> GeoDataFrame:
+    base['intersects'] = False
+    for w, x in iter_poly(shapefile=base):
+        for y, z in iter_poly(shapefile=interest):
+            if x.intersects(z)[0]:
+                base.loc[w, 'intersects'] = True
+    to_drop = base.loc[base.loc[:, 'intersects'] != True].index
+    base.drop(to_drop, inplace=True)
     base.drop(['intersects'], axis=1, inplace=True)
-    return base.reset_index()
+    base = base.reset_index()
+    return base
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:
