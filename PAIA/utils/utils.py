@@ -55,7 +55,7 @@ def format_dataset_output(dataset: AnyStr = '',
             raise UserWarning("Custom dataset path must have attribute 'ext' set")
         pass
 
-    if name != '':
+    if name != '' and name not in Path(dataset).name:
         __dataset_name = ''.join([__dataset_name, '_'])
     else:
         pass
@@ -65,7 +65,10 @@ def format_dataset_output(dataset: AnyStr = '',
     else:
         pass
 
-    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
+    if name in Path(dataset).name:
+        __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
+    else:
+        __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
     return __dataset_name, __ext, __output_path
 
 
