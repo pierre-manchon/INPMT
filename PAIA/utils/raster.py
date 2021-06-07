@@ -78,7 +78,7 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
                         "height": cropped_dataset.shape[1],
                         "width": cropped_dataset.shape[2],
                         "transform": output_transform})
-    *_, __output_path = format_dataset_output(dataset=dataset, name='cropped')
+    *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp')
     with rasterio.open(__output_path, "w", **output_meta) as output_file:
         output_file.write(cropped_dataset)
 
