@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from alive_progress import alive_bar
+from statistics import mean
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -191,10 +192,16 @@ def get_pas_profiles(
             # No need to intersect it again
             bar()  # Progress bar
             bar.text('Distances')  # Progress bar
-            gdf_pop_cropped['mean_dist'] = np.nan
-            for o in range(0, len(gdf_pop_cropped)):
-                gdf_pop_cropped.loc[o, 'mean_dist'] = gdf_pop_cropped.loc[o]['geometry'].distance(geodataframe_aoi.iloc[i]['geometry'])
-            geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['mean_dist'].mean(), 4)
+            """
+            df_dist_global = []
+            for o, q in iter_poly(shapefile=gdf_pop_cropped):
+                df_dist = []
+                for l, s in iter_poly(shapefile=gdf_pop_cropped):
+                    df_dist.append(q.distance(s)[0])
+                df_dist_global.append(mean(df_dist_global))
+            # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(df_dist_global['dist'].mean(), 4)
+            # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['dist'].mean(), 4)
+            """
 
             # Anopheles diversity and catching sites
             bar()  # Progress bar
@@ -202,8 +209,13 @@ def get_pas_profiles(
 
             gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path, crs=3857)
             gdf_anopheles_cropped['spnb'] = np.nan
+            gdf_anopheles_cropped['PA_dist'] = np.nan
+            gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
             for n in range(0, len(gdf_anopheles_cropped)):
                 gdf_anopheles_cropped.loc[n, 'spnb'] = gdf_anopheles_cropped.iloc[n].str.count('Y').sum()
+                gdf_anopheles_cropped.loc[n, 'PA_dist'] = 'PA_dist'
+                gdf_anopheles_cropped.loc[n, 'PA_buffer_dist'] = 'PA_buffer_dist'
+
             geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
             geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
 
