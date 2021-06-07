@@ -37,7 +37,8 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
 
 
 def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
-    gdf = gpd.read_file(shapefile)
+    gdf = gpd.read_file(shapefile, encoding='latin1')
+    gdf.crs = 3857
     return gdf
 
 
@@ -55,17 +56,21 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
 
 
 def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> [GeoDataFrame, AnyStr]:
-    gdf_base = gpd.read_file(base)
-    gdf_ol = gpd.read_file(overlay)
+    gdf_base = gpd.read_file(base, encoding='latin1')
+    gdf_ol = gpd.read_file(overlay, encoding='latin1')
     gdf_base.crs = crs
     gdf_ol.crs = crs
     inter_df = gpd.overlay(gdf_base, gdf_ol)
     inter_df.crs = crs
 
     if export:
-        _, _, output_path = format_dataset_output(dataset=base, name='intersect')
-        inter_df.to_file(output_path, index=False)
-        return inter_df, output_path
+        _, _, output_path = format_dataset_output(dataset=base, name='intersect_tmp')
+        try:
+            inter_df.to_file(output_path, index=False)
+            return inter_df, output_path
+        except ValueError:
+            print(UserWarning('Empty dataframe from {} was not saved.'.format(base)))
+            pass
     else:
         return inter_df
 
