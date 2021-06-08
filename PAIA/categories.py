@@ -53,13 +53,12 @@ path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact P
                           r'Limites administratives/african_countries_boundaries.shp'
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
 """
-from pandas import DataFrame
+import geopandas as gpd
+from typing import AnyStr
 from geopandas import GeoDataFrame
-from typing import Any, AnyStr, Union
-from alive_progress import alive_bar
-from PAIA.processing import get_pas_profiles, get_pixel_diversity
+from PAIA.processing import get_pas_profiles
 from PAIA.utils.utils import format_dataset_output
-from PAIA.utils.vector import intersect, is_of_interest
+from PAIA.utils.vector import intersect
 from PAIA.utils.raster import raster_crop
 
 # Really not important tho
@@ -68,93 +67,65 @@ from PAIA.utils.raster import raster_crop
 # Appears to be impossible due to qgz project file being a binary type file
 
 
-def app(aoi: AnyStr, export: bool = False) -> tuple[
-    DataFrame, GeoDataFrame, Union[Union[str, bytes], Any], GeoDataFrame, Union[Union[str, bytes], Any]]:
-    path_pa_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
-                     r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land.shp'
-    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
-                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
+def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
     path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
                           r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
     path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
 
-    with alive_bar(total=11) as bar:
-        bar.text('AOI:Intersection')  # Progress bar
-        # Intersect and crop every layers with the area of interest
-        gdf_pa_aoi, path_pa_aoi = intersect(base=path_pa_africa,
+    # Read file as a geodataframe
+    gdf_aoi = gpd.read_file(aoi)
+    """
+    # Intersect and crop every layers with the area of interest
+    gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles,
                                             overlay=aoi,
                                             crs=3857,
                                             export=True)
-        bar()  # Progress bar
-        gdf_pa_buffered_aoi, path_pa_buffered_aoi = intersect(base=path_pa_buffer_africa,
-                                                              overlay=aoi,
-                                                              crs=3857,
-                                                              export=True)
-        bar()  # Progress bar
-        gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles,
-                                                overlay=aoi,
-                                                crs=3857,
-                                                export=True)
-        bar()  # Progress bar
-        gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain,
-                                                  overlay=aoi,
-                                                  crs=3857,
-                                                  export=True)
-        bar()  # Progress bar
-        path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
-        bar()  # Progress bar
 
-        # Intersect vector layers with the data of interest (mosquitoes, etc) to only keep the polygons we can analyze.
-        #  keep all the PAs where we find anopheles
-        bar.text('PAs:Anopheles')  # Progress bar
-        gdf_pa_aoi_anos = is_of_interest(base=gdf_pa_aoi, interest=gdf_anos_aoi)
-        bar()  # Progress bar
-        """
-        #  keep all the PAs where there is population
-        bar.text('PAs:Population')  # Progress bar
-        gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi_anos, interest=gdf_urban_aoi)
-        bar()  # Progress bar
+    gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain,
+                                              overlay=aoi,
+                                              crs=3857,
+                                              export=True)
 
-        #  keep all the buffers of the PAs where there is anopheles and population. I process a buffer of 1m so the
-        # polygons intersects otherwise they would just be next ot each other.
-        bar.text('Buffers:PAs')  # Progress bar
-        gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi_anos.buffer(1)
-        gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_buffered_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
-        """
-        bar()  # Progress bar
-        bar.text('AOI:Pixel diversity')  # Progress bar
-        df = get_pixel_diversity(dataset_path=path_occsol_aoi, band=0, export=True)
-        bar()  # Progress bar
+    path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
 
-        bar.text('PAs:Profiling')  # Progress bar
-        gdf_profiles_pas, path_profiles_pas = get_pas_profiles(geodataframe_aoi=gdf_pa_aoi_anos,
-                                                               aoi=path_pa_aoi,
-                                                               occsol=path_occsol_aoi,
-                                                               population=path_urban_aoi,
-                                                               anopheles=path_anos_aoi)
-        bar()  # Progress bar
-        bar.text('Buffers:Profiling')  # Progress bar
-        gdf_profiles_buffer, path_profiles_buffer = get_pas_profiles(geodataframe_aoi=gdf_pa_buffered_aoi,
-                                                                     aoi=path_pa_buffered_aoi,
-                                                                     occsol=path_occsol_aoi,
-                                                                     population=path_urban_aoi,
-                                                                     anopheles=path_anos_aoi)
-        bar()  # Progress bar
+    # Keep all the PAs where there is population
+    gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
+
+    # Keep all the buffers of the PAs where there is anopheles and population. I process a buffer of 1m so the
+    # polygons intersects otherwise they would just be next ot each other.
+    gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
+    gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
+    """
+    gdf_profiles_aoi, path_profiles_aoi = get_pas_profiles(geodataframe_aoi=gdf_aoi,
+                                                           aoi=aoi,
+                                                           occsol=path_occsol_degrade,
+                                                           population=path_urbain,
+                                                           anopheles=path_anopheles)
 
     if export:
-        _, _, output_pas_profile = format_dataset_output(dataset=path_pa_aoi, name='profiling')
-        _, _, output_pas_buffer_profile = format_dataset_output(dataset=path_pa_buffered_aoi, name='profiling')
-        gdf_profiles_pas.to_file(output_pas_profile)
-        gdf_profiles_buffer.to_file(output_pas_buffer_profile)
-        return df, gdf_profiles_pas, path_profiles_pas, gdf_profiles_buffer, path_profiles_buffer
+        # Retrieves the directory the dataset is in and joins it the output filename
+        """
+        __dataset_name, _, _ = format_dataset_output(dataset=aoi)
+        _, _, __output_path_habitat_diversity = format_dataset_output(dataset=path_occsol_degrade,
+                                                                      name='report_{}'.format(__dataset_name),
+                                                                      ext='.xlsx')
+        """
+        _, _, output_countries = format_dataset_output(dataset=aoi, name='profiling')
+        # df.to_excel(__output_path_habitat_diversity, index=False)
+        gdf_profiles_aoi.to_file(output_countries)
+        return gdf_profiles_aoi
     else:
-        return df, gdf_profiles_pas, path_profiles_pas, gdf_profiles_buffer, path_profiles_buffer
+        return gdf_profiles_aoi
 
 
 if __name__ == '__main__':
-    path_aoi_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles/Administratif/' \
-                     r'Limites administratives/gabon.shp'
+    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+                           r'Limites administratives/africa_countries_irish.shp'
+    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
+               r'Aires protegees/WDPA_Africa_anopheles.shp'
+    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
+                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
 
-    df, gdf_pas, _, gdf_buffers, _ = app(aoi=path_aoi_gabon,
-                                         export=True)
+    gdf_profiles_PAs = app(aoi=path_countries_irish)
+    # gdf_profiles_aoi_buffers = app(aoi=path_pa_buffer_africa)
