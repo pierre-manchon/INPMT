@@ -2,7 +2,6 @@
 import numpy as np
 import pandas as pd
 from alive_progress import alive_bar
-from statistics import mean
 from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -13,7 +12,6 @@ from PAIA.utils.raster import raster_crop, get_pixel_count
 from PAIA.utils.utils import format_dataset_output, getConfigValue, read_qml
 
 
-@timer
 def set_urban_profile(
         urban_areas: GeoDataFrame,
         path_urban_areas: AnyStr,
@@ -44,7 +42,6 @@ def set_urban_profile(
         return merging_result
 
 
-@timer
 def get_distances(pas: GeoDataFrame,
                   urban_areas: GeoDataFrame,
                   path_urban_areas: AnyStr,
@@ -95,7 +92,21 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-@timer
+def get_anopheles_data(geodataframe_aoi: GeoDataFrame, i: SupportsInt, anopheles: AnyStr, overlay: AnyStr):
+    gdf_anopheles_cropped = intersect(base=anopheles, overlay=overlay, crs=3857)
+    gdf_anopheles_cropped['spnb'] = np.nan
+    gdf_anopheles_cropped['PA_dist'] = np.nan
+    gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
+    for x in range(0, len(gdf_anopheles_cropped)):
+        gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
+        gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
+        gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
+
+    geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
+    geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+    return geodataframe_aoi
+
+
 def get_pixel_diversity(dataset_path: AnyStr, band: SupportsInt) -> DataFrame:
     """
     As an input, i take the dataset path and the band number i want to categorize.
@@ -162,36 +173,35 @@ def get_pas_profiles(
     geodataframe_aoi['SPECIES_NUMBER'] = np.nan
     geodataframe_aoi['HABITAT_DIVERSITY'] = np.nan  # Added at the end because the types of habitats come after it.
 
-    with alive_bar(total=len(geodataframe_aoi)*5) as bar:
-
+    with alive_bar(total=len(geodataframe_aoi)*5, title='Countries: ') as bar:
         for i, p in iter_poly(shapefile=geodataframe_aoi):
             # Retrieve the temporary file of the polygons.
             p.to_file(filename=output_path)
 
             # Habitat diversity
-            bar()  # Progress bar
             bar.text('Habitats')  # Progress bar
-
             path_occsol_cropped = raster_crop(occsol, output_path)
             _, ctr = get_pixel_count(path_occsol_cropped, 0)
             geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
+            bar()  # Progress bar
 
+            bar.text('Land use')
             df_habitat_diversity = get_pixel_diversity(dataset_path=path_occsol_cropped, band=0)
-            geodataframe_aoi.iloc[i] = df_habitat_diversity.pivot_table(columns='Label',
-                                                                        values='Proportion (%)',
-                                                                        aggfunc='sum').reset_index(drop=True)
+            df_habitat_diversity_pivoted = df_habitat_diversity.pivot_table(columns='Label',
+                                                                            values='Proportion (%)',
+                                                                            aggfunc='sum').reset_index(drop=True)
+            geodataframe_aoi.append(df_habitat_diversity_pivoted)
+            bar()  # Progress bar
 
             # Population and urban patches
-            bar()  # Progress bar
             bar.text('Population')  # Progress bar
-            """
             gdf_pop_cropped = intersect(base=population, overlay=output_path, crs=3857)
             geodataframe_aoi.loc[i, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
             geodataframe_aoi.loc[i, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
-
+            bar()  # Progress bar
+            """
             # Distances and urban fragmentation
             # No need to intersect it again
-            bar()  # Progress bar
             bar.text('Distances')  # Progress bar
             df_dist_global = []
             for o, q in iter_poly(shapefile=gdf_pop_cropped):
@@ -201,26 +211,14 @@ def get_pas_profiles(
                 df_dist_global.append(mean(df_dist_global))
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(df_dist_global['dist'].mean(), 4)
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['dist'].mean(), 4)
-            """
-
-            # Anopheles diversity and catching sites
             bar()  # Progress bar
+            """
+            # Anopheles diversity and catching sites
             bar.text('Anopheles')  # Progress bar
-
-            gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path, crs=3857)
-            gdf_anopheles_cropped['spnb'] = np.nan
-            gdf_anopheles_cropped['PA_dist'] = np.nan
-            gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
-            for x in range(0, len(gdf_anopheles_cropped)):
-                gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
-                gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
-                gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
-
-            geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
-            geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+            geodataframe_aoi = get_anopheles_data(geodataframe_aoi, i, anopheles, output_path)
+            bar()  # Progress bar
 
             # End
-            bar()  # Progress bar
 
     if export:
         _, _, output_path = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
