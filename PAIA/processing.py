@@ -171,33 +171,33 @@ def get_pas_profiles(
     geodataframe_aoi['SPECIES_NUMBER'] = np.nan
     geodataframe_aoi['HABITAT_DIVERSITY'] = np.nan  # Added at the end because the types of habitats come after it.
 
-    with alive_bar(total=len(geodataframe_aoi)*5) as bar:
+    with alive_bar(total=len(geodataframe_aoi)*5) as bar_process:
         # len(geodataframe_aoi*5 = Number of countries times the number of operations i need to do per countries
         for i, p in iter_poly(shapefile=geodataframe_aoi):
             # Retrieve the temporary file of the polygons.
             p.to_file(filename=output_path)
 
             # Habitat diversity
-            bar.text('Habitats')  # Progress bar
+            bar_process.text('Habitats')  # Progress bar
             path_occsol_cropped = raster_crop(dataset=occsol, shapefile=output_path)
             _, ctr = get_pixel_count(dataset_path=path_occsol_cropped, band=0)
             geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
-            bar()  # Progress bar
+            bar_process()  # Progress bar
 
-            bar.text('Land use')
+            bar_process.text('Land use')
             df_habitat_diversity = get_pixel_diversity(dataset_path=path_occsol_cropped, band=0)
             df_habitat_diversity_pivoted = df_habitat_diversity.pivot_table(columns='Label',
                                                                             values='Proportion (%)',
                                                                             aggfunc='sum').reset_index(drop=True)
-            geodataframe_aoi.append(df_habitat_diversity_pivoted)
-            bar()  # Progress bar
+            geodataframe_aoi.iloc[i] = geodataframe_aoi.append(df_habitat_diversity_pivoted)
+            bar_process()  # Progress bar
 
             # Population and urban patches
-            bar.text('Population')  # Progress bar
+            bar_process.text('Population')  # Progress bar
             gdf_pop_cropped = intersect(base=population, overlay=output_path, crs=3857)
             geodataframe_aoi.loc[i, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
             geodataframe_aoi.loc[i, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
-            bar()  # Progress bar
+            bar_process()  # Progress bar
             """
             # Distances and urban fragmentation
             # No need to intersect it again
@@ -213,9 +213,9 @@ def get_pas_profiles(
             bar()  # Progress bar
             """
             # Anopheles diversity and catching sites
-            bar.text('Anopheles')  # Progress bar
+            bar_process.text('Anopheles')  # Progress bar
             geodataframe_aoi = get_anopheles_data(geodataframe_aoi, i, anopheles, output_path)
-            bar()  # Progress bar
+            bar_process()  # Progress bar
 
             # End
 

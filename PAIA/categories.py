@@ -44,12 +44,12 @@ Dans le second cas, utiliser le centroïde pour ensuite mesurer la distance avec
 => Puis, dans un second temps, mesurer au sein de cellules/patchs la fragmentation des tâches urbaines.
 
 
-path_occsol = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol\Produit OS/' \
+path_occsol = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Produit OS/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7/' \
               r'ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7_AFRICA.tif'
-path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Population\population_dataset/' \
+path_population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Population/population_dataset/' \
                   r'gab_ppp_2020_UNadj_constrained.tif'
-path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+path_country_boundaries = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/' \
                           r'Limites administratives/african_countries_boundaries.shp'
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
 
@@ -88,6 +88,16 @@ from PAIA.utils.utils import format_dataset_output
 
 
 def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
+    """
+    Docstring
+
+    :param aoi:
+    :type aoi:
+    :param export:
+    :type export:
+    :return:
+    :rtype:
+    """
     path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
     path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
                           r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
