@@ -6,7 +6,6 @@ from numpy import ndarray
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
-from PAIA.utils.decorators import timer
 from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
 from PAIA.utils.raster import raster_crop, get_pixel_count
 from PAIA.utils.utils import format_dataset_output, getConfigValue, read_qml
@@ -152,7 +151,6 @@ def get_pixel_diversity(dataset_path: AnyStr, band: SupportsInt) -> DataFrame:
     return df
 
 
-@timer
 def get_pas_profiles(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
@@ -173,15 +171,16 @@ def get_pas_profiles(
     geodataframe_aoi['SPECIES_NUMBER'] = np.nan
     geodataframe_aoi['HABITAT_DIVERSITY'] = np.nan  # Added at the end because the types of habitats come after it.
 
-    with alive_bar(total=len(geodataframe_aoi)*5, title='Countries: ') as bar:
+    with alive_bar(total=len(geodataframe_aoi)*5) as bar:
+        # len(geodataframe_aoi*5 = Number of countries times the number of operations i need to do per countries
         for i, p in iter_poly(shapefile=geodataframe_aoi):
             # Retrieve the temporary file of the polygons.
             p.to_file(filename=output_path)
 
             # Habitat diversity
             bar.text('Habitats')  # Progress bar
-            path_occsol_cropped = raster_crop(occsol, output_path)
-            _, ctr = get_pixel_count(path_occsol_cropped, 0)
+            path_occsol_cropped = raster_crop(dataset=occsol, shapefile=output_path)
+            _, ctr = get_pixel_count(dataset_path=path_occsol_cropped, band=0)
             geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
             bar()  # Progress bar
 

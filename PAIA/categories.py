@@ -52,14 +52,34 @@ path_population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anoph�
 path_country_boundaries = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                           r'Limites administratives/african_countries_boundaries.shp'
 path_decoupage = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Administratif/decoupe_3857.shp'
+
+
+# Intersect and crop every layers with the area of interest
+gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles,
+                                        overlay=aoi,
+                                        crs=3857,
+                                        export=True)
+
+gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain,
+                                          overlay=aoi,
+                                          crs=3857,
+                                          export=True)
+
+path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
+
+# Keep all the PAs where there is population
+gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
+
+# Keep all the buffers of the PAs where there is anopheles and population. I process a buffer of 1m so the
+# polygons intersects otherwise they would just be next ot each other.
+gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
+gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
 import geopandas as gpd
 from typing import AnyStr
 from geopandas import GeoDataFrame
 from PAIA.processing import get_pas_profiles
 from PAIA.utils.utils import format_dataset_output
-from PAIA.utils.vector import intersect
-from PAIA.utils.raster import raster_crop
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -75,28 +95,6 @@ def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
 
     # Read file as a geodataframe
     gdf_aoi = gpd.read_file(aoi)
-    """
-    # Intersect and crop every layers with the area of interest
-    gdf_anos_aoi, path_anos_aoi = intersect(base=path_anopheles,
-                                            overlay=aoi,
-                                            crs=3857,
-                                            export=True)
-
-    gdf_urban_aoi, path_urban_aoi = intersect(base=path_urbain,
-                                              overlay=aoi,
-                                              crs=3857,
-                                              export=True)
-
-    path_occsol_aoi = raster_crop(dataset=path_occsol_degrade, shapefile=aoi)
-
-    # Keep all the PAs where there is population
-    gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
-
-    # Keep all the buffers of the PAs where there is anopheles and population. I process a buffer of 1m so the
-    # polygons intersects otherwise they would just be next ot each other.
-    gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
-    gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
-    """
     gdf_profiles_aoi, path_profiles_aoi = get_pas_profiles(geodataframe_aoi=gdf_aoi,
                                                            aoi=aoi,
                                                            occsol=path_occsol_degrade,
@@ -105,12 +103,6 @@ def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
 
     if export:
         # Retrieves the directory the dataset is in and joins it the output filename
-        """
-        __dataset_name, _, _ = format_dataset_output(dataset=aoi)
-        _, _, __output_path_habitat_diversity = format_dataset_output(dataset=path_occsol_degrade,
-                                                                      name='report_{}'.format(__dataset_name),
-                                                                      ext='.xlsx')
-        """
         _, _, output_countries = format_dataset_output(dataset=aoi, name='profiling')
         # df.to_excel(__output_path_habitat_diversity, index=False)
         gdf_profiles_aoi.to_file(output_countries)
