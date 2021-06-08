@@ -70,19 +70,23 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
     """
     __sf = __read_shapefile(shapefile=shapefile)
 
-    with rasterio.open(dataset) as src:
-        cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
-        output_meta = src.meta
+    try:
+        with rasterio.open(dataset) as src:
+            cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
+            output_meta = src.meta
+            output_meta.update({"driver": "GTiff",
+                                "height": cropped_dataset.shape[1],
+                                "width": cropped_dataset.shape[2],
+                                "transform": output_transform})
+            *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp')
 
-    output_meta.update({"driver": "GTiff",
-                        "height": cropped_dataset.shape[1],
-                        "width": cropped_dataset.shape[2],
-                        "transform": output_transform})
-    *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp')
-    with rasterio.open(__output_path, "w", **output_meta) as output_file:
-        output_file.write(cropped_dataset)
+            with rasterio.open(__output_path, "w", **output_meta) as output_file:
+                output_file.write(cropped_dataset)
+            return __output_path
 
-    return __output_path
+    except ValueError:
+        print(UserWarning('Raster {} does not overlap.'.format(dataset)))
+        pass
 
 
 def export_raster(output_image, *args: Optional[Path]) -> None:
