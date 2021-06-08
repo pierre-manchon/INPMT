@@ -16,6 +16,14 @@ from PAIA.utils.utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
+    """
+    This was made specifically for the raster_crop function because the mask function uses fiona.
+
+    :param shapefile: Vector file path
+    :type shapefile: AnyStr
+    :return: List of dicts of geometries and their types
+    :rtype: list
+    """
     with fiona.open(shapefile) as shapefile:
         shapes = [feature["geometry"] for feature in shapefile]
     return shapes
@@ -23,9 +31,12 @@ def __read_shapefile(shapefile: AnyStr) -> list:
 
 def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     """
-    Read a geodataframe into a Pandas dataframe with a 'coords'
-    column holding the geometry information. This uses the pyshp
-    package
+    Read a geodataframe into a Pandas dataframe with a 'coords' column holding the geometry information.
+
+    :param shapefile: Vector file path
+    :type shapefile: AnyStr
+    :return: DataFrame with a coords column
+    :rtype: [DataFrame, Reader]
     """
     sf = shp.Reader(shapefile)
     fields = [x[0] for x in sf.fields][1:]
@@ -37,13 +48,31 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
 
 
 def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
+    """
+
+
+    :param shapefile:
+    :type shapefile:
+    :return:
+    :rtype:
+    """
     gdf = gpd.read_file(shapefile, encoding='latin1')
     gdf.crs = 3857
     return gdf
 
 
 def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
+    """
+    Takes a GeoDataFrame as input and dissolve every touching polygons by doing the sum of their values.
+
+    Heavily inspired from this stackoverflow post:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
+
+    :param geodataframe: A generic GeoDataFrame
+    :type geodataframe: GeoDataFrame
+    :return: A new GeoDataFrame of polygons merged when touching
+    :rtype: GeoDataFrame
+    """
     w = libpysal.weights.Queen.from_dataframe(geodataframe)
     components = w.component_labels
     combined_polygons = geodataframe.dissolve(by=components, aggfunc='sum')
@@ -51,11 +80,35 @@ def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
 
 
 def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
+    """
+    Transform a column of text geometry into a column of wkt (Well Known Text)
+
+    :param df: Input DataFrame with the faulty geometry column
+    :type df: DataFrame
+    :param column: Column where the geometry is
+    :type column: AnyStr
+    :return: New DataFrame
+    :rtype: DataFrame
+    """
     df[column] = gpd.GeoSeries.from_wkt(df[column])
     return df
 
 
 def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> [GeoDataFrame, AnyStr]:
+    """
+    Takes two GeoDataFrames as input files and returns their polygons that intersects as another GeoDataFrame.
+
+    :param base:
+    :type base: AnyStr
+    :param overlay:
+    :type overlay: AnyStr
+    :param crs:
+    :type crs: int
+    :param export:
+    :type export: bool
+    :return:
+    :rtype: [GeoDataFrame, AnyStr]
+    """
     gdf_base = gpd.read_file(base, encoding='latin1')
     gdf_ol = gpd.read_file(overlay, encoding='latin1')
     gdf_base.crs = crs
@@ -76,6 +129,18 @@ def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> 
 
 
 def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
+    """
+    Takes two GeoDataFrames as input files and returns the first one minus every polygons that doesn't intersect with
+    the polygons of the second GeoDataFrame.
+    This function doesn't actually intersect but keep the polygons that does.
+
+    :param base: Geodataframe
+    :type base: GeoDataFrame
+    :param interest: GeoDataFrame
+    :type interest: GeoDataFrame
+    :return: GeoDataFrame
+    :rtype: GeoDataFrame
+    """
     base['intersects'] = False
     for w, x in iter_poly(shapefile=base):
         for y, z in iter_poly(shapefile=interest):
@@ -89,6 +154,14 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
 
 
 def iter_poly(shapefile: GeoDataFrame) -> Iterable:
+    """
+    Takes a GeoDataFrame as input file then iterates over it and yields each shape and its index as a GeoDataFrame.
+
+    :param shapefile: Vector file path
+    :type shapefile: GeoDataFrame
+    :return: Generator yielding the index (i) and a Geodataframe
+    :rtype: Iterable
+    """
     for i in range(0, len(shapefile)):
         r = gpd.GeoDataFrame(gpd.GeoSeries(shapefile.iloc[i]['geometry']))
         r = r.rename(columns={0: 'geometry'}).set_geometry('geometry')

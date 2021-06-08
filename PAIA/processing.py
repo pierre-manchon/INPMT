@@ -162,6 +162,20 @@ def get_pas_profiles(
     Might want use a mask otherwise
     Then process and associate result to each polygon
 
+    :param geodataframe_aoi: GeoDatFrame of the Areas of Interest to process.
+    :type geodataframe_aoi: GeoDataFrame
+    :param aoi: Path to the vector file of the Areas of Interest to process.
+    :type aoi: AnyStr
+    :param occsol: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
+    :type occsol: AnyStr
+    :param population: Vector file path for the population of Africa (WorldPop, 2020), Unconstrained, UN adjusted, 100m
+    :type population: AnyStr
+    :param anopheles: Vector file path of the Anopheles species present in countries in sub-Saharan Africa (Kyalo, 2019)
+    :type anopheles: AnyStr
+    :param export: Same file as input but with additional columns corresponding to the results of the calculations
+    :type export: bool
+    :return: Same file as input but with additional columns corresponding to the results of the calculations
+    :rtype: tuple[GeoDataFrame, AnyStr]
     """
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
