@@ -121,8 +121,6 @@ def get_pixel_diversity(dataset_path: AnyStr, band: SupportsInt) -> DataFrame:
     :type dataset_path: AnyStr
     :param band: Specific band from a raster file
     :type band: ndarray
-    :param export: Whether the file is saved locally ot kept in cache memory
-    :type export: bool
     :return: Export the counter to a text file row by row
     :rtype: None
     """
@@ -159,9 +157,12 @@ def get_pas_profiles(
         anopheles: AnyStr,
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
-    # Crop the raster and the vector for every polygon of the pas layer
-    # Might want use a mask otherwise
-    # Then process and associate result to each polygon
+    """
+    Crop the raster and the vector for every polygon of the pas layer
+    Might want use a mask otherwise
+    Then process and associate result to each polygon
+
+    """
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
     geodataframe_aoi['SUM_POP'] = np.nan
@@ -189,7 +190,8 @@ def get_pas_profiles(
             df_habitat_diversity_pivoted = df_habitat_diversity.pivot_table(columns='Label',
                                                                             values='Proportion (%)',
                                                                             aggfunc='sum').reset_index(drop=True)
-            geodataframe_aoi.iloc[i] = geodataframe_aoi.append(df_habitat_diversity_pivoted)
+            df_habitat_diversity_pivoted.name = i
+            geodataframe_aoi = geodataframe_aoi.append(df_habitat_diversity_pivoted)
             bar_process()  # Progress bar
 
             # Population and urban patches
