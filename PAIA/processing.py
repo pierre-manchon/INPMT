@@ -179,12 +179,13 @@ def get_pas_profiles(
     """
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
-    geodataframe_aoi['SUM_POP'] = np.nan
-    geodataframe_aoi['DENS_POP'] = np.nan
-    geodataframe_aoi['MEAN_DIST'] = np.nan
-    geodataframe_aoi['CATCHING_SITES_NUMBER'] = np.nan
-    geodataframe_aoi['SPECIES_NUMBER'] = np.nan
-    geodataframe_aoi['HABITAT_DIVERSITY'] = np.nan  # Added at the end because the types of habitats come after it.
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCHING_SITES_NUMBER', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIES_NUMBER', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HABITAT_DIVERSITY', np.nan)
+    # At the end because the types of habitats come after it.
 
     with alive_bar(total=len(geodataframe_aoi)*5) as bar_process:
         # len(geodataframe_aoi*5 = Number of countries times the number of operations i need to do per countries
@@ -204,7 +205,6 @@ def get_pas_profiles(
             df_habitat_diversity_pivoted = df_habitat_diversity.pivot_table(columns='Label',
                                                                             values='Proportion (%)',
                                                                             aggfunc='sum').reset_index(drop=True)
-            df_habitat_diversity_pivoted.name = i
             geodataframe_aoi = geodataframe_aoi.append(df_habitat_diversity_pivoted)
             bar_process()  # Progress bar
 
