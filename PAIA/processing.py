@@ -223,6 +223,7 @@ def get_profile(
             # Anopheles diversity and catching sites
             bar_process.text('Anopheles')  # Progress bar
             geodataframe_aoi = get_anopheles_data(geodataframe_aoi, i, anopheles, output_path)
+            print('[{}/{}]'.format(i, len(geodataframe_aoi)))
             bar_process()  # Progress bar
 
             # End
