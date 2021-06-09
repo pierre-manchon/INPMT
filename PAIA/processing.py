@@ -105,7 +105,7 @@ def get_anopheles_data(geodataframe_aoi: GeoDataFrame, i: SupportsInt, anopheles
     return geodataframe_aoi
 
 
-def get_pas_profiles(
+def get_profile(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
         occsol: AnyStr,
@@ -114,9 +114,6 @@ def get_pas_profiles(
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
-    Crop the raster and the vector for every polygon of the pas layer
-    Might want use a mask otherwise
-    Then process and associate result to each polygon
 
     :param geodataframe_aoi: GeoDatFrame of the Areas of Interest to process.
     :type geodataframe_aoi: GeoDataFrame
@@ -135,6 +132,7 @@ def get_pas_profiles(
     """
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
 
+    geodataframe_aoi.index.name = 'id'
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', np.nan)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', np.nan)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', np.nan)
@@ -180,8 +178,8 @@ def get_pas_profiles(
             df_habitat_diversity = df_habitat_diversity.pivot_table(columns='Label',
                                                                     values='Proportion (%)',
                                                                     aggfunc='sum')
-            df_habitat_diversity.rename(index={'Proportion (%)': str(i)}, inplace=True)
-            geodataframe_aoi = geodataframe_aoi.append(df_habitat_diversity)
+            df_habitat_diversity.rename(index={'Proportion (%)': int(i)}, inplace=True)
+            geodataframe_aoi.loc[i, df_habitat_diversity.columns] = df_habitat_diversity.loc[i, :].values
             bar_process()  # Progress bar
             """
             # Population and urban patches

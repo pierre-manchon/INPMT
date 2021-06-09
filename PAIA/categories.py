@@ -78,7 +78,7 @@ gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_a
 import geopandas as gpd
 from typing import AnyStr
 from geopandas import GeoDataFrame
-from PAIA.processing import get_pas_profiles
+from PAIA.processing import get_profile
 from PAIA.utils.utils import format_dataset_output
 
 # Really not important tho
@@ -105,11 +105,11 @@ def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
 
     # Read file as a geodataframe
     gdf_aoi = gpd.read_file(aoi)
-    gdf_profiles_aoi, path_profiles_aoi = get_pas_profiles(geodataframe_aoi=gdf_aoi,
-                                                           aoi=aoi,
-                                                           occsol=path_occsol_degrade,
-                                                           population=path_urbain,
-                                                           anopheles=path_anopheles)
+    gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
+                                                      aoi=aoi,
+                                                      occsol=path_occsol_degrade,
+                                                      population=path_urbain,
+                                                      anopheles=path_anopheles)
 
     if export:
         # Retrieves the directory the dataset is in and joins it the output filename
