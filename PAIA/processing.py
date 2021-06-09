@@ -114,6 +114,24 @@ def get_profile(
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
+        Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
+
+    For every of those polygons, this function does two types of things:
+        - Crop/Intersect the data
+        - Process the data
+
+    There is four kind of data to be processed:
+        - Land use
+            - Read and count pixel values to see the diversity of these values
+            - Read and associate the labels with the pixel values to get the land use categories and the proportionality
+        - Population
+            - Read every vectorized pixel and sums their value to get the total population.
+            - Does the same thing but divide by the area to get the density.
+        - Distances
+            - Calculate the mean distance for every polygons of urban settlement to get the fragmentation index
+        - Anopheles species (mosquitoes)
+            - Count every point in the polygon to get the number of sites where anopheles (mosquitoes) where captured
+            - Count the number of species found for each captur sites (sums the number of 'Y' in every rows)
 
     :param geodataframe_aoi: GeoDatFrame of the Areas of Interest to process.
     :type geodataframe_aoi: GeoDataFrame
@@ -188,6 +206,7 @@ def get_profile(
             geodataframe_aoi.loc[i, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
             geodataframe_aoi.loc[i, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
             bar_process()  # Progress bar
+            
             # Distances and urban fragmentation
             # No need to intersect it again
             bar.text('Distances')  # Progress bar
@@ -200,7 +219,7 @@ def get_profile(
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(df_dist_global['dist'].mean(), 4)
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['dist'].mean(), 4)
             bar()  # Progress bar
-                        """
+            """
             # Anopheles diversity and catching sites
             bar_process.text('Anopheles')  # Progress bar
             geodataframe_aoi = get_anopheles_data(geodataframe_aoi, i, anopheles, output_path)
