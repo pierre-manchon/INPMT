@@ -172,16 +172,15 @@ def get_pas_profiles(
             __dataset_name, _, __qml_path = format_dataset_output(dataset=path_occsol_cropped, ext='.qml')
             __style = read_qml(__qml_path)
             __val = None
-            for i, row in df_habitat_diversity.iterrows():
-                for j in __style:
-                    if row['Category'] == j[0]:
-                        __val = j[1]
-                df_habitat_diversity.loc[i, 'Label'] = __val
+            for m, r in df_habitat_diversity.iterrows():
+                for n in __style:
+                    if r['Category'] == n[0]:
+                        __val = n[1]
+                df_habitat_diversity.loc[m, 'Label'] = __val
             df_habitat_diversity = df_habitat_diversity.pivot_table(columns='Label',
                                                                     values='Proportion (%)',
-                                                                    aggfunc='sum').reset_index(drop=True)
-            df_habitat_diversity.reindex([i])
-            print(df_habitat_diversity.head())
+                                                                    aggfunc='sum')
+            df_habitat_diversity.rename(index={'Proportion (%)': str(i)}, inplace=True)
             geodataframe_aoi = geodataframe_aoi.append(df_habitat_diversity)
             bar_process()  # Progress bar
             """
