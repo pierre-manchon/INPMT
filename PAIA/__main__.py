@@ -38,21 +38,16 @@ Pygis
 
 sentinelsat
 rasterio
-
-PAIA Copyright (C) 2021 Manchon Pierre
-This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 """
 from os import path, system, name
 from sys import argv, stderr, exit
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
 from argparse import ArgumentParser, SUPPRESS, ArgumentTypeError
-from PAIA.utils.utils import getConfigValue, setConfigValue
+# from PAIA.utils.utils import getConfigValue, setConfigValue
 
 cfgparser = ConfigParser()
-cfgparser.read('setup.cfg')
+cfgparser.read(r'H:\Logiciels\0_Projets\python\PAIA\setup.cfg')
 
 if __name__ == '__main__':
     # Clean the terminal then print the ascii ascii_art
@@ -81,21 +76,18 @@ if __name__ == '__main__':
     parser.add_argument("-h", "--help",
                         action="help", default=SUPPRESS,
                         help="'Show this help message and exit.")
-    parser.add_argument("-d", "--description",
+    parser.add_argument("-d", "--description", dest='description',
                         action="store_true", default=SUPPRESS,
                         help="Show the program's description and exit.")
-    parser.add_argument("-__ctr", "--license",
+    parser.add_argument("-l", "--license", dest='license',
                         action="store_true", default=SUPPRESS,
                         help="Show the program's license and exit.")
     parser.add_argument('-c', '--config',
                         nargs='?', type=str,
-                        help='Shapefile of the area of interest you want to process')
-    parser.add_argument('-i', '--indicator',
-                        nargs='?', type=str,
-                        help='Shapefile of the area of interest you want to process')
+                        help='Read or overwrite local config file.')
     parser.add_argument('-aoi', '--aoi',
                         nargs='?', type=dir_path,
-                        help='Shapefile of the area of interest you want to process')
+                        help='Shapefile of the area(s) of interest you want to process')
 
     # If no arguments are given, print the help
     if len(argv) == 1:
@@ -106,13 +98,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Based on the dest vars execute methods with the arguments
-    if args.aoi is not None:
-        aoi = args.aoi
-    else:
-        aoi = None
-    if args.indicator is not None:
-        indicator = args.indicator
-    else:
-        indicator = 'all'
-
-    print("Area of interest: {}, Indicator: {}".format(aoi, indicator))
+    try:
+        if args.license:
+            print(cfgparser.get('metadata', 'short_license'))
+        elif args.description:
+            print(cfgparser.get('setup', 'description'))
+    except AttributeError:
+        parser.print_help(stderr)
+        exit(1)
