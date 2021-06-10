@@ -114,7 +114,6 @@ def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     if export:
         # Retrieves the directory the dataset is in and joins it the output filename
         _, _, output_countries = format_dataset_output(dataset=aoi, name='profiling')
-        # df.to_excel(__output_path_habitat_diversity, index=False)
         gdf_profiles_aoi.to_file(output_countries)
         return gdf_profiles_aoi
     else:

@@ -139,9 +139,9 @@ def get_profile(
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', np.nan)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', np.nan)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', np.nan)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCHING_SITES_NUMBER', np.nan)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIES_NUMBER', np.nan)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HABITAT_DIVERSITY', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', np.nan)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', np.nan)
     # At the end but before the geometry column because the types of habitats come after it.
 
     with alive_bar(total=len(geodataframe_aoi)*3) as bar_process:
@@ -154,7 +154,7 @@ def get_profile(
             bar_process.text('Habitats')  # Progress bar
             path_occsol_cropped = raster_crop(dataset=occsol, shapefile=output_path)
             dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped, band=0)
-            geodataframe_aoi.loc[i, 'HABITAT_DIVERSITY'] = len(ctr)
+            geodataframe_aoi.loc[i, 'HAB_DIV'] = len(ctr)
             bar_process()  # Progress bar
 
             bar_process.text('Land use')
@@ -216,11 +216,12 @@ def get_profile(
                 gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
                 gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
 
-            geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
-            geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+            geodataframe_aoi.loc[i, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
+            geodataframe_aoi.loc[i, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
 
             # TODO Convertir les data types en int et pas en float pour éviter les trailing 0
-            # TODO Vérifier le nombre d'habitats et la len(nbr_habs)
+            # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
+            # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
 
             print(' [{}/{}]'.format(i, len(geodataframe_aoi)))
             bar_process()  # Progress bar
