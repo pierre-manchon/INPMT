@@ -90,21 +90,6 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-def get_anopheles_data(geodataframe_aoi: GeoDataFrame, i: SupportsInt, anopheles: AnyStr, overlay: AnyStr):
-    gdf_anopheles_cropped = intersect(base=anopheles, overlay=overlay, crs=3857)
-    gdf_anopheles_cropped['spnb'] = np.nan
-    gdf_anopheles_cropped['PA_dist'] = np.nan
-    gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
-    for x in range(0, len(gdf_anopheles_cropped)):
-        gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
-        gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
-        gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
-
-    geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
-    geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
-    return geodataframe_aoi
-
-
 def get_profile(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
@@ -199,17 +184,17 @@ def get_profile(
             df_habitat_diversity.rename(index={'Proportion (%)': int(i)}, inplace=True)
             geodataframe_aoi.loc[i, df_habitat_diversity.columns] = df_habitat_diversity.loc[i, :].values
             bar_process()  # Progress bar
-            """
+
             # Population and urban patches
             bar_process.text('Population')  # Progress bar
             gdf_pop_cropped = intersect(base=population, overlay=output_path, crs=3857)
             geodataframe_aoi.loc[i, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
             geodataframe_aoi.loc[i, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
             bar_process()  # Progress bar
-            
+            """
             # Distances and urban fragmentation
             # No need to intersect it again
-            bar.text('Distances')  # Progress bar
+            bar_process.text('Distances')  # Progress bar
             df_dist_global = []
             for o, q in iter_poly(shapefile=gdf_pop_cropped):
                 df_dist = []
@@ -218,12 +203,26 @@ def get_profile(
                 df_dist_global.append(mean(df_dist_global))
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(df_dist_global['dist'].mean(), 4)
             # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['dist'].mean(), 4)
-            bar()  # Progress bar
+            bar_process()  # Progress bar
             """
             # Anopheles diversity and catching sites
             bar_process.text('Anopheles')  # Progress bar
-            geodataframe_aoi = get_anopheles_data(geodataframe_aoi, i, anopheles, output_path)
-            print('[{}/{}]'.format(i, len(geodataframe_aoi)))
+            gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path, crs=3857)
+            gdf_anopheles_cropped['spnb'] = np.nan
+            gdf_anopheles_cropped['PA_dist'] = np.nan
+            gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
+            for x in range(0, len(gdf_anopheles_cropped)):
+                gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
+                gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
+                gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
+
+            geodataframe_aoi.loc[i, 'CATCHING_SITES_NUMBER'] = int(len(gdf_anopheles_cropped))
+            geodataframe_aoi.loc[i, 'SPECIES_NUMBER'] = gdf_anopheles_cropped['spnb'].max()
+
+            # TODO Convertir les data types en int et pas en float pour éviter les trailing 0
+            # TODO Vérifier le nombre d'habitats et la len(nbr_habs)
+
+            print(' [{}/{}]'.format(i, len(geodataframe_aoi)))
             bar_process()  # Progress bar
 
             # End
