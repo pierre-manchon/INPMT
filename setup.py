@@ -43,6 +43,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
 
+    # https://stackoverflow.com/a/26082635
+    entry_points={'console_scripts': [
+        'PAIA = PAIA.__main__:main',
+    ]},
+
     install_requires=requirements,
     dependency_links=[''.join(['file:\\', path.join(getcwd(), 'dependencies')])],
     packages=find_packages(),

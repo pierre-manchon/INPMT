@@ -39,22 +39,24 @@ Pygis
 sentinelsat
 rasterio
 """
+import argparse
 from os import path, system, name
 from sys import argv, stderr, exit
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
-from argparse import ArgumentParser, SUPPRESS, ArgumentTypeError
+from argparse import SUPPRESS, ArgumentTypeError
 # from PAIA.utils.utils import getConfigValue, setConfigValue
 
 cfgparser = ConfigParser()
 cfgparser.read(r'H:\Logiciels\0_Projets\python\PAIA\setup.cfg')
 
-if __name__ == '__main__':
+
+def main():
     # Clean the terminal then print the ascii ascii_art
     system(shlex_quote('cls' if name == 'nt' else 'clear'))
 
     # Modify the ArgumentParser class so it prints help whenever an error occured (For example, no arguments error)
-    class ArgumentParser(ArgumentParser):
+    class ArgumentParser(argparse.ArgumentParser):
         def error(self, message):
             stderr.write('error: %s\n' % message)
             self.print_help()
@@ -106,3 +108,8 @@ if __name__ == '__main__':
     except AttributeError:
         parser.print_help(stderr)
         exit(1)
+
+
+# Execute outside the if __name__ == '__main__' because I the main function to be accessible from the entry point in
+# setup.py
+main()
