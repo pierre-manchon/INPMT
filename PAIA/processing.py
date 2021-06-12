@@ -18,8 +18,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import math
 import numpy as np
 import pandas as pd
+import libpysal as lps
 from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -87,6 +89,7 @@ def get_distances(pas: GeoDataFrame,
     del df
 
     result = []
+    weighted_dist = None
     for u in ug.values:
         min_dist = getConfigValue('min_dist')
         name = None
@@ -94,13 +97,19 @@ def get_distances(pas: GeoDataFrame,
             dist = p[3].distance(u[3])
             if dist < min_dist:
                 min_dist = dist
+                try:
+                    weighted_dist = u[1]/(min_dist*math.sqrt(p[3].area))
+                except ZeroDivisionError:
+                    weighted_dist = u[1]
                 name = p[1]
-        result.append([u[0], u[1], u[2], u[3], name, min_dist])
+        result.append([u[0], u[1], u[2], u[3], name, min_dist, weighted_dist])
     del dist, min_dist, name, p, u
+
     cols = ug.keys().values.tolist()
     cols.append('distance')
     df = pd.DataFrame(result, columns=cols)
     del result
+
     if export:
         _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='distances', ext='.xlsx')
         df.to_excel(output_path, index=False)
@@ -153,6 +162,8 @@ def get_profile(
     :rtype: tuple[GeoDataFrame, AnyStr]
     """
     _, _, output_path = format_dataset_output(dataset=aoi, name='tmp')
+
+    dist_treshold = getConfigValue('dist_treshold')
 
     geodataframe_aoi.index.name = 'id'
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', np.nan)
@@ -210,20 +221,21 @@ def get_profile(
             geodataframe_aoi.loc[i, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
             geodataframe_aoi.loc[i, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
             bar_process()  # Progress bar
-            """
+
             # Distances and urban fragmentation
             # No need to intersect it again
             bar_process.text('Distances')  # Progress bar
-            df_dist_global = []
-            for o, q in iter_poly(shapefile=gdf_pop_cropped):
-                df_dist = []
-                for l, s in iter_poly(shapefile=gdf_pop_cropped):
-                    df_dist.append(q.distance(s)[0])
-                df_dist_global.append(mean(df_dist_global))
-            # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(df_dist_global['dist'].mean(), 4)
-            # geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(gdf_pop_cropped['dist'].mean(), 4)
+            # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
+            dbc = lps.weights.DistanceBand.from_dataframe(gdf_pop_cropped,
+                                                          threshold=dist_treshold,
+                                                          p=2,
+                                                          binary=False,
+                                                          build_sp=True,
+                                                          silent=True)
+
+            geodataframe_aoi.loc[i, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
             bar_process()  # Progress bar
-            """
+
             # Anopheles diversity and catching sites
             bar_process.text('Anopheles')  # Progress bar
             gdf_anopheles_cropped = intersect(base=anopheles, overlay=output_path, crs=3857)
