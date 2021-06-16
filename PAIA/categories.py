@@ -94,9 +94,9 @@ gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_a
 """
 from typing import AnyStr
 from geopandas import GeoDataFrame
-from PAIA.processing import get_profile
-from PAIA.utils.utils import format_dataset_output
-from PAIA.utils.vector import __read_shapefile_as_geodataframe
+from processing import get_profile
+from utils.utils import format_dataset_output
+from utils.vector import __read_shapefile_as_geodataframe
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files

@@ -61,6 +61,13 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
 
 
 def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Counter]:
+    """
+    Takes a dataset path as an input, read every of its pixel then count them based on their values.
+
+    :param dataset_path:
+    :param band:
+    :return:
+    """
     __pixel_value = 0
     __val = None
     __dataset = None
