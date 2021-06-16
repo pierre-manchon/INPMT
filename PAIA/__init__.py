@@ -19,9 +19,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Built-ins
-from os import environ
+import sys
+from os import environ, path
 from shapely import speedups
 from alive_progress import config_handler
+
+project_root = path.dirname(path.abspath(__file__))
+sys.path.append(project_root)
 
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861

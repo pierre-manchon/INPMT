@@ -42,30 +42,59 @@ rasterio
 import argparse
 from os import path, system, name
 from sys import argv, stderr, exit
+from typing import AnyStr
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
 from argparse import ArgumentTypeError
 from utils.utils import setConfigValue
+# from categories import app
 
 cfgparser = ConfigParser()
-cfgparser.read(r'H:\Logiciels\0_Projets\python\PAIA\setup.cfg')
+cfgparser.read('setup.cfg')
 
 
 def main():
     # Clean the terminal then print the ascii ascii_art
     system(shlex_quote('cls' if name == 'nt' else 'clear'))
 
-    # Modify the ArgumentParser class so it prints help whenever an error occured (For example, no arguments error)
     class ArgumentParser(argparse.ArgumentParser):
+        """Object for parsing command line strings into Python objects.
+        Overridden to print the help whenever an error occured (For example, no arguments error)
+
+        Keyword Arguments:
+            - prog -- The name of the program (default: sys.argv[0])
+            - usage -- A usage message (default: auto-generated from arguments)
+            - description -- A description of what the program does
+            - epilog -- Text following the argument descriptions
+            - parents -- Parsers whose arguments should be copied into this one
+            - formatter_class -- HelpFormatter class for printing help messages
+            - prefix_chars -- Characters that prefix optional arguments
+            - fromfile_prefix_chars -- Characters that prefix files containing
+                additional arguments
+            - argument_default -- The default value for all arguments
+            - conflict_handler -- String indicating how to handle conflicts
+            - add_help -- Add a -h/-help option
+            - allow_abbrev -- Allow long options to be abbreviated unambiguously
+            - exit_on_error -- Determines whether or not ArgumentParser exits with
+                error info when an error occurs
+        """
         def error(self, message):
             stderr.write('error: %s\n' % message)
             self.print_help()
             exit(2)
 
-    def dir_path(dirpath):
-        normalized_dirpath = path.normpath(dirpath)
-        if path.isdir(normalized_dirpath):
-            return normalized_dirpath
+    def file_path(dirpath: AnyStr) -> AnyStr:
+        """
+        Returns a path only if it is a valid one
+
+        :param dirpath:
+        :type dirpath AnyStr
+        :return: normalized_filepath
+        :rtype normalized_filepath AnyStr
+        """
+        normalized_filepath = path.normpath(dirpath)
+        if path.isfile(normalized_filepath):
+            return normalized_filepath
         else:
             raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, '\n'))
 
@@ -88,7 +117,7 @@ def main():
                         nargs='*', type=str,
                         help='Read or overwrite local config file.')
     parser.add_argument('-aoi', '--aoi',
-                        nargs='?', type=dir_path,
+                        nargs='?', type=file_path,
                         help='Shapefile of the area(s) of interest you want to process')
 
     # If no arguments are given, print the help
@@ -98,7 +127,6 @@ def main():
 
     # Parse the arguments
     args = parser.parse_args()
-    print(args)
 
     # Based on the dest vars execute methods with the arguments
     try:
@@ -114,7 +142,9 @@ def main():
                 with open('PAIA/config.cfg', 'r') as cfg:
                     print(cfg.read())
         elif args.aoi:
-            pass
+            print(args.aoi)
+            # TODO Python pointe vers les modules globauc au lieu de pointer vers les modules de l'environnement virtuel
+            # app(aoi=args.aoi)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)
