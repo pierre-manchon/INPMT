@@ -92,11 +92,11 @@ gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
 gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
 gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
-import geopandas as gpd
 from typing import AnyStr
 from geopandas import GeoDataFrame
 from PAIA.processing import get_profile
 from PAIA.utils.utils import format_dataset_output
+from PAIA.utils.vector import __read_shapefile_as_geodataframe
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -121,10 +121,10 @@ def app(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
 
     # Read file as a geodataframe
-    gdf_aoi = gpd.read_file(aoi)
+    gdf_aoi = __read_shapefile_as_geodataframe(aoi)
     gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
                                                       aoi=aoi,
-                                                      occsol=path_occsol_degrade,
+                                                      habitat=path_occsol_degrade,
                                                       population=path_urbain,
                                                       anopheles=path_anopheles)
 
@@ -146,4 +146,3 @@ if __name__ == '__main__':
                             r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
 
     gdf_profiles_PAs = app(aoi=path_countries_irish)
-    # gdf_profiles_aoi_buffers = app(aoi=path_pa_buffer_africa)

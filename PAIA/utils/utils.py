@@ -52,7 +52,7 @@ def format_dataset_output(dataset: AnyStr = '',
                           ext: AnyStr = ''
                           ) -> tuple[str, Union[AnyStr, str], str]:
     """
-    :param dataset:
+    :param dataset: Path to a file
     :type dataset: AnyStr
     :param name: Name of the output file
     :type name: AnyStr
