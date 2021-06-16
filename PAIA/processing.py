@@ -197,24 +197,23 @@ def get_profile(
                     percentage = ((ctr[c] * 100) / raster_area)
                     data.append([c, ctr[c], category_area, percentage])
 
-                df_habitat_diversity = pd.DataFrame(data,
-                                                    columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
+                df_hab_div = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
 
                 # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to
                 #  load it into qgis export it into a qml file by hand.
                 __dataset_name, _, __qml_path = format_dataset_output(dataset=path_occsol_cropped, ext='.qml')
                 __style = read_qml(__qml_path)
                 __val = None
-                for m, r in df_habitat_diversity.iterrows():
+                for m, r in df_hab_div.iterrows():
                     for n in __style:
                         if r['Category'] == n[0]:
                             __val = n[1]
-                    df_habitat_diversity.loc[m, 'Label'] = __val
-                df_habitat_diversity = df_habitat_diversity.pivot_table(columns='Label',
-                                                                        values='Proportion (%)',
-                                                                        aggfunc='sum')
-                df_habitat_diversity.rename(index={'Proportion (%)': int(i)}, inplace=True)
-                geodataframe_aoi.loc[i, df_habitat_diversity.columns] = df_habitat_diversity.loc[i, :].values
+                    df_hab_div.loc[m, 'Label'] = __val
+                df_hab_div = df_hab_div.pivot_table(columns='Label',
+                                                    values='Proportion (%)',
+                                                    aggfunc='sum')
+                df_hab_div.rename(index={'Proportion (%)': int(i)}, inplace=True)
+                geodataframe_aoi.loc[i, df_hab_div.columns] = df_hab_div.loc[i, :].values
                 bar_process()  # Progress bar
 
             elif population:  # Population and urban patches
