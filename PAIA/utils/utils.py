@@ -20,12 +20,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellanious cases
 from os import path
+from warnings import warn
 import xml.dom.minidom
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
 from configparser import ConfigParser
 from typing import AnyStr, List, Generator, Union
+
+cfgparser = ConfigParser()
+cfgparser.read('setup.cfg')
+config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
 
 
 def var_dump(var, prefix=''):
@@ -119,19 +124,23 @@ def __count_values(pixel_array: List) -> Counter:
 
 
 def getConfigValue(value):
-    cfgparser = ConfigParser()
-    cfgparser.read('./PAIA/config.cfg')
-    return cfgparser.get('config', value)
+    getcfgparser = ConfigParser()
+    getcfgparser.read(config_file_path)
+    return getcfgparser.get('config', value)
 
 
 def setConfigValue(var, value):
     # TODO check if a parameter is already here, if not, raise error
-    config_path = './PAIA/config.cfg'
-    config = ConfigParser(comment_prefixes='///', allow_no_value=True)
-    config.read_file(open(config_path))
-    config['config'][var] = value
-    with open(config_path, 'w') as configfile:
-        config.write(configfile)
+    setcfgparser = ConfigParser(comment_prefixes='///', allow_no_value=True)
+    setcfgparser.read_file(open(config_file_path))
+    try:
+        _ = setcfgparser['config'][var]
+        setcfgparser['config'][var] = value
+        with open(config_file_path, 'w') as configfile:
+            setcfgparser.write(configfile)
+    except KeyError:
+        warn("Can't modify non present value", category=SyntaxWarning)
+        print('\n')
 
 
 def read_qml(path_qml: AnyStr) -> List:

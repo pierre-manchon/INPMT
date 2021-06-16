@@ -51,6 +51,7 @@ from utils.utils import setConfigValue
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
+config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
 
 
 def main():
@@ -138,13 +139,15 @@ def main():
             if len(args.config) == 2:
                 var, value = args.config
                 setConfigValue(var, value)
+                with open(config_file_path, 'r') as cfg:
+                    print(cfg.read())
             elif len(args.config) == 0:
-                with open('PAIA/config.cfg', 'r') as cfg:
+                with open(config_file_path, 'r') as cfg:
                     print(cfg.read())
         elif args.aoi:
             print(args.aoi)
-            # TODO Python pointe vers les modules globauc au lieu de pointer vers les modules de l'environnement virtuel
-            # app(aoi=args.aoi)
+            # TODO Python pointe vers les modules globaux au lieu de pointer vers les modules de l'environnement virtuel
+            # _= app(aoi=args.aoi, export=True)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)

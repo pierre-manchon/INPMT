@@ -30,6 +30,7 @@ with open("README.md", "r") as ld,\
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
+entry_point = ''.join([cfgparser.get('setup', 'name'), ' = ', cfgparser.get('setup', 'name'), '.__main__:main'])
 
 setup(
     name=cfgparser.get('setup', 'name'),
@@ -45,7 +46,7 @@ setup(
 
     # https://stackoverflow.com/a/26082635
     entry_points={'console_scripts': [
-        'PAIA = PAIA.__main__:main',
+        entry_point,
     ]},
 
     install_requires=requirements,
