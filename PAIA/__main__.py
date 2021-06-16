@@ -44,8 +44,8 @@ from os import path, system, name
 from sys import argv, stderr, exit
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
-from argparse import SUPPRESS, ArgumentTypeError
-# from PAIA.utils.utils import getConfigValue, setConfigValue
+from argparse import ArgumentTypeError
+from utils.utils import setConfigValue
 
 cfgparser = ConfigParser()
 cfgparser.read(r'H:\Logiciels\0_Projets\python\PAIA\setup.cfg')
@@ -76,16 +76,16 @@ def main():
 
     # Create the arguments
     parser.add_argument("-h", "--help",
-                        action="help", default=SUPPRESS,
-                        help="'Show this help message and exit.")
+                        action="help",
+                        help="Show this help message and exit.")
     parser.add_argument("-d", "--description", dest='description',
-                        action="store_true", default=SUPPRESS,
+                        action="store_true",
                         help="Show the program's description and exit.")
     parser.add_argument("-l", "--license", dest='license',
-                        action="store_true", default=SUPPRESS,
+                        action="store_true",
                         help="Show the program's license and exit.")
     parser.add_argument('-c', '--config',
-                        nargs='?', type=str,
+                        nargs='*', type=str,
                         help='Read or overwrite local config file.')
     parser.add_argument('-aoi', '--aoi',
                         nargs='?', type=dir_path,
@@ -98,13 +98,23 @@ def main():
 
     # Parse the arguments
     args = parser.parse_args()
+    print(args)
 
     # Based on the dest vars execute methods with the arguments
     try:
-        if args.license:
+        if args.license is True:
             print(cfgparser.get('metadata', 'short_license'))
-        elif args.description:
+        elif args.description is True:
             print(cfgparser.get('setup', 'description'))
+        elif args.config is not None:
+            if len(args.config) == 2:
+                var, value = args.config
+                setConfigValue(var, value)
+            elif len(args.config) == 0:
+                with open('PAIA/config.cfg', 'r') as cfg:
+                    print(cfg.read())
+        elif args.aoi:
+            pass
     except AttributeError:
         parser.print_help(stderr)
         exit(1)

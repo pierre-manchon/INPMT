@@ -125,6 +125,7 @@ def getConfigValue(value):
 
 
 def setConfigValue(var, value):
+    # TODO check if a parameter is already here, if not, raise error
     config_path = './PAIA/config.cfg'
     config = ConfigParser(comment_prefixes='///', allow_no_value=True)
     config.read_file(open(config_path))
