@@ -115,7 +115,7 @@ def main():
                         action="store_true",
                         help="Show the program's license and exit.")
     parser.add_argument('-c', '--config',
-                        nargs='*', type=str,
+                        nargs='*',
                         help='Read or overwrite local config file.')
     parser.add_argument('-aoi', '--aoi',
                         nargs='?', type=file_path,
