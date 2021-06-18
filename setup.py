@@ -18,19 +18,47 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from os import path, getcwd
-from setuptools import find_packages
-from distutils.core import setup
+import os
+import pip
 from configparser import ConfigParser
+from setuptools import find_packages
+from setuptools.command.install import install as _install
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 with open("README.md", "r") as ld,\
         open("dependencies/requirements.txt", "r") as r:
     long_description = ld.read()
-    requirements = r.read()
+    requirements = r.read().split('\n')
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
 entry_point = ''.join([cfgparser.get('setup', 'name'), '=', cfgparser.get('setup', 'name'), '.__main__:main'])
+
+
+def getWheels():
+    dependency = []
+    for _, _, files in os.walk(os.path.join(os.getcwd(), 'dependencies')):
+        for file in files:
+            dependency.append(''.join(['file:\\', os.path.join(os.getcwd(), 'dependencies', file)]))
+    return dependency
+
+
+class install(_install):
+    """
+    Workaround to install local dependencies taken from there:
+
+    https://stackoverflow.com/a/45262430
+    """
+    def run(self):
+        _install.do_egg_install(self)
+        for x in getWheels():
+            # just go ahead and do it
+            pip.main(['install', x])
+
 
 setup(
     name=cfgparser.get('setup', 'name'),
@@ -80,9 +108,7 @@ setup(
               "tools"],
 
     # https://stackoverflow.com/a/26082635
-    entry_points={'console_scripts': [
-        entry_point,
-    ]},
+    entry_points={'console_scripts': [entry_point]},
 
     packages=find_packages(),
     requirements=requirements,
@@ -90,8 +116,6 @@ setup(
     python_requires=cfgparser.get('setup', 'python_requires'),
     # https://stackoverflow.com/questions/55208309/installing-data-files-in-setup-py-with-pip-install-e
     # data_files=[('', ['LICENSE'])],
-    dependency_links=[''.join(['file:\\', path.join(getcwd(), 'dependencies')])],
+    # dependency_links=getWheels(),
+    cmdclass={'install': install}
 )
-
-# # TODO Installer les dependencies de GDAL
-# https://stackoverflow.com/a/45262430
