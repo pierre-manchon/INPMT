@@ -26,9 +26,9 @@ from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
-from PAIA.utils.vector import merge_touching, to_wkt, iter_poly, intersect
-from PAIA.utils.raster import raster_crop, get_pixel_count
-from PAIA.utils.utils import format_dataset_output, getConfigValue, read_qml
+from .utils.vector import merge_touching, to_wkt, iter_poly, intersect
+from .utils.raster import raster_crop, get_pixel_count
+from .utils.utils import format_dataset_output, getConfigValue, read_qml
 
 
 def set_urban_profile(

@@ -29,7 +29,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
 from collections import Iterable
-from PAIA.utils.utils import format_dataset_output
+from .utils import format_dataset_output
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:

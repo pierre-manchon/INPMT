@@ -24,8 +24,8 @@ import rasterio.mask
 from numpy import ndarray
 from pathlib import Path
 from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt
-from PAIA.utils.utils import format_dataset_output, __gather, __count_values
-from PAIA.utils.vector import __read_shapefile
+from .utils import format_dataset_output, __gather, __count_values
+from .vector import __read_shapefile
 
 
 def read_pixels(dataset: AnyStr, band: ndarray) -> Generator:

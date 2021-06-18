@@ -19,21 +19,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Built-ins
+import os
 import sys
-from os import environ, path
 from shapely import speedups
 from alive_progress import config_handler
+from .__main__ import run
 
-project_root = path.dirname(path.abspath(__file__))
-sys.path.append(project_root)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861
 # TODO Correct GEOS Error
 if speedups.available:
     speedups.enable()
+    print('Speedups enabled')
 else:
     speedups.disable()
+    print('Speedups disabled')
 
 # PRogress bar
 config_handler.set_global(length=20,
@@ -45,7 +47,7 @@ config_handler.set_global(length=20,
 # POSTGRES SQL install or either one it founds)
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?
-environ['PROJ_LIB'] = r'C:\Program Files\GDAL\projlib'
-environ['GDAL_DATA'] = r'C:\Program Files\GDAL\gdal-data'
-environ['GDAL_DRIVER_PATH'] = r'C:\Program Files\GDAL\gdalplugins'
-environ['PYTHONPATH'] = r'C:\Program Files\GDAL'
+os.environ['PROJ_LIB'] = r'C:\Program Files\GDAL\projlib'
+os.environ['GDAL_DATA'] = r'C:\Program Files\GDAL\gdal-data'
+os.environ['GDAL_DRIVER_PATH'] = r'C:\Program Files\GDAL\gdalplugins'
+os.environ['PYTHONPATH'] = r'C:\Program Files\GDAL'
