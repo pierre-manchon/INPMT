@@ -130,7 +130,6 @@ def getConfigValue(value):
 
 
 def setConfigValue(var, value):
-    # TODO check if a parameter is already here, if not, raise error
     setcfgparser = ConfigParser(comment_prefixes='///', allow_no_value=True)
     setcfgparser.read_file(open(config_file_path))
     try:

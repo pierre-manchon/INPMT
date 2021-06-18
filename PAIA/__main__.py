@@ -156,6 +156,12 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
                           r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
     path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
+    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+                           r'Limites administratives/africa_countries_irish.shp'
+    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
+               r'WDPA_Africa_anopheles.shp'
+    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
+                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
 
     # Read file as a geodataframe
     gdf_aoi = __read_shapefile_as_geodataframe(aoi)
@@ -278,9 +284,4 @@ def main():
 if __name__ == '__main__':
     main()
 else:
-    """
-    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/Limites administratives/africa_countries_irish.shp'
-    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/WDPA_Africa_anopheles.shp'
-    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
-    """
     pass

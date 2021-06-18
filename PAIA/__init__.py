@@ -21,8 +21,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # Built-ins
 import os
 import sys
-from shapely import speedups
 from alive_progress import config_handler
+from shapely import speedups
+
 try:
     from __main__ import run
 except ImportError:
@@ -32,7 +33,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861
-# TODO Correct GEOS Error
+# I don't know specifically why but it appears to have resolved itself (I recall deleting and reinstalling cleanly all
+# of the dependencies but i already tried that back when i got that error so i doubt this fixed it.)
 if speedups.available:
     speedups.enable()
     print('Speedups enabled')

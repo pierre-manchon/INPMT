@@ -30,7 +30,7 @@ with open("README.md", "r") as ld,\
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
-entry_point = ''.join([cfgparser.get('setup', 'name'), ' = ', cfgparser.get('setup', 'name'), '.__main__:main'])
+entry_point = ''.join([cfgparser.get('setup', 'name'), '=', cfgparser.get('setup', 'name'), '.__main__:main'])
 
 setup(
     name=cfgparser.get('setup', 'name'),
