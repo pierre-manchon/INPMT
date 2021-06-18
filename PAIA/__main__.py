@@ -123,15 +123,13 @@ from shlex import quote as shlex_quote
 from argparse import ArgumentTypeError
 
 try:
+    from processing import get_profile
+    from utils.utils import setConfigValue, format_dataset_output
+    from utils.vector import __read_shapefile_as_geodataframe
+except ImportError:
     from .processing import get_profile
     from .utils.utils import setConfigValue, format_dataset_output
     from .utils.vector import __read_shapefile_as_geodataframe
-except ModuleNotFoundError:
-    print('module not found error')
-    pass
-except ImportError:
-    print('import error')
-    pass
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
@@ -201,6 +199,7 @@ def main():
             - exit_on_error -- Determines whether or not ArgumentParser exits with
                 error info when an error occurs
         """
+
         def error(self, message):
             stderr.write('error: %s\n' % message)
             self.print_help()
@@ -268,7 +267,6 @@ def main():
                     print(cfg.read())
         elif args.aoi:
             print(args.aoi)
-            # TODO Python pointe vers les modules globaux au lieu de pointer vers les modules de l'environnement virtuel
             _ = run(aoi=args.aoi, export=True)
     except AttributeError:
         parser.print_help(stderr)
@@ -281,13 +279,8 @@ if __name__ == '__main__':
     main()
 else:
     """
-    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
-                           r'Limites administratives/africa_countries_irish.shp'
-    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
-               r'Aires protegees/WDPA_Africa_anopheles.shp'
-    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
-                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
-
-    PAIA.run(aoi=path_countries_irish)
+    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/Limites administratives/africa_countries_irish.shp'
+    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/WDPA_Africa_anopheles.shp'
+    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
     """
     pass

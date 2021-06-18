@@ -23,7 +23,10 @@ import os
 import sys
 from shapely import speedups
 from alive_progress import config_handler
-from .__main__ import run
+try:
+    from __main__ import run
+except ImportError:
+    from .__main__ import run
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
