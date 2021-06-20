@@ -21,8 +21,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import rasterio
 import rasterio.mask
+from rasterio.features import shapes
+import geopandas as gpd
 from numpy import ndarray
 from pathlib import Path
+from geopandas import GeoDataFrame
 from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt
 from .utils import format_dataset_output, __gather, __count_values
 from .vector import __read_shapefile
@@ -112,6 +115,18 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
         pass
 
 
+def polygonize(dataset: AnyStr) -> GeoDataFrame:
+    mask = None
+    with rasterio.Env():
+        with rasterio.open(dataset) as src:
+            image = src.read(1)
+            results = ({'properties': {'val': v}, 'geometry': s}
+                       for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.transform)))
+    geoms = list(results)
+    gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms).dissolve(by='val')
+    return gpd_polygonized_raster
+
+
 def export_raster(output_image, *args: Optional[Path]) -> None:
     """
     :param output_image:
@@ -125,6 +140,5 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
         os.path.join(*args, 'mask.tif')
     else:
         'mask.tif'
-
     with rasterio.open('mask.tif', "w") as output_file:
         output_file.write(output_image)
