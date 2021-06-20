@@ -162,6 +162,8 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
                r'WDPA_Africa_anopheles.shp'
     path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
                             r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
+    path_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
+                 r'Limites administratives/gabon.shp'
 
     # Read file as a geodataframe
     gdf_aoi = __read_shapefile_as_geodataframe(aoi)
