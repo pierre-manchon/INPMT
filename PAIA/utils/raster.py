@@ -124,7 +124,7 @@ def polygonize(dataset: AnyStr) -> GeoDataFrame:
                        for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.transform)))
     geoms = list(results)
     gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms).dissolve(by='val')
-    return gpd_polygonized_raster
+    return gpd_polygonized_raster.loc[1:]
 
 
 def export_raster(output_image, *args: Optional[Path]) -> None:
