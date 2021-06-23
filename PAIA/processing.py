@@ -244,12 +244,12 @@ def get_profile(
                 if population:  # Population and urban patches
                     bar_process.text('Population')  # Progress bar
                     gdf_pop_cropped = intersect(base=population, overlay=path_poly2, crs=3857)
-                    print(int(gdf_pop_cropped['DN'].sum()), int(gdf_pop_cropped['DN'].sum()/p.area[0]))
                     df_extract.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
                     df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
                     bar_process()  # Progress bar
-                """
-                # TODO error rtree spatial index
+
+                # TODO error rtree spatial index ImportError: Spatial indexes require either `rtree` or `pygeos`.
+                #  See installation instructions at https://geopandas.org/install.html
                 if distances:  # Distances and urban fragmentation
                     # No need to intersect it again
                     bar_process.text('Distances')  # Progress bar
@@ -260,10 +260,9 @@ def get_profile(
                                                                   binary=False,
                                                                   build_sp=True,
                                                                   silent=True)
-                    print(round(dbc.mean_neighbors, 4))
                     df_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Progress bar
-                """
+
                 if anopheles:  # Anopheles diversity and catching sites
                     bar_process.text('Anopheles')  # Progress bar
                     gdf_anopheles_cropped = intersect(base=anopheles, overlay=path_poly2, crs=3857)
@@ -275,7 +274,6 @@ def get_profile(
                         gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
                         gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
 
-                    print(int(len(gdf_anopheles_cropped)), gdf_anopheles_cropped['spnb'].max())
                     df_extract.loc[o, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
                     df_extract.loc[o, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
                     bar_process()  # Progress bar
