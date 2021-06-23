@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import math
-import numpy as np
 import pandas as pd
 import libpysal as lps
 from alive_progress import alive_bar
@@ -206,7 +205,8 @@ def get_profile(
                         percentage = ((category_area * 100) / p.area[0])
                         data.append([c, ctr[c], category_area, percentage])
 
-                    df_hab_div = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
+                    df_hab_div = pd.DataFrame(data,
+                                              columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
 
                     # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to
                     #  load it into qgis export it into a qml file by hand.
