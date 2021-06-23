@@ -186,14 +186,15 @@ def get_profile(
     for i, p in iter_poly(shapefile=geodataframe_aoi):
         p.to_file(filename=path_poly1)
         path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
+        gdf_os_pol = polygonize(dataset=path_occsol_cropped)
         _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
         _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
-        gdf_os_pol = polygonize(dataset=path_occsol_cropped)
         with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
             for o, q in iter_poly(shapefile=gdf_os_pol):
                 q.to_file(filename=path_poly2)
                 path_occsol_cropped_hab = raster_crop(dataset=habitat, shapefile=path_poly2)
                 df_extract = df_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
+                # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                 if habitat:  # Habitat diversity
                     bar_process.text('Habitats')  # Progress bar
                     dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped_hab, band=0)
@@ -222,6 +223,7 @@ def get_profile(
                             else:
                                 __val = 'Unknown'
                         df_hab_div.loc[m, 'Label'] = __val
+                    # TODO Est-ce que ça fait pas bugger par rapport à l'itération ?
                     if method == 'append:':
                         try:
                             geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
@@ -252,8 +254,6 @@ def get_profile(
                     df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
                     bar_process()  # Progress bar
 
-                # TODO error rtree spatial index ImportError: Spatial indexes require either `rtree` or `pygeos`.
-                #  See installation instructions at https://geopandas.org/install.html
                 if distances:  # Distances and urban fragmentation
                     # No need to intersect it again
                     bar_process.text('Distances')  # Progress bar

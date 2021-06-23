@@ -38,10 +38,10 @@ sys.path.append(os.path.join(os.getcwd(), 'venv', 'Lib', 'site-packages'))
 # of the dependencies but i already tried that back when i got that error so i doubt this fixed it.)
 if speedups.available:
     speedups.enable()
-    print('Speedups enabled')
+    print('Shapely speedups enabled')
 else:
     speedups.disable()
-    print('Speedups disabled')
+    print('Shapely speedups disabled')
 
 # PRogress bar
 config_handler.set_global(length=20,
