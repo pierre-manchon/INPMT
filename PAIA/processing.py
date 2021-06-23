@@ -183,13 +183,12 @@ def get_profile(
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', 0)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', 0)
     geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', 0)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
     # At the end but before the geometry column because the types of habitats come after it.
     for i, p in iter_poly(shapefile=geodataframe_aoi):
         p.to_file(filename=path_poly1)
         path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
         gdf_os_pol = polygonize(dataset=path_occsol_cropped)
-        with alive_bar(total=(len(gdf_os_pol)*2)) as bar_process:
+        with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
             for o, q in iter_poly(shapefile=gdf_os_pol):
                 q.to_file(filename=path_poly2)
                 path_occsol_cropped_hab = raster_crop(dataset=habitat, shapefile=path_poly2)
@@ -197,7 +196,6 @@ def get_profile(
                 if habitat:  # Habitat diversity
                     bar_process.text('Habitats')  # Progress bar
                     dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped_hab, band=0)
-                    df_extract.loc[o, 'HAB_DIV'] = len(ctr)
                     bar_process()  # Progress bar
 
                     bar_process.text('Land use')
@@ -205,7 +203,7 @@ def get_profile(
                     for c in ctr:
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
                         # raster_area = sum(ctr.values())
-                        percentage = ((ctr[c] * 100) / p.area[0])
+                        percentage = ((category_area * 100) / p.area[0])
                         data.append([c, ctr[c], category_area, percentage])
 
                     df_hab_div = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
@@ -221,6 +219,11 @@ def get_profile(
                                 __val = n[1]
                         df_hab_div.loc[m, 'Label'] = __val
                     if method == 'append:':
+                        try:
+                            geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
+                        except ValueError:
+                            pass
+                        df_extract.loc[o, 'HAB_DIV'] = len(ctr)
                         df_hab_div = df_hab_div.pivot_table(columns='Label',
                                                             values='Proportion (%)',
                                                             aggfunc='sum')
@@ -237,7 +240,7 @@ def get_profile(
                     else:
                         pass
                     bar_process()  # Progress bar
-                """    
+
                 if population:  # Population and urban patches
                     bar_process.text('Population')  # Progress bar
                     gdf_pop_cropped = intersect(base=population, overlay=path_poly2, crs=3857)
@@ -245,7 +248,8 @@ def get_profile(
                     df_extract.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
                     df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
                     bar_process()  # Progress bar
-
+                """
+                # TODO error rtree spatial index
                 if distances:  # Distances and urban fragmentation
                     # No need to intersect it again
                     bar_process.text('Distances')  # Progress bar
@@ -259,7 +263,7 @@ def get_profile(
                     print(round(dbc.mean_neighbors, 4))
                     df_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Progress bar
-
+                """
                 if anopheles:  # Anopheles diversity and catching sites
                     bar_process.text('Anopheles')  # Progress bar
                     gdf_anopheles_cropped = intersect(base=anopheles, overlay=path_poly2, crs=3857)
@@ -275,7 +279,6 @@ def get_profile(
                     df_extract.loc[o, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
                     df_extract.loc[o, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
                     bar_process()  # Progress bar
-                """
 
         gdf_result = gdf_result.append(df_extract, ignore_index=True)
         # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
