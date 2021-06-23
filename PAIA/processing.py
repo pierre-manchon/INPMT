@@ -186,6 +186,8 @@ def get_profile(
     for i, p in iter_poly(shapefile=geodataframe_aoi):
         p.to_file(filename=path_poly1)
         path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
+        _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
+        _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
         gdf_os_pol = polygonize(dataset=path_occsol_cropped)
         with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
             for o, q in iter_poly(shapefile=gdf_os_pol):
@@ -240,10 +242,10 @@ def get_profile(
                     else:
                         pass
                     bar_process()  # Progress bar
-
+                """
                 if population:  # Population and urban patches
                     bar_process.text('Population')  # Progress bar
-                    gdf_pop_cropped = intersect(base=population, overlay=path_poly2, crs=3857)
+                    gdf_pop_cropped = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
                     df_extract.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
                     df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
                     bar_process()  # Progress bar
@@ -262,10 +264,10 @@ def get_profile(
                                                                   silent=True)
                     df_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Progress bar
-
+                """
                 if anopheles:  # Anopheles diversity and catching sites
                     bar_process.text('Anopheles')  # Progress bar
-                    gdf_anopheles_cropped = intersect(base=anopheles, overlay=path_poly2, crs=3857)
+                    gdf_anopheles_cropped = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                     gdf_anopheles_cropped['spnb'] = 0
                     gdf_anopheles_cropped['PA_dist'] = 0
                     gdf_anopheles_cropped['PA_buffer_dist'] = 0
