@@ -29,7 +29,8 @@ try:
 except ImportError:
     from .__main__ import run
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(os.getcwd(), 'venv', 'Scripts'))
+sys.path.append(os.path.join(os.getcwd(), 'venv', 'Lib', 'site-packages'))
 
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861
