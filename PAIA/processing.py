@@ -205,7 +205,7 @@ def get_profile(
                     for c in ctr:
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
                         # raster_area = sum(ctr.values())
-                        polygon_area = gdf_os_pol.loc[o].geometry.area/1000000
+                        polygon_area = p.area[0]/1000000
                         percentage = ((ctr[c] * 100) / polygon_area)
                         data.append([c, ctr[c], category_area, percentage])
 
