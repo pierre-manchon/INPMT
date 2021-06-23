@@ -219,6 +219,8 @@ def get_profile(
                         for n in __style:
                             if r['Category'] == n[0]:
                                 __val = n[1]
+                            else:
+                                __val = 'Unknown'
                         df_hab_div.loc[m, 'Label'] = __val
                     if method == 'append:':
                         try:
@@ -269,8 +271,8 @@ def get_profile(
                     bar_process.text('Anopheles')  # Progress bar
                     gdf_anopheles_cropped = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                     gdf_anopheles_cropped['spnb'] = 0
-                    gdf_anopheles_cropped['PA_dist'] = 0
-                    gdf_anopheles_cropped['PA_buffer_dist'] = 0
+                    gdf_anopheles_cropped['PA_dist'] = ''
+                    gdf_anopheles_cropped['PA_buffer_dist'] = ''
                     for x in range(0, len(gdf_anopheles_cropped)):
                         gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
                         gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
