@@ -128,6 +128,7 @@ def get_profile(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
         habitat: AnyStr,
+        method: AnyStr,
         population: AnyStr,
         anopheles: AnyStr,
         distances: bool = True,
@@ -174,28 +175,29 @@ def get_profile(
     _, _, path_poly2 = format_dataset_output(dataset=habitat, name='tmp')
 
     dist_treshold = getConfigValue('dist_treshold')
-
+    gdf_result = GeoDataFrame()
+    df_extract = GeoDataFrame()
     geodataframe_aoi.index.name = 'id'
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', int)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', int)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', int)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', int)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', int)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', int)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', 0)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', 0)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', 0)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', 0)
+    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
     # At the end but before the geometry column because the types of habitats come after it.
-
-    with alive_bar(total=len(geodataframe_aoi)*5) as bar_process:
-        # len(geodataframe_aoi*5 = Number of countries times the number of operations i need to do per countries
-        for i, p in iter_poly(shapefile=geodataframe_aoi):
-            p.to_file(filename=path_poly1)
-            path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
-            for o, q in iter_poly(shapefile=polygonize(dataset=path_occsol_cropped)):
+    for i, p in iter_poly(shapefile=geodataframe_aoi):
+        p.to_file(filename=path_poly1)
+        path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
+        gdf_os_pol = polygonize(dataset=path_occsol_cropped)
+        with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
+            for o, q in iter_poly(shapefile=gdf_os_pol):
                 q.to_file(filename=path_poly2)
-                geodataframe_aoi = geodataframe_aoi.append(geodataframe_aoi.iloc[i], ignore_index=True)
+                path_occsol_cropped_hab = raster_crop(dataset=habitat, shapefile=path_poly2)
+                df_extract = df_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
                 if habitat:  # Habitat diversity
                     bar_process.text('Habitats')  # Progress bar
-                    dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped, band=0)
-                    geodataframe_aoi.loc[o, 'HAB_DIV'] = len(ctr)
+                    dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped_hab, band=0)
+                    df_extract.loc[o, 'HAB_DIV'] = len(ctr)
                     bar_process()  # Progress bar
 
                     bar_process.text('Land use')
@@ -218,21 +220,36 @@ def get_profile(
                             if r['Category'] == n[0]:
                                 __val = n[1]
                         df_hab_div.loc[m, 'Label'] = __val
-                    df_hab_div = df_hab_div.pivot_table(columns='Label',
-                                                        values='Proportion (%)',
-                                                        aggfunc='sum')
-                    df_hab_div.rename(index={'Proportion (%)': int(o)}, inplace=True)
-                    geodataframe_aoi.loc[i, df_hab_div.columns] = df_hab_div.loc[o, :].values
+                    print('extract', df_extract)
+                    print('habs', df_hab_div)
+                    if method == 'append:':
+                        df_hab_div = df_hab_div.pivot_table(columns='Label',
+                                                            values='Proportion (%)',
+                                                            aggfunc='sum')
+                        df_hab_div.rename(index={'Proportion (%)': int(o)}, inplace=True)
+                        df_extract.loc[o, df_hab_div.columns] = df_hab_div.loc[o, :].values
+                    elif method == 'duplicate':
+                        try:
+                            df_extract.insert(df_extract.shape[1] - 1, 'HAB', 0)
+                            df_extract.insert(df_extract.shape[1] - 1, 'HAB_PROP', 0)
+                        except ValueError:
+                            print('n\' rien recréé')
+                        print(i, o, 'duplicate', [df_extract.loc[o, 'HAB'], df_hab_div.loc[0, 'Label']], [df_extract.loc[o, 'HAB_PROP'], round(df_hab_div.loc[0, 'Proportion (%)'], 3)])
+                        df_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
+                        df_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
+                    else:
+                        pass
                     bar_process()  # Progress bar
-
-                elif population:  # Population and urban patches
+                """    
+                if population:  # Population and urban patches
                     bar_process.text('Population')  # Progress bar
                     gdf_pop_cropped = intersect(base=population, overlay=path_poly2, crs=3857)
-                    geodataframe_aoi.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
-                    geodataframe_aoi.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
+                    print(int(gdf_pop_cropped['DN'].sum()), int(gdf_pop_cropped['DN'].sum()/p.area[0]))
+                    df_extract.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
+                    df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
                     bar_process()  # Progress bar
 
-                elif distances:  # Distances and urban fragmentation
+                if distances:  # Distances and urban fragmentation
                     # No need to intersect it again
                     bar_process.text('Distances')  # Progress bar
                     # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
@@ -242,35 +259,39 @@ def get_profile(
                                                                   binary=False,
                                                                   build_sp=True,
                                                                   silent=True)
-
-                    geodataframe_aoi.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
+                    print(round(dbc.mean_neighbors, 4))
+                    df_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Progress bar
 
-                elif anopheles:  # Anopheles diversity and catching sites
+                if anopheles:  # Anopheles diversity and catching sites
                     bar_process.text('Anopheles')  # Progress bar
                     gdf_anopheles_cropped = intersect(base=anopheles, overlay=path_poly2, crs=3857)
-                    gdf_anopheles_cropped['spnb'] = np.nan
-                    gdf_anopheles_cropped['PA_dist'] = np.nan
-                    gdf_anopheles_cropped['PA_buffer_dist'] = np.nan
+                    gdf_anopheles_cropped['spnb'] = 0
+                    gdf_anopheles_cropped['PA_dist'] = 0
+                    gdf_anopheles_cropped['PA_buffer_dist'] = 0
                     for x in range(0, len(gdf_anopheles_cropped)):
                         gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
                         gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
                         gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
 
-                    geodataframe_aoi.loc[o, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
-                    geodataframe_aoi.loc[o, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
+                    print(int(len(gdf_anopheles_cropped)), gdf_anopheles_cropped['spnb'].max())
+                    df_extract.loc[o, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
+                    df_extract.loc[o, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
                     bar_process()  # Progress bar
+                """
 
-            # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
-            # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
+        gdf_result = gdf_result.append(df_extract, ignore_index=True)
+        # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
+        # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
+        # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
 
-            print('[{}/{}]'.format(i+1, len(geodataframe_aoi)))
+        print('[{}/{}]'.format(i+1, len(geodataframe_aoi)))
 
-            # End
+        # End
 
     if export:
         _, _, path_poly1 = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
-        geodataframe_aoi.to_excel(path_poly1, index=False)
-        return geodataframe_aoi, aoi
+        gdf_result.to_excel(path_poly1, index=False)
+        return gdf_result, aoi
     else:
-        return geodataframe_aoi, aoi
+        return gdf_result, aoi
