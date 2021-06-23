@@ -220,8 +220,6 @@ def get_profile(
                             if r['Category'] == n[0]:
                                 __val = n[1]
                         df_hab_div.loc[m, 'Label'] = __val
-                    print('extract', df_extract)
-                    print('habs', df_hab_div)
                     if method == 'append:':
                         df_hab_div = df_hab_div.pivot_table(columns='Label',
                                                             values='Proportion (%)',
@@ -233,8 +231,7 @@ def get_profile(
                             df_extract.insert(df_extract.shape[1] - 1, 'HAB', 0)
                             df_extract.insert(df_extract.shape[1] - 1, 'HAB_PROP', 0)
                         except ValueError:
-                            print('n\' rien recréé')
-                        print(i, o, 'duplicate', [df_extract.loc[o, 'HAB'], df_hab_div.loc[0, 'Label']], [df_extract.loc[o, 'HAB_PROP'], round(df_hab_div.loc[0, 'Proportion (%)'], 3)])
+                            pass
                         df_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
                         df_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
                     else:
