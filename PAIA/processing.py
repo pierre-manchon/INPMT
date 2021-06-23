@@ -189,7 +189,7 @@ def get_profile(
         p.to_file(filename=path_poly1)
         path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
         gdf_os_pol = polygonize(dataset=path_occsol_cropped)
-        with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
+        with alive_bar(total=(len(gdf_os_pol)*2)) as bar_process:
             for o, q in iter_poly(shapefile=gdf_os_pol):
                 q.to_file(filename=path_poly2)
                 path_occsol_cropped_hab = raster_crop(dataset=habitat, shapefile=path_poly2)
@@ -205,8 +205,7 @@ def get_profile(
                     for c in ctr:
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
                         # raster_area = sum(ctr.values())
-                        polygon_area = p.area[0]/1000000
-                        percentage = ((ctr[c] * 100) / polygon_area)
+                        percentage = ((ctr[c] * 100) / p.area[0])
                         data.append([c, ctr[c], category_area, percentage])
 
                     df_hab_div = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
