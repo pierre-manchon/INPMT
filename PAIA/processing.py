@@ -204,8 +204,9 @@ def get_profile(
                     data = []
                     for c in ctr:
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
-                        raster_area = sum(ctr.values())
-                        percentage = ((ctr[c] * 100) / raster_area)
+                        # raster_area = sum(ctr.values())
+                        polygon_area = gdf_os_pol.loc[o].geometry.area/1000000
+                        percentage = ((ctr[c] * 100) / polygon_area)
                         data.append([c, ctr[c], category_area, percentage])
 
                     df_hab_div = pd.DataFrame(data, columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
