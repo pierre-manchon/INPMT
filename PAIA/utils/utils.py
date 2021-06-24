@@ -54,13 +54,16 @@ def var_dump(var, prefix=''):
 
 def format_dataset_output(dataset: AnyStr = '',
                           name: AnyStr = '',
-                          ext: AnyStr = ''
+                          ext: AnyStr = '',
+                          prevent_duplicate=True
                           ) -> tuple[str, Union[AnyStr, str], str]:
     """
     :param dataset: Path to a file
     :type dataset: AnyStr
     :param name: Name of the output file
     :type name: AnyStr
+    :param prevent_duplicate:
+    :type prevent_duplicate:
     :param ext: Extension of the output file. If blank, then the input file's etension will be used.
     :type ext: AnyStr
     :return: Dataset name, dataset extension, output path formatted
@@ -87,8 +90,11 @@ def format_dataset_output(dataset: AnyStr = '',
     else:
         pass
 
-    if name in Path(dataset).name:
-        __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
+    if prevent_duplicate:
+        if name in Path(dataset).name:
+            __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
+        else:
+            __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
     else:
         __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
     return __dataset_name, __ext, __output_path
