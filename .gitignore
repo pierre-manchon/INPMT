@@ -116,6 +116,5 @@ dmypy.json
 # Project specific exclusion
 .idea
 .processing
-datasets
 # Miscellanous
 *.lnk
