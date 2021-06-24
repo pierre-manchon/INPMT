@@ -84,9 +84,11 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     return __dataset, __ctr
 
 
-def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
+def raster_crop(dataset: AnyStr, shapefile: AnyStr, overwrite: bool = False) -> AnyStr:
     """
     Crop raster with geodataframe boundary
+    :param overwrite:
+    :type overwrite:
     :param dataset:
     :type dataset:
     :param shapefile:
@@ -104,11 +106,17 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr) -> AnyStr:
                                 "height": cropped_dataset.shape[1],
                                 "width": cropped_dataset.shape[2],
                                 "transform": output_transform})
-            *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp')
+            *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp', prevent_duplicate=False)
+
+            if overwrite:
+                try:
+                    os.remove(__output_path)
+                except FileNotFoundError:
+                    pass
 
             with rasterio.open(__output_path, "w", **output_meta) as output_file:
                 output_file.write(cropped_dataset)
-            return __output_path
+        return __output_path
 
     except ValueError:
         print(UserWarning('Raster {} does not overlap.'.format(dataset)))
