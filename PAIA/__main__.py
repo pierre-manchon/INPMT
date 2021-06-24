@@ -152,6 +152,13 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     :return:
     :rtype:
     """
+    population = '../PAIA/datasets/UNadj_constrained_merged_degraded.tif'
+    landuse = '../PAIA/datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    anopheles_kyalo = '../PAIA/datasets/VectorDB_1898-2016.shp'
+    irish = '../PAIA/datasets/africa_countries_irish_tmp.shp'
+    protected_areas = '../PAIA/datasets/WDPA_Africa_anopheles.shp'
+    protected_areas_buffered = '../PAIA/datasets/WDPA_Africa_anopheles_buffer10km.shp'
+
     path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
     path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
                           r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
@@ -170,7 +177,6 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
                                                       aoi=aoi,
                                                       landuse=path_occsol_degrade,
-                                                      population=path_urbain,
                                                       anopheles=path_anopheles)
 
     if export:
