@@ -169,8 +169,7 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     gdf_aoi = __read_shapefile_as_geodataframe(aoi)
     gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
                                                       aoi=aoi,
-                                                      habitat=path_occsol_degrade,
-                                                      method='duplicate',
+                                                      landuse=path_occsol_degrade,
                                                       population=path_urbain,
                                                       anopheles=path_anopheles)
 
