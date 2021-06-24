@@ -20,34 +20,47 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Built-ins
 import os
-import sys
-from alive_progress import config_handler
-from shapely import speedups
+from sys import modules as __modules
+from configparser import ConfigParser as __ConfigParser
+from alive_progress import config_handler as __config_handler
+from .__utils.vector import __do_Speedups
 
 try:
     from __main__ import run
 except ImportError:
     from .__main__ import run
 
-sys.path.append(os.path.join(os.getcwd(), 'venv', 'Scripts'))
-sys.path.append(os.path.join(os.getcwd(), 'venv', 'Lib', 'site-packages'))
+__cfgparser = __ConfigParser()
+__cfgparser.read('setup.cfg')
+
+__name__ = __cfgparser.get('setup', 'name')
+__package__ = __cfgparser.get('setup', 'name')
+__file__ = __modules[__name__]
+__doc__ = __modules[__name__].__doc__
+__version__ = __cfgparser.get('setup', 'version')
+__license__ = __cfgparser.get('setup', 'license')
+__author__ = __cfgparser.get('setup', 'author')
+__email__ = __cfgparser.get('setup', 'author_email')
+
+__all__ = (
+    '__name__',
+    '__package__',
+    '__doc__',
+    '__version__',
+    '__license__',
+    '__author__',
+    '__email__',
+    'run',
+)
+
+print(r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets')
 
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861
 # I don't know specifically why but it appears to have resolved itself (I recall deleting and reinstalling cleanly all
 # of the dependencies but i already tried that back when i got that error so i doubt this fixed it.)
-if speedups.available:
-    speedups.enable()
-    print('Shapely speedups enabled')
-else:
-    speedups.disable()
-    print('Shapely speedups disabled')
-
-# PRogress bar
-config_handler.set_global(length=20,
-                          spinner='dots_reverse',
-                          unknown='long_message',
-                          force_tty=True)
+# Made as a function to be hidden on import
+__do_Speedups()
 
 # Modify environement variables so shapely finds the correct proj.db file (the one from the GDAL install and not the
 # POSTGRES SQL install or either one it founds)
@@ -57,3 +70,9 @@ os.environ['PROJ_LIB'] = r'C:\Program Files\GDAL\projlib'
 os.environ['GDAL_DATA'] = r'C:\Program Files\GDAL\gdal-data'
 os.environ['GDAL_DRIVER_PATH'] = r'C:\Program Files\GDAL\gdalplugins'
 os.environ['PYTHONPATH'] = r'C:\Program Files\GDAL'
+
+# Progress bar settings
+__config_handler.set_global(length=20,
+                            spinner='dots_reverse',
+                            unknown='long_message',
+                            force_tty=True)
