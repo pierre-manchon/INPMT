@@ -24,12 +24,22 @@ import libpysal
 import pandas as pd
 import geopandas as gpd
 import shapefile as shp
+from shapely import speedups
 from shapefile import Reader
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr
 from collections import Iterable
 from .utils import format_dataset_output
+
+
+def __do_Speedups():
+    if speedups.available:
+        speedups.enable()
+        print('speedups enabled')
+    else:
+        speedups.disable()
+        print('speedups disabled')
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:

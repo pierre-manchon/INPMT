@@ -25,15 +25,18 @@ from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
+from timeit import default_timer
 
 try:
-    from utils.vector import merge_touching, to_wkt, iter_poly, intersect
-    from utils.raster import raster_crop, get_pixel_count, polygonize
-    from utils.utils import format_dataset_output, getConfigValue, read_qml
+    from __utils.vector import merge_touching, to_wkt, iter_poly, intersect
+    from __utils.raster import raster_crop, get_pixel_count, polygonize
+    from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
+    from __utils.decorators import timer
 except ImportError:
-    from .utils.vector import merge_touching, to_wkt, iter_poly, intersect
-    from .utils.raster import raster_crop, get_pixel_count, polygonize
-    from .utils.utils import format_dataset_output, getConfigValue, read_qml
+    from .__utils.vector import merge_touching, to_wkt, iter_poly, intersect
+    from .__utils.raster import raster_crop, get_pixel_count, polygonize
+    from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
+    from .__utils.decorators import timer
 
 
 def set_urban_profile(
@@ -74,7 +77,7 @@ def get_distances(pas: GeoDataFrame,
     """
     # TODO
     """
-    urban_treshold = getConfigValue('urban_area_treshold')
+    urban_treshold = __getConfigValue('urban_area_treshold')
     ug = set_urban_profile(urban_areas=urban_areas,
                            path_urban_areas=path_urban_areas,
                            urban_treshold=urban_treshold)
@@ -96,7 +99,7 @@ def get_distances(pas: GeoDataFrame,
     result = []
     weighted_dist = None
     for u in ug.values:
-        min_dist = getConfigValue('min_dist')
+        min_dist = __getConfigValue('min_dist')
         name = None
         for p in pas.values:
             dist = p[3].distance(u[3])
@@ -127,10 +130,10 @@ def get_profile(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
         landuse: AnyStr,
-        population: AnyStr,
-        anopheles: AnyStr,
+        population: AnyStr = '',
+        anopheles: AnyStr = '',
         method: AnyStr = 'duplicate',
-        distances: bool = True,
+        distances: bool = False,
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
@@ -178,7 +181,7 @@ def get_profile(
     result = GeoDataFrame()
     aoi_extract = GeoDataFrame()
     geodataframe_aoi.index.name = 'id'
-    dist_treshold = getConfigValue('dist_treshold')
+    dist_treshold = __getConfigValue('dist_treshold')
 
     # Format datasets outputs
     _, _, path_poly1 = format_dataset_output(dataset=aoi, name='tmp')
@@ -186,10 +189,17 @@ def get_profile(
 
     # Inserts new columns if the __data is given or not.
     if method == 'append':
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
+        try:
+            geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
+        except ValueError:
+            geodataframe_aoi.insert(0, 'HAB_DIV', 0)
     elif method == 'duplicate':
-        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
-        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
+        try:
+            aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
+            aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
+        except ValueError:
+            aoi_extract.insert(0, 'HAB', 0)
+            aoi_extract.insert(0, 'HAB_PROP', 0)
 
     if population:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
@@ -207,18 +217,22 @@ def get_profile(
         # Iterates over every polygon and yield its index too
         for i, p in iter_poly(shapefile=geodataframe_aoi):
             p.to_file(filename=path_poly1)
-
+            print(geodataframe_aoi.loc[i, 'NAME'])
+            start_time = default_timer()
             bar_main.text('Preparing')  # Pbar 1st level
             # Crops the raster file with the first polygon boundaries then polygonize the result.
             # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
-            path_occsol_cropped = raster_crop(dataset=landuse, shapefile=path_poly1)
-            gdf_os_pol = polygonize(dataset=path_occsol_cropped)
-
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1)
+            print('raster_crop: ', round(default_timer() - start_time), 3)
+            gdf_os_pol = polygonize(dataset=path_landuse_aoi)
+            print('polygonize: ', round(default_timer() - start_time), 3)
             # Intersects only if the __data is given at the start.
             if population:
                 _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
+                print('population intersects: ', round(default_timer() - start_time), 3)
             if anopheles:
                 _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
+                print('anopheles inetersects: ', round(default_timer() - start_time), 3)
 
             bar_main.text('Processing')  # Pbar 1st level
 
@@ -236,14 +250,14 @@ def get_profile(
                     aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
 
                     # Crops the raster file with the second polygon bounaries
-                    path_landuse_aoi_landuse = raster_crop(dataset=landuse, shapefile=path_poly2)
+                    path_landuse_aoi_landuse = raster_crop(dataset=path_landuse_aoi, shapefile=path_poly2)
                     if population:
                         population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
                     if anopheles:
                         anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                         anopheles_aoi_landuse['spnb'] = 0
                     bar_process()  # Pbar 2nd level
-
+                    # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                     bar_process.text('Habitat')  # Pbar 2nd level
                     # Count every pixel from the raster and its value
@@ -265,9 +279,9 @@ def get_profile(
                     # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to
                     #  load it into qgis export it into a qml file by hand.
                     # TODO Might improve performance by associating the label when searching for the categories
-                    __dataset_name, _, __qml_path = format_dataset_output(dataset=path_occsol_cropped, ext='.qml')
+                    __dataset_name, _, __qml_path = format_dataset_output(dataset=path_landuse_aoi, ext='.qml')
                     # Reads the corresponding legend style from the .qml file
-                    __style = read_qml(__qml_path)
+                    __style = __read_qml(__qml_path)
                     # Associates the category number the label name of the legend values (ridden from a .qml file)
                     for m, r in df_hab_div.iterrows():
                         for n in __style:

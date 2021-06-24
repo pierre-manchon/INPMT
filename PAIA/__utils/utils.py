@@ -129,13 +129,13 @@ def __count_values(pixel_array: List) -> Counter:
     return __nb
 
 
-def getConfigValue(value):
+def __getConfigValue(value):
     getcfgparser = ConfigParser()
     getcfgparser.read(config_file_path)
     return getcfgparser.get('config', value)
 
 
-def setConfigValue(var, value):
+def __setConfigValue(var, value):
     setcfgparser = ConfigParser(comment_prefixes='///', allow_no_value=True)
     setcfgparser.read_file(open(config_file_path))
     try:
@@ -148,7 +148,7 @@ def setConfigValue(var, value):
         print('\n')
 
 
-def read_qml(path_qml: AnyStr) -> List:
+def __read_qml(path_qml: AnyStr) -> List:
     xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
     for item in xml_data.getElementsByTagName('item'):
