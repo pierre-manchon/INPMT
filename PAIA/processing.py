@@ -126,10 +126,10 @@ def get_distances(pas: GeoDataFrame,
 def get_profile(
         geodataframe_aoi: GeoDataFrame,
         aoi: AnyStr,
-        habitat: AnyStr,
-        method: AnyStr,
+        landuse: AnyStr,
         population: AnyStr,
         anopheles: AnyStr,
+        method: AnyStr = 'duplicate',
         distances: bool = True,
         export: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
@@ -137,10 +137,10 @@ def get_profile(
         Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
 
     For every of those polygons, this function does two types of things:
-        - Crop/Intersect the data
-        - Process the data
+        - Crop/Intersect the __data
+        - Process the __data
 
-    There is four kind of data to be processed:
+    There is four kind of __data to be processed:
         - Land use
             - Read and count pixel values to see the diversity of these values
             - Read and associate the labels with the pixel values to get the land use categories and the proportionality
@@ -153,12 +153,15 @@ def get_profile(
             - Count every point in the polygon to get the number of sites where anopheles (mosquitoes) where captured
             - Count the number of species found for each captur sites (sums the number of 'Y' in every rows)
 
+    :param method:
     :param geodataframe_aoi: GeoDatFrame of the Areas of Interest to process.
     :type geodataframe_aoi: GeoDataFrame
     :param aoi: Path to the vector file of the Areas of Interest to process.
     :type aoi: AnyStr
-    :param habitat: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
-    :type habitat: AnyStr
+    :param landuse: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
+    :type landuse: AnyStr
+    :param method: The __data is produced as a duplicate for each habitat (default) or groupped by countries
+    :type method: AnyStr
     :param population: Vector file path for the population of Africa (WorldPop, 2020), Unconstrained, UN adjusted, 100m
     :type population: AnyStr
     :param anopheles: Vector file path of the Anopheles species present in countries in sub-Saharan Africa (Kyalo, 2019)
@@ -170,52 +173,102 @@ def get_profile(
     :return: Same file as input but with additional columns corresponding to the results of the calculations
     :rtype: tuple[GeoDataFrame, AnyStr]
     """
-    _, _, path_poly1 = format_dataset_output(dataset=aoi, name='tmp')
-    _, _, path_poly2 = format_dataset_output(dataset=habitat, name='tmp')
 
-    dist_treshold = getConfigValue('dist_treshold')
-    gdf_result = GeoDataFrame()
-    df_extract = GeoDataFrame()
+    # Creates empty GeoDataFrames used later to store the results
+    result = GeoDataFrame()
+    aoi_extract = GeoDataFrame()
     geodataframe_aoi.index.name = 'id'
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', 0)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', 0)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', 0)
-    geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', 0)
-    # At the end but before the geometry column because the types of habitats come after it.
-    for i, p in iter_poly(shapefile=geodataframe_aoi):
-        p.to_file(filename=path_poly1)
-        path_occsol_cropped = raster_crop(dataset=habitat, shapefile=path_poly1)
-        gdf_os_pol = polygonize(dataset=path_occsol_cropped)
-        _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
-        _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
-        with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
-            for o, q in iter_poly(shapefile=gdf_os_pol):
-                q.to_file(filename=path_poly2)
-                path_occsol_cropped_hab = raster_crop(dataset=habitat, shapefile=path_poly2)
-                df_extract = df_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
-                # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
-                if habitat:  # Habitat diversity
-                    bar_process.text('Habitats')  # Progress bar
-                    dataset, ctr = get_pixel_count(dataset_path=path_occsol_cropped_hab, band=0)
-                    bar_process()  # Progress bar
+    dist_treshold = getConfigValue('dist_treshold')
 
-                    bar_process.text('Land use')
-                    data = []
+    # Format datasets outputs
+    _, _, path_poly1 = format_dataset_output(dataset=aoi, name='tmp')
+    _, _, path_poly2 = format_dataset_output(dataset=landuse, name='tmp')
+
+    # Inserts new columns if the __data is given or not.
+    if method == 'append':
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
+    elif method == 'duplicate':
+        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
+        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
+
+    if population:
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', 0)
+    if distances:
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', 0)
+    if anopheles:
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', 0)
+
+    print('OK')
+
+    # Progress bar for the first level
+    with alive_bar(total=(len(geodataframe_aoi))) as bar_main:
+        # Iterates over every polygon and yield its index too
+        for i, p in iter_poly(shapefile=geodataframe_aoi):
+            p.to_file(filename=path_poly1)
+
+            bar_main.text('Preparing')  # Pbar 1st level
+            # Crops the raster file with the first polygon boundaries then polygonize the result.
+            # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
+            path_occsol_cropped = raster_crop(dataset=landuse, shapefile=path_poly1)
+            gdf_os_pol = polygonize(dataset=path_occsol_cropped)
+
+            # Intersects only if the __data is given at the start.
+            if population:
+                _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
+            if anopheles:
+                _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
+
+            bar_main.text('Processing')  # Pbar 1st level
+
+            # Progress bar for the second level
+            with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
+                # Iterates over every polygon and yield its index too
+                for o, q in iter_poly(shapefile=gdf_os_pol):
+                    q.to_file(filename=path_poly2)
+
+                    bar_process.text('Preparing')  # Pbar 2nd level
+                    # Set vars to default states
+                    __data = []
+                    __val = None
+                    # Extracts the row from geodataframe_aoi corresponding to the entity we're currently iterating over
+                    aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
+
+                    # Crops the raster file with the second polygon bounaries
+                    path_landuse_aoi_landuse = raster_crop(dataset=landuse, shapefile=path_poly2)
+                    if population:
+                        population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
+                    if anopheles:
+                        anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
+                        anopheles_aoi_landuse['spnb'] = 0
+                    bar_process()  # Pbar 2nd level
+
+                    # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
+                    bar_process.text('Habitat')  # Pbar 2nd level
+                    # Count every pixel from the raster and its value
+                    dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
                     for c in ctr:
+                        # Multiply the number of pixels by the resolution of a pixel
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
-                        # raster_area = sum(ctr.values())
+                        # Cross product with the geodataframe_aoi's polygon's area to get the percetage of land use of
+                        # the current category
                         percentage = ((category_area * 100) / p.area[0])
-                        data.append([c, ctr[c], category_area, percentage])
-
-                    df_hab_div = pd.DataFrame(data,
+                        __data.append([c, ctr[c], category_area, percentage])
+                    # Creates a DataFrame from the list processed previously
+                    df_hab_div = pd.DataFrame(__data,
                                               columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
-
+                    # Format the .qml file path from the dataset path
+                    # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
+                    # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
+                    # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
                     # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to
                     #  load it into qgis export it into a qml file by hand.
+                    # TODO Might improve performance by associating the label when searching for the categories
                     __dataset_name, _, __qml_path = format_dataset_output(dataset=path_occsol_cropped, ext='.qml')
+                    # Reads the corresponding legend style from the .qml file
                     __style = read_qml(__qml_path)
-                    __val = None
+                    # Associates the category number the label name of the legend values (ridden from a .qml file)
                     for m, r in df_hab_div.iterrows():
                         for n in __style:
                             if r['Category'] == n[0]:
@@ -223,77 +276,59 @@ def get_profile(
                             else:
                                 __val = 'Unknown'
                         df_hab_div.loc[m, 'Label'] = __val
-                    # TODO Est-ce que ça fait pas bugger par rapport à l'itération ?
+                    # Checks the __data has been given to process only what is available
+                    # TODO Est-ce que ça fait pas bugger par rapport à l'itération de mettre method =='append' ?
                     if method == 'append:':
-                        try:
-                            geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
-                        except ValueError:
-                            pass
-                        df_extract.loc[o, 'HAB_DIV'] = len(ctr)
+                        aoi_extract.loc[o, 'HAB_DIV'] = len(ctr)
                         df_hab_div = df_hab_div.pivot_table(columns='Label',
                                                             values='Proportion (%)',
                                                             aggfunc='sum')
                         df_hab_div.rename(index={'Proportion (%)': int(o)}, inplace=True)
-                        df_extract.loc[o, df_hab_div.columns] = df_hab_div.loc[o, :].values
+                        aoi_extract.loc[o, df_hab_div.columns] = df_hab_div.loc[o, :].values
                     elif method == 'duplicate':
-                        try:
-                            df_extract.insert(df_extract.shape[1] - 1, 'HAB', 0)
-                            df_extract.insert(df_extract.shape[1] - 1, 'HAB_PROP', 0)
-                        except ValueError:
-                            pass
-                        df_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
-                        df_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
-                    else:
-                        pass
-                    bar_process()  # Progress bar
-                """
-                if population:  # Population and urban patches
-                    bar_process.text('Population')  # Progress bar
-                    gdf_pop_cropped = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
-                    df_extract.loc[o, 'SUM_POP'] = int(gdf_pop_cropped['DN'].sum())
-                    df_extract.loc[o, 'DENS_POP'] = int(gdf_pop_cropped['DN'].sum() / p.area[0])
-                    bar_process()  # Progress bar
+                        aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
+                        aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
+                    bar_process()  # Pbar 2nd level
 
-                if distances:  # Distances and urban fragmentation
-                    # No need to intersect it again
-                    bar_process.text('Distances')  # Progress bar
-                    # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
-                    dbc = lps.weights.DistanceBand.from_dataframe(gdf_pop_cropped,
-                                                                  threshold=dist_treshold,
-                                                                  p=2,
-                                                                  binary=False,
-                                                                  build_sp=True,
-                                                                  silent=True)
-                    df_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
-                    bar_process()  # Progress bar
-                """
-                if anopheles:  # Anopheles diversity and catching sites
-                    bar_process.text('Anopheles')  # Progress bar
-                    gdf_anopheles_cropped = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
-                    gdf_anopheles_cropped['spnb'] = 0
-                    gdf_anopheles_cropped['PA_dist'] = ''
-                    gdf_anopheles_cropped['PA_buffer_dist'] = ''
-                    for x in range(0, len(gdf_anopheles_cropped)):
-                        gdf_anopheles_cropped.loc[x, 'spnb'] = gdf_anopheles_cropped.iloc[x].str.count('Y').sum()
-                        gdf_anopheles_cropped.loc[x, 'PA_dist'] = 'PA_dist'
-                        gdf_anopheles_cropped.loc[x, 'PA_buffer_dist'] = 'PA_buffer_dist'
+                    bar_process.text('Population')  # Pbar 2nd level
+                    if population:  # Population and urban patches
+                        aoi_extract.loc[o, 'SUM_POP'] = int(population_aoi_landuse['DN'].sum())
+                        aoi_extract.loc[o, 'DENS_POP'] = int(population_aoi_landuse['DN'].sum() / p.area[0])
+                    bar_process()  # Pbar 2nd level
 
-                    df_extract.loc[o, 'CATCH_SITE'] = int(len(gdf_anopheles_cropped))
-                    df_extract.loc[o, 'SPECIE_DIV'] = gdf_anopheles_cropped['spnb'].max()
-                    bar_process()  # Progress bar
+                    bar_process.text('Distances')  # Pbar 2nd level
+                    if distances:  # Distances and urban fragmentation
+                        # No need to intersect it again
+                        # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
+                        dbc = lps.weights.DistanceBand.from_dataframe(population_aoi_landuse,
+                                                                      threshold=dist_treshold,
+                                                                      p=2,
+                                                                      binary=False,
+                                                                      build_sp=True,
+                                                                      silent=True)
+                        aoi_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
+                    bar_process()  # Pbar 2nd level
 
-        gdf_result = gdf_result.append(df_extract, ignore_index=True)
-        # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
-        # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
-        # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
+                    bar_process.text('Anopheles')  # Pbar 2nd level
+                    if anopheles:  # Anopheles diversity and catching sites
+                        for x in range(0, len(anopheles_aoi_landuse)):
+                            anopheles_aoi_landuse.loc[x, 'spnb'] = anopheles_aoi_landuse.iloc[x].str.count('Y').sum()
+                        aoi_extract.loc[o, 'CATCH_SITE'] = int(len(anopheles_aoi_landuse))
+                        aoi_extract.loc[o, 'SPECIE_DIV'] = anopheles_aoi_landuse['spnb'].max()
+                    bar_process()  # Pbar 2nd level
 
-        print('[{}/{}]'.format(i+1, len(geodataframe_aoi)))
+            bar_main.text('Append')  # Pbar 1st level
+            result = result.append(aoi_extract, ignore_index=True)
+
+            bar_main.text('Done')  # Progress bar for the first level
+            print('[{}/{}]'.format(i+1, len(geodataframe_aoi)))
+            bar_main()  # Progress bar for the first level
 
         # End
 
     if export:
         _, _, path_poly1 = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
-        gdf_result.to_excel(path_poly1, index=False)
-        return gdf_result, aoi
+        result.to_excel(path_poly1, index=False)
+        return result, aoi
     else:
-        return gdf_result, aoi
+        return result, aoi
