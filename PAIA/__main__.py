@@ -114,6 +114,7 @@ gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
 gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
 import argparse
+from shutil import rmtree
 from os import path, system, name
 from sys import argv, stderr, exit
 from typing import AnyStr
@@ -123,13 +124,13 @@ from shlex import quote as shlex_quote
 from argparse import ArgumentTypeError
 
 try:
-    from processing import get_profile
-    from utils.utils import setConfigValue, format_dataset_output
-    from utils.vector import __read_shapefile_as_geodataframe
+    from __processing import get_profile
+    from __utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
+    from __utils.vector import __read_shapefile_as_geodataframe
 except ImportError:
-    from .processing import get_profile
-    from .utils.utils import setConfigValue, format_dataset_output
-    from .utils.vector import __read_shapefile_as_geodataframe
+    from .__processing import get_profile
+    from .__utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
+    from .__utils.vector import __read_shapefile_as_geodataframe
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
@@ -141,25 +142,14 @@ config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
 # Appears to be impossible due to qgz project file being a binary type file
 
 
-def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
+def run(aoi: AnyStr,
+        processing_dir: AnyStr = './.processing/',
+        export: bool = False
+        ) -> GeoDataFrame:
     """
     Docstring
 
-    :param aoi:
-    :type aoi:
-    :param export:
-    :type export:
-    :return:
-    :rtype:
-    """
-    population = '../PAIA/datasets/UNadj_constrained_merged_degraded.tif'
-    landuse = '../PAIA/datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-    anopheles_kyalo = '../PAIA/datasets/VectorDB_1898-2016.shp'
-    irish = '../PAIA/datasets/africa_countries_irish_tmp.shp'
-    protected_areas = '../PAIA/datasets/WDPA_Africa_anopheles.shp'
-    protected_areas_buffered = '../PAIA/datasets/WDPA_Africa_anopheles_buffer10km.shp'
-
-    path_urbain = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
+    path_urbain =  r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
     path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
                           r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
     path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
@@ -172,13 +162,36 @@ def run(aoi: AnyStr, export: bool = False) -> GeoDataFrame:
     path_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
                  r'Limites administratives/gabon.shp'
 
+    :param datasets:
+    :type datasets:
+    :param processing_dir:
+    :type processing_dir:
+    :param aoi:
+    :type aoi:
+    :param export:
+    :type export:
+    :return:
+    :rtype:
+    """
+    datasets = __getConfigValue('datasets_storage_path')
+
+    population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
+    landuse = path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
+    anopheles_kyalo = path.join(datasets, 'VectorDB_1898-2016.shp')
+    countries_irish = path.join(datasets, 'africa_countries_irish_tmp.shp')
+    protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
+    protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
+    # TODO Polygonize population
+    # TODO Polygonize Land Use
+
     # Read file as a geodataframe
     gdf_aoi = __read_shapefile_as_geodataframe(aoi)
     gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
                                                       aoi=aoi,
-                                                      landuse=path_occsol_degrade,
-                                                      anopheles=path_anopheles)
-
+                                                      landuse=landuse,
+                                                      anopheles=anopheles_kyalo)
+    # Clean the processing directory
+    rmtree(processing_dir)
     if export:
         # Retrieves the directory the dataset is in and joins it the output filename
         _, _, output_countries = format_dataset_output(dataset=aoi, name='profiling')
@@ -273,14 +286,13 @@ def main():
         elif args.config is not None:
             if len(args.config) == 2:
                 var, value = args.config
-                setConfigValue(var, value)
+                __setConfigValue(var, value)
                 with open(config_file_path, 'r') as cfg:
                     print(cfg.read())
             elif len(args.config) == 0:
                 with open(config_file_path, 'r') as cfg:
                     print(cfg.read())
         elif args.aoi:
-            print(args.aoi)
             _ = run(aoi=args.aoi, export=True)
     except AttributeError:
         parser.print_help(stderr)
