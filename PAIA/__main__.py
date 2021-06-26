@@ -147,27 +147,11 @@ def run(aoi: AnyStr,
         export: bool = False
         ) -> GeoDataFrame:
     """
-    Docstring
-
-    path_urbain =  r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\0/pop_polygonized_taille.shp'
-    path_occsol_degrade = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Occupation du sol/' \
-                          r'Produit OS/ESA CCI/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-    path_anopheles = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Anophèles/VectorDB_1898-2016.shp'
-    path_countries_irish = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
-                           r'Limites administratives/africa_countries_irish.shp'
-    path_pas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/Aires protegees/' \
-               r'WDPA_Africa_anopheles.shp'
-    path_pa_buffer_africa = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/Occupation du sol/' \
-                            r'Aires protegees/WDPA_Mar2021_Public_AFRICA_Land_buffered10km.shp'
-    path_gabon = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\Administratif/' \
-                 r'Limites administratives/gabon.shp'
-
-    :param datasets:
-    :type datasets:
-    :param processing_dir:
-    :type processing_dir:
+    path_urbain =  r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/0/pop_polygonized_taille.shp'
     :param aoi:
     :type aoi:
+    :param processing_dir:
+    :type processing_dir:
     :param export:
     :type export:
     :return:
@@ -175,12 +159,12 @@ def run(aoi: AnyStr,
     """
     datasets = __getConfigValue('datasets_storage_path')
 
-    population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
+    # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
     landuse = path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
     anopheles_kyalo = path.join(datasets, 'VectorDB_1898-2016.shp')
-    countries_irish = path.join(datasets, 'africa_countries_irish_tmp.shp')
-    protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
-    protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
+    # countries_irish = path.join(datasets, 'africa_countries_irish_tmp.shp')
+    # protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
+    # protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
     # TODO Polygonize population
     # TODO Polygonize Land Use
 
@@ -202,6 +186,12 @@ def run(aoi: AnyStr,
 
 
 def main():
+    """
+    Function to manage the CLI
+
+    :return: Nothing
+    :rtype: None
+    """
     # Clean the terminal everytime a command is triggered
     system(shlex_quote('cls' if name == 'nt' else 'clear'))
 
