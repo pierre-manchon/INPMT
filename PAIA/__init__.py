@@ -19,21 +19,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Built-ins
-import os
-from sys import modules as __modules
+from os import environ as __environ
+from sys import version_info as __version_info, modules as __modules
 from configparser import ConfigParser as __ConfigParser
 from alive_progress import config_handler as __config_handler
-from .__utils.vector import __do_Speedups
 
 try:
     from __main__ import run
+    from __utils.vector import __do_Speedups
+    from __utils.utils import format_dataset_output
 except ImportError:
     from .__main__ import run
+    from .__utils.vector import __do_Speedups
+    from .__utils.utils import format_dataset_output
+
+# Si la version de python est trop ancienne, le code ne s'execute
+__current_python_version = '{}.{}'.format(__version_info[0], __version_info[1])
+if __current_python_version != '3.9':
+    raise Exception("Python 3.9 is required.")
+
 
 __cfgparser = __ConfigParser()
 __cfgparser.read('setup.cfg')
 
-__name__ = __cfgparser.get('setup', 'name')
 __package__ = __cfgparser.get('setup', 'name')
 __file__ = __modules[__name__]
 __doc__ = __modules[__name__].__doc__
@@ -43,7 +51,6 @@ __author__ = __cfgparser.get('setup', 'author')
 __email__ = __cfgparser.get('setup', 'author_email')
 
 __all__ = (
-    '__name__',
     '__package__',
     '__doc__',
     '__version__',
@@ -66,10 +73,10 @@ __do_Speedups()
 # POSTGRES SQL install or either one it founds)
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?
-os.environ['PROJ_LIB'] = r'C:\Program Files\GDAL\projlib'
-os.environ['GDAL_DATA'] = r'C:\Program Files\GDAL\gdal-data'
-os.environ['GDAL_DRIVER_PATH'] = r'C:\Program Files\GDAL\gdalplugins'
-os.environ['PYTHONPATH'] = r'C:\Program Files\GDAL'
+__environ['PROJ_LIB'] = r'C:\Program Files\GDAL\projlib'
+__environ['GDAL_DATA'] = r'C:\Program Files\GDAL\gdal-data'
+__environ['GDAL_DRIVER_PATH'] = r'C:\Program Files\GDAL\gdalplugins'
+__environ['PYTHONPATH'] = r'C:\Program Files\GDAL'
 
 # Progress bar settings
 __config_handler.set_global(length=20,
