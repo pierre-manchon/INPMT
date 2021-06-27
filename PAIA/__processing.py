@@ -31,12 +31,10 @@ try:
     from __utils.vector import merge_touching, to_wkt, iter_poly, intersect
     from __utils.raster import raster_crop, get_pixel_count, polygonize
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
-    from __utils.decorators import timer
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_poly, intersect
     from .__utils.raster import raster_crop, get_pixel_count, polygonize
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
-    from .__utils.decorators import timer
 
 
 def set_urban_profile(
@@ -217,6 +215,7 @@ def get_profile(
         # Iterates over every polygon and yield its index too
         for i, p in iter_poly(shapefile=geodataframe_aoi):
             p.to_file(filename=path_poly1)
+            # TODO Multithreading to ce qui est en dessous
             print(geodataframe_aoi.loc[i, 'NAME'])
             start_time = default_timer()
             bar_main.text('Preparing')  # Pbar 1st level
@@ -240,6 +239,7 @@ def get_profile(
             with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
                 # Iterates over every polygon and yield its index too
                 for o, q in iter_poly(shapefile=gdf_os_pol):
+                    # TODO Multiprocessing tout ce qui est en dessous
                     q.to_file(filename=path_poly2)
 
                     bar_process.text('Preparing')  # Pbar 2nd level
