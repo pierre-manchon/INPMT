@@ -169,8 +169,8 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
     :rtype: GeoDataFrame
     """
     base['intersects'] = False
-    for w, x in iter_poly(shapefile=base):
-        for y, z in iter_poly(shapefile=interest):
+    for w, x in iter_geoseries_as_geodataframe(shapefile=base):
+        for y, z in iter_geoseries_as_geodataframe(shapefile=interest):
             if x.intersects(z)[0]:
                 base.loc[w, 'intersects'] = True
     to_drop = base.loc[base.loc[:, 'intersects'] != True].index
@@ -180,7 +180,7 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
     return base
 
 
-def iter_poly(shapefile: GeoDataFrame) -> Iterable:
+def iter_geoseries_as_geodataframe(shapefile: GeoDataFrame) -> Iterable:
     """
     Takes a GeoDataFrame as input file then iterates over it and yields each shape and its index as a GeoDataFrame.
 
