@@ -1,2 +1,2 @@
-# PAIA [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pierre-manchon/PAIA)](https://github.com/pierre-manchon/PAIA/releases/latest) [![GitHub](https://img.shields.io/github/license/pierre-manchon/PAIA)](https://www.gnu.org/licenses/gpl-3.0.en.html) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4972214.svg)](https://doi.org/10.5281/zenodo.4972214)   
- Protected Areas Impact on Anopheles for Malaria Transmission
+# INPMT [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pierre-manchon/PAIA)](https://github.com/pierre-manchon/PAIA/releases/latest) [![GitHub](https://img.shields.io/github/license/pierre-manchon/PAIA)](https://www.gnu.org/licenses/gpl-3.0.en.html) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4972214.svg)](https://doi.org/10.5281/zenodo.4972214)   
+Impact of National Parks on Malaria Transmission

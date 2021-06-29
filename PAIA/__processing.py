@@ -1,7 +1,7 @@
 # -*-coding: utf8 -*
 """
-PAIA
-A tool to process data to learn more about Protected Areas Impact on Malaria Transmission
+INPMT
+A tool to process data to learn more about Impact of National Parks on Malaria Transmission
 
 Copyright (C) <2021>  <Manchon Pierre>
 
