@@ -145,7 +145,7 @@ def get_urban_profile(interest: AnyStr,
 
     with alive_bar(total=len(villages)) as process_bar:
         for i, p in iter_geoseries_as_geodataframe(villages):
-            patch_buffered = p.buffer(patch_buffer_size)
+            # patch_buffered = p.buffer(patch_buffer_size)
             process_bar.text('Distances')
             for o, q in iter_geoseries_as_geodataframe(parks):
                 # Check every distance and once every polygon has been checked: returns the distance and name of nearest
