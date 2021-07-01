@@ -114,7 +114,7 @@ gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
 gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
 import argparse
-from shutil import rmtree
+from tempfile import TemporaryDirectory
 from os import path, system, name
 from sys import argv, stderr, exit
 from typing import AnyStr
@@ -124,13 +124,11 @@ from shlex import quote as shlex_quote
 from argparse import ArgumentTypeError
 
 try:
-    from __processing import get_profile
+    from __processing import get_countries_profile, get_distances
     from __utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
-    from __utils.vector import __read_shapefile_as_geodataframe
 except ImportError:
-    from .__processing import get_profile
+    from .__processing import get_countries_profile, get_distances
     from .__utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
-    from .__utils.vector import __read_shapefile_as_geodataframe
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
@@ -143,46 +141,53 @@ config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
 
 
 def run(aoi: AnyStr,
-        processing_dir: AnyStr = './.processing/',
+        export_dir: AnyStr = './results/',
         export: bool = False
         ) -> GeoDataFrame:
     """
     path_urbain =  r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/0/pop_polygonized_taille.shp'
+
     :param aoi:
-    :type aoi:
-    :param processing_dir:
-    :type processing_dir:
+    :param export_dir:
     :param export:
-    :type export:
     :return:
-    :rtype:
     """
     datasets = __getConfigValue('datasets_storage_path')
-
     # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
     landuse = path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
+    landuse_polygonized = path.join(datasets, '')
     anopheles_kyalo = path.join(datasets, 'VectorDB_1898-2016.shp')
     # countries_irish = path.join(datasets, 'africa_countries_irish_tmp.shp')
     # protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
     # protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
+    """
+    path_irish: r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/africa_countries_irish.shp'
+    protected_areas = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/WDPA_Africa_anopheles.shp'
+    protected_areas_buffered = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/WDPA_Africa_anopheles_buffer10km.shp'
+    population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/UNadj_constrained_merged_degraded.tif'
+    landuse = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    anopheles_kyalo = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/VectorDB_1898-2016.shp'
+    """
     # TODO Polygonize population
     # TODO Polygonize Land Use
 
-    # Read file as a geodataframe
-    gdf_aoi = __read_shapefile_as_geodataframe(aoi)
-    gdf_profiles_aoi, path_profiles_aoi = get_profile(geodataframe_aoi=gdf_aoi,
-                                                      aoi=aoi,
-                                                      landuse=landuse,
-                                                      anopheles=anopheles_kyalo)
-    # Clean the processing directory
-    rmtree(processing_dir)
-    if export:
-        # Retrieves the directory the dataset is in and joins it the output filename
-        _, _, output_countries = format_dataset_output(dataset=aoi, name='profiling')
-        gdf_profiles_aoi.to_file(output_countries)
-        return gdf_profiles_aoi
-    else:
-        return gdf_profiles_aoi
+    with TemporaryDirectory() as tmp_directory:
+        # Read file as a geodataframe
+        gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(aoi=aoi,
+                                                                    landuse=landuse,
+                                                                    landuse_polygonized=landuse_polygonized,
+                                                                    anopheles=anopheles_kyalo,
+                                                                    processing_directory=tmp_directory)
+
+        if export:
+            # Retrieves the directory the dataset is in and joins it the output filename
+            _, _, output_profiles = format_dataset_output(dataset=export_dir, name='profiles')
+            _, _, output_kyalo = format_dataset_output(dataset=export_dir, name='kyalo')
+            gdf_profiles_aoi.to_file(output_profiles)
+            # gfd_kyalo.to_file(output_kyalos)
+            return gdf_profiles_aoi
+        else:
+            return gdf_profiles_aoi
 
 
 def main():

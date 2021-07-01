@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Built-ins
 from os import environ as __environ
-from sys import version_info as __version_info, modules as __modules
+from sys import version_info as __version_info, modules as __modules, executable as __executable
 from configparser import ConfigParser as __ConfigParser
 from alive_progress import config_handler as __config_handler
 
@@ -38,6 +38,9 @@ __current_python_version = '{}.{}'.format(__version_info[0], __version_info[1])
 if __current_python_version != '3.9':
     raise Exception("Python 3.9 is required.")
 
+# To avoid writing venv's python path everytime
+# Might be overridden by the setup.py entry points
+__environ['PATH'] = __executable
 
 __cfgparser = __ConfigParser()
 __cfgparser.read('setup.cfg')

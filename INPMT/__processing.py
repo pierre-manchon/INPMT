@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import os
 import math
 import pandas as pd
 import libpysal as lps
@@ -25,14 +26,13 @@ from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
-from timeit import default_timer
 
 try:
-    from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect
+    from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shapefile_as_geodataframe
     from __utils.raster import raster_crop, get_pixel_count, polygonize
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
 except ImportError:
-    from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect
+    from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shapefile_as_geodataframe
     from .__utils.raster import raster_crop, get_pixel_count, polygonize
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
 
@@ -75,7 +75,7 @@ def get_distances(pas: GeoDataFrame,
     """
     # TODO
     """
-    urban_treshold = __getConfigValue('urban_area_treshold')
+    urban_treshold = __getConfigValue('area_treshold')
     ug = set_urban_profile(urban_areas=urban_areas,
                            path_urban_areas=path_urban_areas,
                            urban_treshold=urban_treshold)
@@ -124,15 +124,48 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-def get_profile(
-        geodataframe_aoi: GeoDataFrame,
+def get_urban_profile(interest: AnyStr,
+                      interest2: AnyStr,
+                      ) -> DataFrame:
+    """
+    AAA
+
+    :param interest:
+    :param interest2:
+    :return:
+    """
+    villages = __read_shapefile_as_geodataframe(interest)
+    parks = __read_shapefile_as_geodataframe(interest2)
+    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+
+    name = None
+    min_dist = __getConfigValue('min_dist')
+    patch_buffer_size = __getConfigValue('patch_buffer_size')
+
+    with alive_bar(total=len(villages)) as process_bar:
+        for i, p in iter_geoseries_as_geodataframe(villages):
+            patch_buffered = p.buffer(patch_buffer_size)
+            for o, q in iter_geoseries_as_geodataframe(parks):
+                # Check every distance and once every polygon has been checked: returns the distance and name of nearest
+                dist = p.boundary.distance(q)
+                if dist < min_dist:
+                    min_dist = dist
+                    name = parks.loc[o, 'NAME']
+            result.loc[i, 'NP'] = name
+            result.loc[i, 'dist_NP'] = min_dist
+            process_bar()
+    return result
+
+
+def get_countries_profile(
         aoi: AnyStr,
         landuse: AnyStr,
+        landuse_polygonized: AnyStr,
+        processing_directory: AnyStr,
         population: AnyStr = '',
         anopheles: AnyStr = '',
         method: AnyStr = 'duplicate',
-        distances: bool = False,
-        export: bool = False
+        distances: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
         Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
@@ -154,9 +187,9 @@ def get_profile(
             - Count every point in the polygon to get the number of sites where anopheles (mosquitoes) where captured
             - Count the number of species found for each captur sites (sums the number of 'Y' in every rows)
 
+    :param landuse_polygonized:
+    :param processing_directory:
     :param method:
-    :param geodataframe_aoi: GeoDatFrame of the Areas of Interest to process.
-    :type geodataframe_aoi: GeoDataFrame
     :param aoi: Path to the vector file of the Areas of Interest to process.
     :type aoi: AnyStr
     :param landuse: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
@@ -178,12 +211,15 @@ def get_profile(
     # Creates empty GeoDataFrames used later to store the results
     result = GeoDataFrame()
     aoi_extract = GeoDataFrame()
+    geodataframe_aoi = __read_shapefile_as_geodataframe(shapefile=aoi)
     geodataframe_aoi.index.name = 'id'
     dist_treshold = __getConfigValue('dist_treshold')
 
-    # Format datasets outputs
-    _, _, path_poly1 = format_dataset_output(dataset=aoi, name='tmp')
-    _, _, path_poly2 = format_dataset_output(dataset=landuse, name='tmp')
+    # Format datasets outputs with the temporary directory's path
+    p1, p1ext, _ = format_dataset_output(dataset=aoi, name='tmp')
+    path_poly1 = os.path.join(processing_directory, ''.join([p1, p1ext]))
+    p2, p2ext, _ = format_dataset_output(dataset=landuse, name='tmp')
+    path_poly2 = os.path.join(processing_directory, ''.join([p2, p2ext]))
 
     # Inserts new columns if the __data is given or not.
     if method == 'append':
@@ -211,27 +247,23 @@ def get_profile(
     print('OK')
 
     # Progress bar for the first level
-    with alive_bar(total=(len(geodataframe_aoi))) as bar_main:
+    with alive_bar(total=len(geodataframe_aoi)) as bar_main:
         # Iterates over every polygon and yield its index too
         for i, p in iter_geoseries_as_geodataframe(shapefile=geodataframe_aoi):
             p.to_file(filename=path_poly1)
             # TODO Multithreading to ce qui est en dessous
-            print(geodataframe_aoi.loc[i, 'NAME'])
-            start_time = default_timer()
+
             bar_main.text('Preparing')  # Pbar 1st level
             # Crops the raster file with the first polygon boundaries then polygonize the result.
             # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
-            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1)
-            print('raster_crop: ', round(default_timer() - start_time), 3)
-            gdf_os_pol = polygonize(dataset=path_landuse_aoi)
-            print('polygonize: ', round(default_timer() - start_time), 3)
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1, processing=processing_directory)
+            gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857, export=False)
+
             # Intersects only if the __data is given at the start.
             if population:
                 _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
-                print('population intersects: ', round(default_timer() - start_time), 3)
             if anopheles:
                 _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
-                print('anopheles inetersects: ', round(default_timer() - start_time), 3)
 
             bar_main.text('Processing')  # Pbar 1st level
 
@@ -250,7 +282,10 @@ def get_profile(
                     aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
 
                     # Crops the raster file with the second polygon bounaries
-                    path_landuse_aoi_landuse = raster_crop(dataset=path_landuse_aoi, shapefile=path_poly2)
+                    path_landuse_aoi_landuse = raster_crop(
+                        dataset=path_landuse_aoi,
+                        shapefile=path_poly2,
+                        processing=processing_directory)
                     if population:
                         population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
                     if anopheles:
@@ -339,10 +374,4 @@ def get_profile(
             bar_main()  # Progress bar for the first level
 
         # End
-
-    if export:
-        _, _, path_poly1 = format_dataset_output(dataset=aoi, name='profiles', ext='.xlsx')
-        result.to_excel(path_poly1, index=False)
-        return result, aoi
-    else:
         return result, aoi

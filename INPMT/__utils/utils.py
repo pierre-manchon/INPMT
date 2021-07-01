@@ -80,23 +80,18 @@ def format_dataset_output(dataset: AnyStr = '',
             raise UserWarning("Custom dataset path must have attribute 'ext' set")
         pass
 
-    if name != '' and name not in Path(dataset).name:
-        __dataset_name = ''.join([__dataset_name, '_'])
+    if prevent_duplicate:
+        if name != '' and name not in Path(dataset).name:
+            __dataset_name = ''.join([__dataset_name, '_', name])
     else:
-        pass
+        __dataset_name = ''.join([__dataset_name, '_', name])
 
     if ext != '':
         __ext = ext
     else:
         pass
 
-    if prevent_duplicate:
-        if name in Path(dataset).name:
-            __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
-        else:
-            __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
-    else:
-        __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, name, __ext]))
+    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
     return __dataset_name, __ext, __output_path
 
 

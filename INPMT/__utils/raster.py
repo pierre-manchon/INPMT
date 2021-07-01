@@ -84,7 +84,7 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     return __dataset, __ctr
 
 
-def raster_crop(dataset: AnyStr, shapefile: AnyStr, overwrite: bool = False) -> AnyStr:
+def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False) -> AnyStr:
     """
     Crop raster with geodataframe boundary
     :param overwrite:
@@ -106,7 +106,8 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, overwrite: bool = False) -> 
                                 "height": cropped_dataset.shape[1],
                                 "width": cropped_dataset.shape[2],
                                 "transform": output_transform})
-            *_, __output_path = format_dataset_output(dataset=dataset, name='cropped_tmp', prevent_duplicate=False)
+            r, r_ext, _ = format_dataset_output(dataset=dataset, name='cropped_tmp', prevent_duplicate=False)
+            __output_path = os.path.join(processing, ''.join([r, r_ext]))
 
             if overwrite:
                 try:
