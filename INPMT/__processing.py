@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import math
+import time
 import pandas as pd
 import libpysal as lps
 from alive_progress import alive_bar
@@ -145,6 +146,7 @@ def get_urban_profile(interest: AnyStr,
     with alive_bar(total=len(villages)) as process_bar:
         for i, p in iter_geoseries_as_geodataframe(villages):
             patch_buffered = p.buffer(patch_buffer_size)
+            process_bar.text('Distances')
             for o, q in iter_geoseries_as_geodataframe(parks):
                 # Check every distance and once every polygon has been checked: returns the distance and name of nearest
                 dist = p.boundary.distance(q)
@@ -153,6 +155,9 @@ def get_urban_profile(interest: AnyStr,
                     name = parks.loc[o, 'NAME']
             result.loc[i, 'NP'] = name
             result.loc[i, 'dist_NP'] = min_dist
+            process_bar()
+            process_bar.text('NDVI')
+            time.sleep(1)
             process_bar()
     return result
 
