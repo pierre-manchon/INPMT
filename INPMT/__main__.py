@@ -161,12 +161,12 @@ def run(aoi: AnyStr,
     # protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
     # protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
     """
-    path_irish: r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/africa_countries_irish.shp'
-    protected_areas = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/WDPA_Africa_anopheles.shp'
-    protected_areas_buffered = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/WDPA_Africa_anopheles_buffer10km.shp'
-    population = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/UNadj_constrained_merged_degraded.tif'
-    landuse = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-    anopheles_kyalo = r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets/VectorDB_1898-2016.shp'
+    path_irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
+    protected_areas = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/WDPA_Africa_anopheles.shp'
+    protected_areas_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/WDPA_Africa_anopheles_buffer10km.shp'
+    population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/UNadj_constrained_merged_degraded.tif'
+    landuse = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
     """
     # TODO Polygonize population
     # TODO Polygonize Land Use
