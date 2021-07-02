@@ -74,7 +74,7 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     return df, sf
 
 
-def __read_shapefile_as_geodataframe(shapefile: AnyStr) -> GeoDataFrame:
+def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     """
 
 

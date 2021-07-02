@@ -20,8 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import math
-import time
 import pandas as pd
+import geopandas as gpd
 import libpysal as lps
 from alive_progress import alive_bar
 from pandas import DataFrame
@@ -29,11 +29,11 @@ from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 
 try:
-    from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shapefile_as_geodataframe
+    from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
     from __utils.raster import raster_crop, get_pixel_count, polygonize
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
 except ImportError:
-    from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shapefile_as_geodataframe
+    from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
     from .__utils.raster import raster_crop, get_pixel_count, polygonize
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
 
@@ -135,12 +135,12 @@ def get_urban_profile(interest: AnyStr,
     :param interest2:
     :return:
     """
-    villages = __read_shapefile_as_geodataframe(interest)
-    parks = __read_shapefile_as_geodataframe(interest2)
-    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
-
+    villages = gpd.read_file(interest)
+    parks = gpd.read_file(interest2)
+    # result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+    """
     name = None
-    min_dist = __getConfigValue('min_dist')
+    min_dist = int(__getConfigValue('min_dist'))
     patch_buffer_size = __getConfigValue('patch_buffer_size')
 
     with alive_bar(total=len(villages)) as process_bar:
@@ -150,6 +150,8 @@ def get_urban_profile(interest: AnyStr,
             for o, q in iter_geoseries_as_geodataframe(parks):
                 # Check every distance and once every polygon has been checked: returns the distance and name of nearest
                 dist = p.boundary.distance(q)
+                print(dist)
+                type(dist)
                 if dist < min_dist:
                     min_dist = dist
                     name = parks.loc[o, 'NAME']
@@ -160,6 +162,8 @@ def get_urban_profile(interest: AnyStr,
             time.sleep(1)
             process_bar()
     return result
+    """
+    return villages, parks
 
 
 def get_countries_profile(
@@ -216,7 +220,7 @@ def get_countries_profile(
     # Creates empty GeoDataFrames used later to store the results
     result = GeoDataFrame()
     aoi_extract = GeoDataFrame()
-    geodataframe_aoi = __read_shapefile_as_geodataframe(shapefile=aoi)
+    geodataframe_aoi = __read_shp_as_gdf(shapefile=aoi)
     geodataframe_aoi.index.name = 'id'
     dist_treshold = __getConfigValue('dist_treshold')
 
