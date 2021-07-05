@@ -170,7 +170,7 @@ def run(aoi: AnyStr,
     national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/WDPA_Africa_anopheles_buffer10km.shp'
     kyalo_in_national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/anopheles_in_PAs.shp'
     kyalo_in_national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/anopheles_in_PAs_buffers.shp'
-    national_parks_lemonde_with_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/PAs_buffers_anos.shp'
+    national_parks_lemonde_buffered_with_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/PAs_buffers_anos.shp'
     """
     # TODO Polygonize population
     # TODO Polygonize Land Use
