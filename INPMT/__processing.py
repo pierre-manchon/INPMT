@@ -35,7 +35,7 @@ try:
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from .__utils.raster import raster_crop, get_pixel_count, polygonizeX
+    from .__utils.raster import raster_crop, get_pixel_count, polygonize
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
 
 
@@ -141,26 +141,27 @@ def get_urban_profile(villages: AnyStr,
     """
     gdf_villages = gpd.read_file(villages)
     gdf_parks = gpd.read_file(parks)
+    gdf_villages.crs = 3857
+    gdf_parks.crs = 3857
     result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
     with alive_bar(total=len(gdf_villages)) as process_bar:
         for x in range(len(gdf_villages)):
-            name = None
+            name = ""
             min_dist = 100000
-            process_bar.text('Distances')
             for y in range(len(gdf_parks)):
-                try:
-                    dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[x, 'geometry'])
-                    if dist < min_dist:
-                        min_dist = dist
-                        name = gdf_parks.loc[y, 'NAME']
-                except ValueError:
-                    pass
+                dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[x, 'geometry'])
+                if dist < min_dist:
+                    min_dist = dist
+                    name = gdf_parks.loc[y, 'NAME']
+                    if gdf_parks.loc[y, 'geometry'].distance(gdf_villages.loc[x, 'geometry']) == 0.0:
+                        res_dist = - min_dist
+                    else:
+                        res_dist = min_dist
             result.loc[x, 'ID'] = gdf_villages.loc[x, 'Full_Name']
             result.loc[x, 'NP'] = name
-            result.loc[x, 'dist_NP'] = round(min_dist, 3)
-            process_bar.text('NDVI')
-            time.sleep(1)
+            result.loc[x, 'dist_NP'] = round(res_dist, 3)
             process_bar()
+    result.to_excel('profils_villages.xlsx')
     return result
 
 
