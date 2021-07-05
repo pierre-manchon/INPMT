@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import math
+import time
 import pandas as pd
 import geopandas as gpd
 import libpysal as lps
@@ -34,7 +35,7 @@ try:
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from .__utils.raster import raster_crop, get_pixel_count, polygonize
+    from .__utils.raster import raster_crop, get_pixel_count, polygonizeX
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
 
 
@@ -125,45 +126,42 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-def get_urban_profile(interest: AnyStr,
-                      interest2: AnyStr,
+def get_urban_profile(villages: AnyStr,
+                      parks: AnyStr,
                       ) -> DataFrame:
     """
-    AAA
+    AA
 
-    :param interest:
-    :param interest2:
+    :param villages:
+    :type villages:
+    :param parks:
+    :type parks:
     :return:
+    :rtype:
     """
-    villages = gpd.read_file(interest)
-    parks = gpd.read_file(interest2)
-    # result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
-    """
-    name = None
-    min_dist = int(__getConfigValue('min_dist'))
-    patch_buffer_size = __getConfigValue('patch_buffer_size')
-
-    with alive_bar(total=len(villages)) as process_bar:
-        for i, p in iter_geoseries_as_geodataframe(villages):
-            # patch_buffered = p.buffer(patch_buffer_size)
+    gdf_villages = gpd.read_file(villages)
+    gdf_parks = gpd.read_file(parks)
+    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+    with alive_bar(total=len(gdf_villages)) as process_bar:
+        for x in range(len(gdf_villages)):
+            name = None
+            min_dist = 100000
             process_bar.text('Distances')
-            for o, q in iter_geoseries_as_geodataframe(parks):
-                # Check every distance and once every polygon has been checked: returns the distance and name of nearest
-                dist = p.boundary.distance(q)
-                print(dist)
-                type(dist)
-                if dist < min_dist:
-                    min_dist = dist
-                    name = parks.loc[o, 'NAME']
-            result.loc[i, 'NP'] = name
-            result.loc[i, 'dist_NP'] = min_dist
-            process_bar()
+            for y in range(len(gdf_parks)):
+                try:
+                    dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[x, 'geometry'])
+                    if dist < min_dist:
+                        min_dist = dist
+                        name = gdf_parks.loc[y, 'NAME']
+                except ValueError:
+                    pass
+            result.loc[x, 'ID'] = gdf_villages.loc[x, 'Full_Name']
+            result.loc[x, 'NP'] = name
+            result.loc[x, 'dist_NP'] = round(min_dist, 3)
             process_bar.text('NDVI')
             time.sleep(1)
             process_bar()
     return result
-    """
-    return villages, parks
 
 
 def get_countries_profile(

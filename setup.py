@@ -63,12 +63,12 @@ class install(_install):
 setup(
     name=cfgparser.get('setup', 'name'),
     version=cfgparser.get('setup', 'version'),
-    license=cfgparser.get('setup', 'license'),
 
     author=cfgparser.get('setup', 'author'),
     author_email=cfgparser.get('setup', 'author_email'),
     url=cfgparser.get('setup', 'url'),
 
+    license=cfgparser.get('setup', 'license'),
     description=cfgparser.get('setup', 'description'),
     long_description=long_description,
     long_description_content_type="text/markdown",
