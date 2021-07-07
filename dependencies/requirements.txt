@@ -18,5 +18,3 @@ rtree==0.9.7
 rasterio==1.2.3
 
 pip~=21.1.2
-
-selenium~=3.141.0
