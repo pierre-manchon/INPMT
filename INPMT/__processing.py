@@ -24,6 +24,7 @@ import time
 import pandas as pd
 import geopandas as gpd
 import libpysal as lps
+from tempfile import TemporaryDirectory
 from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -31,11 +32,11 @@ from typing import AnyStr, SupportsInt
 
 try:
     from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from __utils.raster import raster_crop, get_pixel_count, polygonize
+    from __utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
     from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from .__utils.raster import raster_crop, get_pixel_count, polygonize
+    from .__utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
     from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
 
 
@@ -128,6 +129,7 @@ def get_distances(pas: GeoDataFrame,
 
 def get_urban_profile(villages: AnyStr,
                       parks: AnyStr,
+                      ndvi: AnyStr,
                       ) -> DataFrame:
     """
     AA
@@ -139,28 +141,53 @@ def get_urban_profile(villages: AnyStr,
     :return:
     :rtype:
     """
+    # Read the shapefiles as GeoDataFrames
     gdf_villages = gpd.read_file(villages)
     gdf_parks = gpd.read_file(parks)
+    # Set the projection to 3857 to have distance, etc as meters
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
+    # Create a blank DataFrame to receive the result when iterating below
     result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
-    with alive_bar(total=len(gdf_villages)) as process_bar:
-        for x in range(len(gdf_villages)):
+    # Create the progress and the temporary directory used to save some temporary files
+    with alive_bar(total=len(gdf_villages)) as pbar, TemporaryDirectory() as tmp_dir:
+        for i in range(len(gdf_villages)):
+            # Get the minimum distance from the village the park edge border and return the said distance and the
+            # park's name
             name = ""
-            min_dist = 100000
+            min_dist = int(__getConfigValue('min_dist'))
+            buffer_villages = int(__getConfigValue('buffer_villages'))
             for y in range(len(gdf_parks)):
-                dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[x, 'geometry'])
+                dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[i, 'geometry'])
                 if dist < min_dist:
                     min_dist = dist
                     name = gdf_parks.loc[y, 'NAME']
-                    if gdf_parks.loc[y, 'geometry'].distance(gdf_villages.loc[x, 'geometry']) == 0.0:
+                    if gdf_parks.loc[y, 'geometry'].distance(gdf_villages.loc[i, 'geometry']) == 0.0:
                         res_dist = - min_dist
                     else:
                         res_dist = min_dist
-            result.loc[x, 'ID'] = gdf_villages.loc[x, 'Full_Name']
-            result.loc[x, 'NP'] = name
-            result.loc[x, 'dist_NP'] = round(res_dist, 3)
-            process_bar()
+            result.loc[i, 'ID'] = gdf_villages.loc[i, 'Full_Name']
+            result.loc[i, 'NP'] = name
+            result.loc[i, 'dist_NP'] = round(res_dist, 3)
+
+            # Transform the GeoSeries as a GeoDataFrame
+            p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]['geometry']))
+            p = p.rename(columns={0: 'geometry'}).set_geometry('geometry')
+            p.crs = 3857
+
+            # Format the path for the temporary file
+            p1, pext, _ = format_dataset_output(dataset=villages, name='tmp')
+            path_poly = os.path.join(tmp_dir, ''.join([p1, pext]))
+            # Create a buffer of the village centroid
+            p.buffer(buffer_villages).to_file(path_poly)
+            # Crop the NDVI data to the buffer extent and process it's min, mean and max value
+            path_landuse_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=tmp_dir)
+            ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_landuse_aoi)
+            result.loc[i, 'NDVI_min'] = ndvi_min
+            result.loc[i, 'NDVI_mean'] = ndvi_mean
+            result.loc[i, 'NDVI_max'] = ndvi_max
+            pbar()
+
     result.to_excel('profils_villages.xlsx')
     return result
 
