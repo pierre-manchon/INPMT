@@ -21,12 +21,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import rasterio
 import rasterio.mask
-from rasterio.features import shapes
+import numpy as np
 import geopandas as gpd
+from rasterio.features import shapes
+
 from numpy import ndarray, float64
 from pathlib import Path
 from geopandas import GeoDataFrame
 from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt, Union
+
 from .utils import format_dataset_output, __gather, __count_values
 from .vector import __read_shapefile
 
@@ -159,7 +162,7 @@ def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, fl
     try:
         with rasterio.open(dataset) as ro:
             x = ro.read()
-            x = x[x != ro.nodata]
+            x = np.delete(x, np.where(x == ro.nodata))
         return x.min(), x.mean(), x.max()
     except TypeError:
         return 0, 0, 0
