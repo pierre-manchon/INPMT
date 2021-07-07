@@ -23,10 +23,10 @@ import rasterio
 import rasterio.mask
 from rasterio.features import shapes
 import geopandas as gpd
-from numpy import ndarray
+from numpy import ndarray, float64
 from pathlib import Path
 from geopandas import GeoDataFrame
-from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt
+from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt, Union
 from .utils import format_dataset_output, __gather, __count_values
 from .vector import __read_shapefile
 
@@ -120,7 +120,7 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrit
         return __output_path
 
     except ValueError:
-        print(UserWarning('Raster {} does not overlap.'.format(dataset)))
+        print(UserWarning('Raster {} does not overlap with {}.'.format(dataset, shapefile)))
         pass
 
 
@@ -151,3 +151,17 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
         'mask.tif'
     with rasterio.open('mask.tif', "w") as output_file:
         output_file.write(output_image)
+
+
+def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
+    # If TypeError, you couldn't read the file because it had no data.
+    # If ValueError, idk
+    try:
+        with rasterio.open(dataset) as ro:
+            x = ro.read()
+            x = x[x != ro.nodata]
+        return x.min(), x.mean(), x.max()
+    except TypeError:
+        return 0, 0, 0
+    except ValueError:
+        return 0, 0, 0
