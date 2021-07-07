@@ -154,6 +154,7 @@ def run(aoi: AnyStr,
     """
     datasets = __getConfigValue('datasets_storage_path')
     # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
+    ndvi = path.join(datasets, 'MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif')
     landuse = path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
     landuse_polygonized = path.join(datasets, '')
     anopheles_kyalo = path.join(datasets, 'VectorDB_1898-2016.shp')
@@ -163,6 +164,7 @@ def run(aoi: AnyStr,
     """
     population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/UNadj_constrained_merged_degraded.tif'
     landuse = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    ndvi = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/test NDVI/1an/MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif'
     
     irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
     kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
