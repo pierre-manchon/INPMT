@@ -126,7 +126,7 @@ def __count_values(pixel_array: List) -> Counter:
 
 def __getConfigValue(value):
     getcfgparser = ConfigParser()
-    getcfgparser.read(config_file_path)
+    getcfgparser.read(config_file_path, encoding='utf-8')
     return getcfgparser.get('config', value)
 
 
