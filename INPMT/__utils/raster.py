@@ -21,11 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import rasterio
 import rasterio.mask
-import numpy as np
 import geopandas as gpd
 from rasterio.features import shapes
 
-from numpy import ndarray, float64
+from numpy import ndarray
 from pathlib import Path
 from geopandas import GeoDataFrame
 from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt, Union
@@ -90,6 +89,7 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
 def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False) -> AnyStr:
     """
     Crop raster with geodataframe boundary
+    :param processing:
     :param overwrite:
     :type overwrite:
     :param dataset:
@@ -123,11 +123,17 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrit
         return __output_path
 
     except ValueError:
-        print(UserWarning('Raster {} does not overlap with {}.'.format(dataset, shapefile)))
+        print(UserWarning('Raster does not overlap with {}.'.format(dataset, __sf.__hash__)))
         pass
 
 
 def polygonize(dataset: AnyStr) -> GeoDataFrame:
+    """
+    Read a raster file and transform each pixel in a vector entity
+
+    :param dataset:
+    :return:
+    """
     mask = None
     with rasterio.Env():
         with rasterio.open(dataset) as src:
@@ -157,6 +163,13 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
 
 
 def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
+    """
+    Read any raster file then delete the on data values and returns some basic statistics about the said raster (min,
+    mean and max)
+
+    :param dataset:
+    :return:
+    """
     # If TypeError, you couldn't read the file because it had no data.
     # If ValueError, idk
     try:
