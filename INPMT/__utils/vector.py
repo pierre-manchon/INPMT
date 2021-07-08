@@ -33,7 +33,11 @@ from collections import Iterable
 from .utils import format_dataset_output
 
 
-def __do_Speedups():
+def __enable_speedups():
+    """
+    Check if shapely's speedups are available or not and either case, activate them or not
+    :return:
+    """
     if speedups.available:
         speedups.enable()
         print('speedups enabled')

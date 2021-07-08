@@ -26,11 +26,11 @@ from alive_progress import config_handler as __config_handler
 
 try:
     from __main__ import run
-    from __utils.vector import __do_Speedups
+    from __utils.vector import __enable_speedups
     from __utils.utils import format_dataset_output
 except ImportError:
     from .__main__ import run
-    from .__utils.vector import __do_Speedups
+    from .__utils.vector import __enable_speedups
     from .__utils.utils import format_dataset_output
 
 # Si la version de python est trop ancienne, le code ne s'execute
@@ -70,7 +70,7 @@ print(r'H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\dataset
 # I don't know specifically why but it appears to have resolved itself (I recall deleting and reinstalling cleanly all
 # of the dependencies but i already tried that back when i got that error so i doubt this fixed it.)
 # Made as a function to be hidden on import
-__do_Speedups()
+__enable_speedups()
 
 # Modify environement variables so shapely finds the correct proj.db file (the one from the GDAL install and not the
 # POSTGRES SQL install or either one it founds)
