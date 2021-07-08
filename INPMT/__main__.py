@@ -113,9 +113,9 @@ gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
 gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
 gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
+import os
 import argparse
 from tempfile import TemporaryDirectory
-from os import path, system, name
 from sys import argv, stderr, exit
 from typing import AnyStr
 from geopandas import GeoDataFrame
@@ -124,11 +124,11 @@ from shlex import quote as shlex_quote
 from argparse import ArgumentTypeError
 
 try:
-    from __processing import get_countries_profile, get_distances
-    from __utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
+    from __processing import get_countries_profile, get_urban_profile
+    from __utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 except ImportError:
-    from .__processing import get_countries_profile, get_distances
-    from .__utils.utils import __getConfigValue, __setConfigValue, format_dataset_output
+    from .__processing import get_countries_profile, get_urban_profile
+    from .__utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 
 cfgparser = ConfigParser()
 cfgparser.read('setup.cfg')
@@ -145,37 +145,45 @@ def run(aoi: AnyStr,
         export: bool = False
         ) -> GeoDataFrame:
     """
-    path_urbain =  r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/0/pop_polygonized_taille.shp'
+    population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    UNadj_constrained_merged_degraded.tif'
+    landuse = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
+    ndvi = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/test NDVI/1an/
+    MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif'
+
+    irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
+    kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
+    national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    WDPA_Africa_anopheles.shp'
+    national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    WDPA_Africa_anopheles_buffer10km.shp'
+    kyalo_in_national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    anopheles_in_PAs.shp'
+    kyalo_in_national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
+    datasets/anopheles_in_PAs_buffers.shp'
+    national_parks_lemonde_buffered_with_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
+    datasets/PAs_buffers_anos.shp'
 
     :param aoi:
     :param export_dir:
     :param export:
     :return:
     """
-    datasets = __getConfigValue('datasets_storage_path')
+    datasets = __get_cfg_val('datasets_storage_path')
+
     # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
-    ndvi = path.join(datasets, 'MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif')
-    landuse = path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
-    landuse_polygonized = path.join(datasets, '')
-    anopheles_kyalo = path.join(datasets, 'VectorDB_1898-2016.shp')
-    # countries_irish = path.join(datasets, 'africa_countries_irish_tmp.shp')
-    # protected_areas = path.join(datasets, 'WDPA_Africa_anopheles.shp')
-    # protected_areas_buffered = path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
-    """
-    population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/UNadj_constrained_merged_degraded.tif'
-    landuse = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-    ndvi = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/test NDVI/1an/MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif'
-    
-    irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
-    kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
-    national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/WDPA_Africa_anopheles.shp'
-    national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/WDPA_Africa_anopheles_buffer10km.shp'
-    kyalo_in_national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/anopheles_in_PAs.shp'
-    kyalo_in_national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/anopheles_in_PAs_buffers.shp'
-    national_parks_lemonde_buffered_with_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/PAs_buffers_anos.shp'
-    """
-    # TODO Polygonize population
-    # TODO Polygonize Land Use
+    landuse = os.path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
+    ndvi = os.path.join(datasets, 'MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif')
+
+    landuse_polygonized = os.path.join(datasets, '')
+    # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
+    anopheles_kyalo = os.path.join(datasets, 'VectorDB_1898-2016.shp')
+    # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'anopheles_in_PAs.shp')
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, 'anopheles_in_PAs_buffers.shp')
+    # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'PAs_buffers_anos.shp')
+    national_parks_with_anopheles_kyalo = os.path.join(datasets, 'WDPA_Africa_anopheles.shp')
+    # national_parks_with_anopheles_buffered = os.path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
@@ -184,13 +192,18 @@ def run(aoi: AnyStr,
                                                                     landuse_polygonized=landuse_polygonized,
                                                                     anopheles=anopheles_kyalo,
                                                                     processing_directory=tmp_directory)
+        gdf_urban_profiles_aoi = get_urban_profile(villages=anopheles_kyalo_in_national_parks_buffered,
+                                                   parks=national_parks_with_anopheles_kyalo,
+                                                   ndvi=ndvi,
+                                                   landuse=landuse,
+                                                   processing_directory=tmp_directory)
 
         if export:
             # Retrieves the directory the dataset is in and joins it the output filename
             _, _, output_profiles = format_dataset_output(dataset=export_dir, name='profiles')
-            _, _, output_kyalo = format_dataset_output(dataset=export_dir, name='kyalo')
+            _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name='urban_profiles')
             gdf_profiles_aoi.to_file(output_profiles)
-            # gfd_kyalo.to_file(output_kyalos)
+            gdf_urban_profiles_aoi.to_file(output_urban_profiles)
             return gdf_profiles_aoi
         else:
             return gdf_profiles_aoi
@@ -204,7 +217,7 @@ def main():
     :rtype: None
     """
     # Clean the terminal everytime a command is triggered
-    system(shlex_quote('cls' if name == 'nt' else 'clear'))
+    os.system(shlex_quote('cls' if os.name == 'nt' else 'clear'))
 
     class ArgumentParser(argparse.ArgumentParser):
         """Object for parsing command line strings into Python objects.
@@ -229,6 +242,10 @@ def main():
         """
 
         def error(self, message):
+            """
+
+            :param message:
+            """
             stderr.write('error: %s\n' % message)
             self.print_help()
             exit(2)
@@ -242,8 +259,8 @@ def main():
         :return: normalized_filepath
         :rtype normalized_filepath AnyStr
         """
-        normalized_filepath = path.normpath(dirpath)
-        if path.isfile(normalized_filepath):
+        normalized_filepath = os.path.normpath(dirpath)
+        if os.path.isfile(normalized_filepath):
             return normalized_filepath
         else:
             raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, '\n'))
@@ -287,7 +304,7 @@ def main():
         elif args.config is not None:
             if len(args.config) == 2:
                 var, value = args.config
-                __setConfigValue(var, value)
+                __set_cfg_val(var, value)
                 with open(config_file_path, 'r') as cfg:
                     print(cfg.read())
             elif len(args.config) == 0:
