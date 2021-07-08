@@ -127,8 +127,88 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
+def get_nearest_park(index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame) -> DataFrame:
+    name = ""
+    min_dist = int(__getConfigValue('min_dist'))
+
+    for y in range(len(parks)):
+        dist = parks.loc[y, 'geometry'].boundary.distance(villages.loc[index, 'geometry'])
+        if dist < min_dist:
+            min_dist = dist
+            name = parks.loc[y, 'NAME']
+            if parks.loc[y, 'geometry'].distance(villages.loc[index, 'geometry']) == 0.0:
+                res_dist = - min_dist
+            else:
+                res_dist = min_dist
+    df.loc[index, 'ID'] = villages.loc[index, 'Full_Name']
+    df.loc[index, 'NP'] = name
+    df.loc[index, 'dist_NP'] = round(res_dist, 3)
+    return df
+
+
+def get_landuse(index: SupportsInt, polygon: GeoDataFrame, df: DataFrame, dataset: AnyStr, method: AnyStr) -> DataFrame:
+    """
+    AA
+
+    :param polygon:
+    :param index:
+    :type: index: SupportsInt
+    :param df:
+    :type df: DataFrame
+    :param dataset:
+    :type dataset: AnyStr
+    :param method:
+    :type method:  AnyStr
+    :return:
+    :rtype: DataFrame
+    """
+    __data = []
+    __val = None
+    # Retrive the legend file's path
+    __data_dir = __getConfigValue('datasets_storage_path')
+    __qml_path = os.path.join(__data_dir, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml')
+    # Count every pixel from the raster and its value
+    dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
+    for c in ctr:
+        # Multiply the number of pixels by the resolution of a pixel
+        category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
+        # Cross product with the geodataframe_aoi's polygon's area to get the percetage of land use of
+        # the current category
+        percentage = ((category_area * 100) / polygon.area[0])
+        __data.append([c, ctr[c], category_area, percentage])
+    # Creates a DataFrame from the list processed previously
+    df_hab_div = pd.DataFrame(__data,
+                              columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
+    # Format the .qml file path from the dataset path
+    # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
+    # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
+    # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
+    # TODO Might improve performance by associating the label when searching for the categories
+    # Reads the corresponding legend style from the .qml file
+    # Associates the category number the label name of the legend values (ridden from a .qml file)
+    for m, r in df_hab_div.iterrows():
+        for n in __read_qml(__qml_path):
+            if r['Category'] == n[0]:
+                __val = n[1]
+            else:
+                __val = 'Unknown'
+        df_hab_div.loc[m, 'Label'] = __val
+    if method == 'append:':
+        df.loc[index, 'HAB_DIV'] = len(ctr)
+        df_hab_div = df_hab_div.pivot_table(columns='Label',
+                                            values='Proportion (%)',
+                                            aggfunc='sum')
+        df_hab_div.rename(index={'Proportion (%)': int(index)}, inplace=True)
+        df.loc[index, df_hab_div.columns] = df_hab_div.loc[index, :].values
+    elif method == 'duplicate':
+        df.loc[index, 'HAB'] = df_hab_div.loc[0, 'Label']
+        df.loc[index, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
+    return df
+
+
 def get_urban_profile(villages: AnyStr,
                       parks: AnyStr,
+                      landuse: AnyStr,
                       ndvi: AnyStr,
                       ) -> DataFrame:
     """
@@ -138,8 +218,11 @@ def get_urban_profile(villages: AnyStr,
     :type villages:
     :param parks:
     :type parks:
+    :param landuse:
+    :type landuse:
+    :param ndvi:
+    :type ndvi:
     :return:
-    :rtype:
     """
     # Read the shapefiles as GeoDataFrames
     gdf_villages = gpd.read_file(villages)
@@ -147,28 +230,17 @@ def get_urban_profile(villages: AnyStr,
     # Set the projection to 3857 to have distance, etc as meters
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
+    # Retrieves buffer size for the vilages patches
+    buffer_villages = int(__getConfigValue('buffer_villages'))
     # Create a blank DataFrame to receive the result when iterating below
     result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar, TemporaryDirectory() as tmp_dir:
         for i in range(len(gdf_villages)):
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
-            name = ""
-            min_dist = int(__getConfigValue('min_dist'))
-            buffer_villages = int(__getConfigValue('buffer_villages'))
-            for y in range(len(gdf_parks)):
-                dist = gdf_parks.loc[y, 'geometry'].boundary.distance(gdf_villages.loc[i, 'geometry'])
-                if dist < min_dist:
-                    min_dist = dist
-                    name = gdf_parks.loc[y, 'NAME']
-                    if gdf_parks.loc[y, 'geometry'].distance(gdf_villages.loc[i, 'geometry']) == 0.0:
-                        res_dist = - min_dist
-                    else:
-                        res_dist = min_dist
-            result.loc[i, 'ID'] = gdf_villages.loc[i, 'Full_Name']
-            result.loc[i, 'NP'] = name
-            result.loc[i, 'dist_NP'] = round(res_dist, 3)
+            result = get_nearest_park(index=i, df=result, parks=gdf_parks, villages=gdf_villages)
 
             # Transform the GeoSeries as a GeoDataFrame
             p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]['geometry']))
@@ -181,11 +253,15 @@ def get_urban_profile(villages: AnyStr,
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-            path_landuse_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=tmp_dir)
-            ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_landuse_aoi)
+            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=tmp_dir)
+            ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
             result.loc[i, 'NDVI_min'] = ndvi_min
             result.loc[i, 'NDVI_mean'] = ndvi_mean
             result.loc[i, 'NDVI_max'] = ndvi_max
+
+            #
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=tmp_dir)
+            result = get_landuse(index=i, polygon=p, df=result, dataset=path_landuse_aoi, method='append')
             pbar()
 
     result.to_excel('profils_villages.xlsx')
@@ -310,9 +386,6 @@ def get_countries_profile(
                     q.to_file(filename=path_poly2)
 
                     bar_process.text('Preparing')  # Pbar 2nd level
-                    # Set vars to default states
-                    __data = []
-                    __val = None
                     # Extracts the row from geodataframe_aoi corresponding to the entity we're currently iterating over
                     aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
 
@@ -330,6 +403,8 @@ def get_countries_profile(
                     # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                     bar_process.text('Habitat')  # Pbar 2nd level
+                    result = get_landuse(index=i, df=result, dataset=path_landuse_aoi, method='duplicate')
+                    """
                     # Count every pixel from the raster and its value
                     dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
                     for c in ctr:
@@ -372,6 +447,7 @@ def get_countries_profile(
                     elif method == 'duplicate':
                         aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
                         aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
+                    """
                     bar_process()  # Pbar 2nd level
 
                     bar_process.text('Population')  # Pbar 2nd level
