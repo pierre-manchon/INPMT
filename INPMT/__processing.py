@@ -20,11 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import math
-import time
 import pandas as pd
 import geopandas as gpd
 import libpysal as lps
-from tempfile import TemporaryDirectory
 from alive_progress import alive_bar
 from pandas import DataFrame
 from geopandas import GeoDataFrame
@@ -33,11 +31,11 @@ from typing import AnyStr, SupportsInt
 try:
     from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
     from __utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
-    from __utils.utils import format_dataset_output, __getConfigValue, __read_qml
+    from __utils.utils import format_dataset_output, __get_cfg_val, __read_qml
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
     from .__utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
-    from .__utils.utils import format_dataset_output, __getConfigValue, __read_qml
+    from .__utils.utils import format_dataset_output, __get_cfg_val, __read_qml
 
 
 def set_urban_profile(
@@ -78,7 +76,7 @@ def get_distances(pas: GeoDataFrame,
     """
     # TODO
     """
-    urban_treshold = __getConfigValue('area_treshold')
+    urban_treshold = __get_cfg_val('area_treshold')
     ug = set_urban_profile(urban_areas=urban_areas,
                            path_urban_areas=path_urban_areas,
                            urban_treshold=urban_treshold)
@@ -100,7 +98,7 @@ def get_distances(pas: GeoDataFrame,
     result = []
     weighted_dist = None
     for u in ug.values:
-        min_dist = __getConfigValue('min_dist')
+        min_dist = __get_cfg_val('min_dist')
         name = None
         for p in pas.values:
             dist = p[3].distance(u[3])
@@ -128,8 +126,17 @@ def get_distances(pas: GeoDataFrame,
 
 
 def get_nearest_park(index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame) -> DataFrame:
-    name = ""
-    min_dist = int(__getConfigValue('min_dist'))
+    """
+    For each polygon, check the distance and keep the smallest one
+    :param index:
+    :param df:
+    :param villages:
+    :param parks:
+    :return:
+    """
+    name = None
+    res_dist = None
+    min_dist = int(__get_cfg_val('min_dist'))
 
     for y in range(len(parks)):
         dist = parks.loc[y, 'geometry'].boundary.distance(villages.loc[index, 'geometry'])
@@ -146,26 +153,21 @@ def get_nearest_park(index: SupportsInt, df: DataFrame, villages: GeoDataFrame, 
     return df
 
 
-def get_landuse(index: SupportsInt, polygon: GeoDataFrame, df: DataFrame, dataset: AnyStr, method: AnyStr) -> DataFrame:
+def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
     """
     AA
 
     :param polygon:
-    :param index:
-    :type: index: SupportsInt
-    :param df:
-    :type df: DataFrame
     :param dataset:
     :type dataset: AnyStr
-    :param method:
-    :type method:  AnyStr
     :return:
     :rtype: DataFrame
     """
     __data = []
     __val = None
+    __polygon = gpd.read_file(polygon)
     # Retrive the legend file's path
-    __data_dir = __getConfigValue('datasets_storage_path')
+    __data_dir = __get_cfg_val('datasets_storage_path')
     __qml_path = os.path.join(__data_dir, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml')
     # Count every pixel from the raster and its value
     dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
@@ -174,7 +176,7 @@ def get_landuse(index: SupportsInt, polygon: GeoDataFrame, df: DataFrame, datase
         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
         # Cross product with the geodataframe_aoi's polygon's area to get the percetage of land use of
         # the current category
-        percentage = ((category_area * 100) / polygon.area[0])
+        percentage = round(((category_area * 100) / __polygon.area[0]), 3)
         __data.append([c, ctr[c], category_area, percentage])
     # Creates a DataFrame from the list processed previously
     df_hab_div = pd.DataFrame(__data,
@@ -186,34 +188,29 @@ def get_landuse(index: SupportsInt, polygon: GeoDataFrame, df: DataFrame, datase
     # TODO Might improve performance by associating the label when searching for the categories
     # Reads the corresponding legend style from the .qml file
     # Associates the category number the label name of the legend values (ridden from a .qml file)
+    __style = __read_qml(__qml_path)
     for m, r in df_hab_div.iterrows():
-        for n in __read_qml(__qml_path):
-            if r['Category'] == n[0]:
+        for n in __style:
+            if int(r['Category']) == int(n[0]):
                 __val = n[1]
+                break
             else:
                 __val = 'Unknown'
         df_hab_div.loc[m, 'Label'] = __val
-    if method == 'append:':
-        df.loc[index, 'HAB_DIV'] = len(ctr)
-        df_hab_div = df_hab_div.pivot_table(columns='Label',
-                                            values='Proportion (%)',
-                                            aggfunc='sum')
-        df_hab_div.rename(index={'Proportion (%)': int(index)}, inplace=True)
-        df.loc[index, df_hab_div.columns] = df_hab_div.loc[index, :].values
-    elif method == 'duplicate':
-        df.loc[index, 'HAB'] = df_hab_div.loc[0, 'Label']
-        df.loc[index, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
-    return df
+
+    return df_hab_div, len(ctr)
 
 
 def get_urban_profile(villages: AnyStr,
                       parks: AnyStr,
                       landuse: AnyStr,
                       ndvi: AnyStr,
+                      processing_directory: AnyStr
                       ) -> DataFrame:
     """
     AA
 
+    :param processing_directory:
     :param villages:
     :type villages:
     :param parks:
@@ -230,13 +227,13 @@ def get_urban_profile(villages: AnyStr,
     # Set the projection to 3857 to have distance, etc as meters
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
-    # Retrieves buffer size for the vilages patches
-    buffer_villages = int(__getConfigValue('buffer_villages'))
+    # Retrieves buffesr size for the vilages patches
+    buffer_villages = int(__get_cfg_val('buffer_villages'))
     # Create a blank DataFrame to receive the result when iterating below
     result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
 
     # Create the progress and the temporary directory used to save some temporary files
-    with alive_bar(total=len(gdf_villages)) as pbar, TemporaryDirectory() as tmp_dir:
+    with alive_bar(total=len(gdf_villages)) as pbar:
         for i in range(len(gdf_villages)):
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
@@ -249,19 +246,27 @@ def get_urban_profile(villages: AnyStr,
 
             # Format the path for the temporary file
             p1, pext, _ = format_dataset_output(dataset=villages, name='tmp')
-            path_poly = os.path.join(tmp_dir, ''.join([p1, pext]))
+            path_poly = os.path.join(processing_directory, ''.join([p1, pext]))
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=tmp_dir)
+            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
             result.loc[i, 'NDVI_min'] = ndvi_min
             result.loc[i, 'NDVI_mean'] = ndvi_mean
             result.loc[i, 'NDVI_max'] = ndvi_max
 
-            #
-            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=tmp_dir)
-            result = get_landuse(index=i, polygon=p, df=result, dataset=path_landuse_aoi, method='append')
+            # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
+            df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
+            result.loc[i, 'HAB_DIV'] = len_ctr
+            try:
+                df_hd = df_hd.pivot_table(columns='Label', values='Proportion (%)', aggfunc='sum')  # noqa
+                df_hd.rename(index={'Proportion (%)': int(i)}, inplace=True)
+                result.loc[i, df_hd.columns] = df_hd.loc[i, :].values  # noqa
+            except KeyError:
+                print('Land use data missing')
+                pass
             pbar()
 
     result.to_excel('profils_villages.xlsx')
@@ -275,7 +280,6 @@ def get_countries_profile(
         processing_directory: AnyStr,
         population: AnyStr = '',
         anopheles: AnyStr = '',
-        method: AnyStr = 'duplicate',
         distances: bool = False
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
@@ -300,21 +304,16 @@ def get_countries_profile(
 
     :param landuse_polygonized:
     :param processing_directory:
-    :param method:
     :param aoi: Path to the vector file of the Areas of Interest to process.
     :type aoi: AnyStr
     :param landuse: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
     :type landuse: AnyStr
-    :param method: The __data is produced as a duplicate for each habitat (default) or groupped by countries
-    :type method: AnyStr
     :param population: Vector file path for the population of Africa (WorldPop, 2020), Unconstrained, UN adjusted, 100m
     :type population: AnyStr
     :param anopheles: Vector file path of the Anopheles species present in countries in sub-Saharan Africa (Kyalo, 2019)
     :type anopheles: AnyStr
     :param distances: Boolean parameter to know wether or not the distances must be processed.
     :type distances: bool
-    :param export: Same file as input but with additional columns corresponding to the results of the calculations
-    :type export: bool
     :return: Same file as input but with additional columns corresponding to the results of the calculations
     :rtype: tuple[GeoDataFrame, AnyStr]
     """
@@ -322,9 +321,15 @@ def get_countries_profile(
     # Creates empty GeoDataFrames used later to store the results
     result = GeoDataFrame()
     aoi_extract = GeoDataFrame()
+    try:
+        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
+        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
+    except ValueError:
+        aoi_extract.insert(0, 'HAB', 0)
+        aoi_extract.insert(0, 'HAB_PROP', 0)
     geodataframe_aoi = __read_shp_as_gdf(shapefile=aoi)
     geodataframe_aoi.index.name = 'id'
-    dist_treshold = __getConfigValue('dist_treshold')
+    dist_treshold = __get_cfg_val('dist_treshold')
 
     # Format datasets outputs with the temporary directory's path
     p1, p1ext, _ = format_dataset_output(dataset=aoi, name='tmp')
@@ -332,20 +337,7 @@ def get_countries_profile(
     p2, p2ext, _ = format_dataset_output(dataset=landuse, name='tmp')
     path_poly2 = os.path.join(processing_directory, ''.join([p2, p2ext]))
 
-    # Inserts new columns if the __data is given or not.
-    if method == 'append':
-        try:
-            geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'HAB_DIV', 0)
-        except ValueError:
-            geodataframe_aoi.insert(0, 'HAB_DIV', 0)
-    elif method == 'duplicate':
-        try:
-            aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
-            aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
-        except ValueError:
-            aoi_extract.insert(0, 'HAB', 0)
-            aoi_extract.insert(0, 'HAB_PROP', 0)
-
+    # Inserts new columns if the data is given or not.
     if population:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', 0)
@@ -368,7 +360,7 @@ def get_countries_profile(
             # Crops the raster file with the first polygon boundaries then polygonize the result.
             # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1, processing=processing_directory)
-            gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857, export=False)
+            gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857)
 
             # Intersects only if the __data is given at the start.
             if population:
@@ -403,7 +395,9 @@ def get_countries_profile(
                     # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                     bar_process.text('Habitat')  # Pbar 2nd level
-                    result = get_landuse(index=i, df=result, dataset=path_landuse_aoi, method='duplicate')
+                    df_hd = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
+                    aoi_extract.loc[i, 'HAB'] = df_hd.loc[0, 'Label']
+                    aoi_extract.loc[i, 'HAB_PROP'] = df_hd.loc[0, 'Proportion (%)']
                     """
                     # Count every pixel from the raster and its value
                     dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
