@@ -162,8 +162,9 @@ def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, fl
     try:
         with rasterio.open(dataset) as ro:
             x = ro.read()
-            x = np.delete(x, np.where(x == ro.nodata))
-        return x.min(), x.mean(), x.max()
+            x = x[x != ro.nodata]
+        # Divide by 10.000 because NDVI is usually between -1 and 1 and these values are between -10000 and 10000
+        return round(x.min()/10000, 3), round(x.mean()/10000, 3), round(x.max()/10000, 3)
     except TypeError:
         return 0, 0, 0
     except ValueError:
