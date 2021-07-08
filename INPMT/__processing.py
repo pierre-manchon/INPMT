@@ -125,7 +125,11 @@ def get_distances(pas: GeoDataFrame,
         return df
 
 
-def get_nearest_park(index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame) -> DataFrame:
+def get_nearest_park(index: SupportsInt,
+                     df: DataFrame,
+                     villages: GeoDataFrame,
+                     parks: GeoDataFrame
+                     ) -> DataFrame:
     """
     For each polygon, check the distance and keep the smallest one
     :param index:
@@ -153,7 +157,9 @@ def get_nearest_park(index: SupportsInt, df: DataFrame, villages: GeoDataFrame, 
     return df
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr,
+                dataset: AnyStr
+                ) -> tuple[DataFrame, int]:
     """
     AA
 
@@ -395,7 +401,7 @@ def get_countries_profile(
                     # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                     bar_process.text('Habitat')  # Pbar 2nd level
-                    df_hd = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
+                    df_hd, _ = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
                     aoi_extract.loc[i, 'HAB'] = df_hd.loc[0, 'Label']
                     aoi_extract.loc[i, 'HAB_PROP'] = df_hd.loc[0, 'Proportion (%)']
                     """
