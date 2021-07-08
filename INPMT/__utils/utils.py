@@ -124,13 +124,13 @@ def __count_values(pixel_array: List) -> Counter:
     return __nb
 
 
-def __getConfigValue(value):
+def __get_cfg_val(value):
     getcfgparser = ConfigParser()
     getcfgparser.read(config_file_path, encoding='utf-8')
     return getcfgparser.get('config', value)
 
 
-def __setConfigValue(var, value):
+def __set_cfg_val(var, value):
     setcfgparser = ConfigParser(comment_prefixes='///', allow_no_value=True)
     setcfgparser.read_file(open(config_file_path))
     try:
