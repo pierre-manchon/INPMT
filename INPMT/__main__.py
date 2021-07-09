@@ -152,17 +152,17 @@ def run(aoi: AnyStr,
     ndvi = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/test NDVI/1an/
     MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif'
 
-    irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
-    kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
-    national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    countries_irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
+    anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
+    national_parks_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
     WDPA_Africa_anopheles.shp'
-    national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    national_parks_with_anopheles_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
     WDPA_Africa_anopheles_buffer10km.shp'
-    kyalo_in_national_parks_lemonde = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
+    anopheles_kyalo_in_national_parks = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
     anopheles_in_PAs.shp'
-    kyalo_in_national_parks_lemonde_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
+    anopheles_kyalo_in_national_parks_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
     datasets/anopheles_in_PAs_buffers.shp'
-    national_parks_lemonde_buffered_with_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
+    national_parks_buffered_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
     datasets/PAs_buffers_anos.shp'
 
     :param aoi:
