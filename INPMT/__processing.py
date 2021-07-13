@@ -47,7 +47,7 @@ def set_urban_profile(
     """
     # TODO
     """
-    merging_result = merge_touching(geodataframe=urban_areas)
+    merging_result = merge_touching(geodataframe=urban_areas, by='sum')
 
     result = []
     for poly in merging_result.geometry:

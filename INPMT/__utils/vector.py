@@ -92,13 +92,15 @@ def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     return gdf
 
 
-def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
+def merge_touching(geodataframe: GeoDataFrame, by: AnyStr) -> GeoDataFrame:
     """
     Takes a GeoDataFrame as input and dissolve every touching polygons by doing the sum of their values.
 
     Heavily inspired from this stackoverflow post:
     # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
 
+    :param by: Aggregate function, either sum or first
+    :type by: AnyStr
     :param geodataframe: A generic GeoDataFrame
     :type geodataframe: GeoDataFrame
     :return: A new GeoDataFrame of polygons merged when touching
@@ -106,7 +108,7 @@ def merge_touching(geodataframe: GeoDataFrame) -> GeoDataFrame:
     """
     w = libpysal.weights.Queen.from_dataframe(geodataframe)
     components = w.component_labels
-    combined_polygons = geodataframe.dissolve(by=components, aggfunc='sum')
+    combined_polygons = geodataframe.dissolve(by=components, aggfunc=by)
     return combined_polygons
 
 
