@@ -39,7 +39,11 @@ cfgparser.read('setup.cfg')
 entry_point = ''.join([cfgparser.get('setup', 'name'), '=', cfgparser.get('setup', 'name'), '.__main__:main'])
 
 
-def getWheels():
+def get_wheels():
+    """
+    DOCSTRING TODO
+    :return:
+    """
     dependency = []
     for _, _, files in os.walk(os.path.join(os.getcwd(), 'dependencies')):
         for file in files:
@@ -54,8 +58,12 @@ class install(_install):
     https://stackoverflow.com/a/45262430
     """
     def run(self):
+        """
+        DOCSTRING TODO
+        :return:
+        """
         _install.do_egg_install(self)
-        for x in getWheels():
+        for x in get_wheels():
             # just go ahead and do it
             pip.main(['install', x])
 

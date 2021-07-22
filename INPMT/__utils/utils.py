@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellanious cases
-from os import path
+import os
 from warnings import warn
 import xml.dom.minidom
 from datetime import datetime
@@ -75,7 +75,7 @@ def format_dataset_output(dataset: AnyStr = '',
     if not Path(dataset).is_dir():
         __dataset = dataset
     else:
-        __dataset_name = path.join(dataset, ''.join(['output_', datetime.now().strftime("%Y%m%d%H%M%S")]))
+        __dataset_name = os.path.join(dataset, ''.join(['output_', datetime.now().strftime("%Y%m%d%H%M%S")]))
         if ext == '':
             raise UserWarning("Custom dataset path must have attribute 'ext' set")
         pass
@@ -91,7 +91,7 @@ def format_dataset_output(dataset: AnyStr = '',
     else:
         pass
 
-    __output_path = path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
+    __output_path = os.path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
     return __dataset_name, __ext, __output_path
 
 

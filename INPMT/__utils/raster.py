@@ -88,16 +88,18 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
 
 def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False) -> AnyStr:
     """
-    Crop raster with geodataframe boundary
-    :param processing:
-    :param overwrite:
-    :type overwrite:
-    :param dataset:
-    :type dataset:
-    :param shapefile:
-    :type shapefile:
-    :return:
-    :rtype:
+    Cut a raster based on the GeoDataFrame boundary and saves it in a new temporary file.
+
+    :param dataset: Path to the dataset file
+    :type dataset: AnyStr
+    :param shapefile: Path to the shapefile file
+    :type shapefile: AnyStr
+    :param processing: Path to the temporary directory used to store temporary files (then deleted)
+    :type processing: AnyStr
+    :param overwrite: Whether I try to overwrite the file or not
+    :type overwrite: bool
+    :return: Path to the file of the cropped dataset
+    :rtype: AnyStr
     """
     __sf = __read_shapefile(shapefile=shapefile)
 
@@ -164,11 +166,13 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
 
 def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
     """
-    Read any raster file then delete the on data values and returns some basic statistics about the said raster (min,
+    Read any raster file then delete the no data values and returns some basic statistics about the said raster (min,
     mean and max)
 
-    :param dataset:
-    :return:
+    :param dataset: Path to the dataset file
+    :type: dataset: AnyStr
+    :return: Min, Mean, Max values
+    :rtype: typle(SupportsInt, SupportsInt, SupportsInt)
     """
     # If TypeError, you couldn't read the file because it had no data.
     # If ValueError, idk

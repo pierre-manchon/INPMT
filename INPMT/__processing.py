@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-import math
 import pandas as pd
 import geopandas as gpd
 import libpysal as lps
@@ -68,14 +67,12 @@ def set_urban_profile(
         return merging_result
 
 
+"""
 def get_distances(pas: GeoDataFrame,
                   urban_areas: GeoDataFrame,
                   path_urban_areas: AnyStr,
                   export: bool = False
                   ) -> DataFrame:
-    """
-    # TODO
-    """
     urban_treshold = __get_cfg_val('area_treshold')
     ug = set_urban_profile(urban_areas=urban_areas,
                            path_urban_areas=path_urban_areas,
@@ -123,6 +120,7 @@ def get_distances(pas: GeoDataFrame,
         return df
     else:
         return df
+"""
 
 
 def get_nearest_park(index: SupportsInt,
@@ -131,12 +129,22 @@ def get_nearest_park(index: SupportsInt,
                      parks: GeoDataFrame
                      ) -> DataFrame:
     """
-    For each polygon, check the distance and keep the smallest one
-    :param index:
-    :param df:
-    :param villages:
-    :param parks:
-    :return:
+    For each polygon, I check the distance from the point to the boundary of the polygon and compare it to the minimum
+    distance found yet (at the start it's 100000 but it is modified in the first occurence).
+    Every time a distance is smaller, the minimum distance it's resetted.
+    Every time the distance from point to the centroid of the polygon equals 0, it means the polygon of villages is
+    inside the polygon of parks. In these cases I set it as a negative value.
+
+    :param index: Row index
+    :type: index: SupportsInt
+    :param df: A DataFrame of the previous results
+    :type: df: DataFrame
+    :param villages: A GeoDataFrame of the locations of mosquito counts of Africa
+    :type: villages: GeoDataFrame
+    :param parks: A GeoDataFrame of the national parks of Africa
+    :type: parks: GeoDataFrame
+    :return: A DataFrame of the result
+    :rtype: DataFrame
     """
     name = None
     res_dist = None
@@ -161,13 +169,17 @@ def get_landuse(polygon: AnyStr,
                 dataset: AnyStr
                 ) -> tuple[DataFrame, int]:
     """
-    AA
+    Use a shapefile and a raster file to process landuse nature and landuse percentage.
+    To do this, I first read the qml (legend file) to get the values and their corresponding labels.
+    Then I retrieve a number of pixels by values using the Counter object.
+    I process the category area and the landuse percentage using the pixel area and the polygon area
 
-    :param polygon:
-    :param dataset:
+    :param polygon: Path to the shapefile
+    :type polygon: AnyStr
+    :param dataset: Path to the dataset file
     :type dataset: AnyStr
-    :return:
-    :rtype: DataFrame
+    :return: A DataFrame updated with the processed values
+    :rtype: tuple(DataFrame, SupportsInt)
     """
     __data = []
     __val = None
@@ -214,18 +226,41 @@ def get_urban_profile(villages: AnyStr,
                       processing_directory: AnyStr
                       ) -> DataFrame:
     """
-    AA
+    I use 4 different data, 2 vectors that I read in a GeoDataFrame at the beginning of the script and 2 raster.
+    Then, I iterate on the GeoDataFrame of the villages.
+    This allows me to make calculations for each entity and not for the whole layer.
 
-    :param processing_directory:
-    :param villages:
-    :type villages:
-    :param parks:
-    :type parks:
-    :param landuse:
-    :type landuse:
-    :param ndvi:
-    :type ndvi:
-    :return:
+    For each iteration:
+    - I first calculate which is the nearest park with the ***get_nearest_park*** function. In addition, if the village
+        is in the park, I transform the value into a negative value),
+    - I count the number of mosquito species in the village,
+    - I transform the GeoSeries in GeoDataFrame: The result that we obtain when we iterate on each line of a
+        GeoDataFrame, is an object of type GeoSeries. I transform it in GeoDataFrame because these two objects have
+        different properties (in particular to calculate a buffer or especially to cut a raster),
+    - I calculate a buffer of 500m,
+    - I cut my raster of NDVI values with the ***raster_crop*** function. This function has the particularity to produce
+        a new raster file that I have to save and then reopen. Indeed, the rasterio package does not allow to overwrite
+        files as it can be done with geopandas,
+    - I read the raster that I have cut and then calculate statistical values like the minimum, the average and the
+        maximum thanks to the ***raster_stats*** function,
+    - I cut my raster of NDVI values with the ***raster_crop*** function. This function has the particularity to produce
+        a new raster file that I have to save and then reopen. Indeed, the rasterio package does not allow to overwrite
+        files as it can be done with geopandas (which I just use above),
+    - I read the raster that I cut out then I calculate the percentages of land use and I associate them to the nature
+        of these land uses with the ***get_landuse*** function
+
+    :param villages: Path to the shapefile
+    :type villages: AnyStr
+    :param parks: Path to the shapefile
+    :type parks: AnyStr
+    :param landuse: Path to the dataset file
+    :type landuse: AnyStr
+    :param ndvi: Path to the dataset file
+    :type ndvi: AnyStr
+    :param processing_directory: Path to the temporary directory used to store temporary files (then deleted)
+    :type processing_directory: AnyStr
+    :return: A DataFrame of the processed values
+    :rtype: DataFrame
     """
     # Read the shapefiles as GeoDataFrames
     gdf_villages = gpd.read_file(villages)
@@ -236,7 +271,7 @@ def get_urban_profile(villages: AnyStr,
     # Retrieves buffesr size for the vilages patches
     buffer_villages = int(__get_cfg_val('buffer_villages'))
     # Create a blank DataFrame to receive the result when iterating below
-    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'ANO_DIV', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
 
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
@@ -244,6 +279,7 @@ def get_urban_profile(villages: AnyStr,
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
             result = get_nearest_park(index=i, df=result, parks=gdf_parks, villages=gdf_villages)
+            result.loc[i, 'ANO_DIV'] = gdf_villages.iloc[i].str.count('Y').sum()
 
             # Transform the GeoSeries as a GeoDataFrame
             p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]['geometry']))
