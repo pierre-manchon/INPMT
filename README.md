@@ -16,6 +16,7 @@ requires.io: dependencies security (http://requires.io/)
 safety: venv and packages security issues (https://pyup.io/safety/)
 voir si j'utilises requires ou plutôt safety
 bandit: security issue (https://github.com/PyCQA/bandit)
+scrutinizer: code quality (https://scrutinizer-ci.com/)
 black: syntax formatting (https://github.com/psf/black)
 ok
 twine: 
