@@ -3,3 +3,14 @@
 [![CircleCI](https://circleci.com/gh/pierre-manchon/INPMT/tree/main.svg?style=svg)](https://circleci.com/gh/pierre-manchon/INPMT/tree/main) 
 
 Impact of National Parks on Malaria Transmission
+
+<!--
+jenkins: needs java (https://www.jenkins.io/)
+travis ci: ci/cd not reliable on the long term (https://www.travis-ci.com/)
+circleci: ci/cd (https://app.circleci.com/pipelines/github/pierre-manchon)
+appveyor: ci/cd (https://ci.appveyor.com/login)
+requires.io: dependencies security (http://requires.io/)
+safety: venv and packages security issues (https://pyup.io/safety/)
+bandit: security issue (https://github.com/PyCQA/bandit)
+black: syntax formatting (https://github.com/psf/black)
+-->
