@@ -10,6 +10,7 @@ travis ci: ci/cd not reliable on the long term (https://www.travis-ci.com/)
 non
 circleci: ci/cd (https://app.circleci.com/pipelines/github/pierre-manchon)
 appveyor: ci/cd (https://ci.appveyor.com/login)
+tox: differnt versions and interpreters (https://github.com/tox-dev/tox)
 voir si je peux test les builds sur plusieurs plateformes à partir de circle ci directement
 requires.io: dependencies security (http://requires.io/)
 safety: venv and packages security issues (https://pyup.io/safety/)
@@ -17,4 +18,12 @@ voir si j'utilises requires ou plutôt safety
 bandit: security issue (https://github.com/PyCQA/bandit)
 black: syntax formatting (https://github.com/psf/black)
 ok
+twine: 
+flit:
+which is better to publish package to pypi
+
+tox => formatting: black
+       security: bandit + safety (local) + requires.io (local+remote)
+       build and test the wheel: sdist + twine
+       publish: twine
 -->
