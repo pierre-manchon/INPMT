@@ -29,12 +29,12 @@ from typing import AnyStr, SupportsInt
 
 try:
     from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from __utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
-    from __utils.utils import format_dataset_output, __get_cfg_val, __read_qml
+    from __utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize, density
+    from __utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
 except ImportError:
     from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from .__utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize
-    from .__utils.utils import format_dataset_output, __get_cfg_val, __read_qml
+    from .__utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize, density
+    from .__utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
 
 
 def set_urban_profile(
@@ -147,6 +147,7 @@ def get_nearest_park(index: SupportsInt,
     :rtype: DataFrame
     """
     name = None
+    loc_np = None
     res_dist = None
     min_dist = int(__get_cfg_val('min_dist'))
 
@@ -157,10 +158,15 @@ def get_nearest_park(index: SupportsInt,
             name = parks.loc[y, 'NAME']
             if parks.loc[y, 'geometry'].distance(villages.loc[index, 'geometry']) == 0.0:
                 res_dist = - min_dist
+                loc_np = 'P'
             else:
                 res_dist = min_dist
-    df.loc[index, 'ID'] = villages.loc[index, 'Full_Name']
-    df.loc[index, 'NP'] = name
+                loc_np = 'P'
+    _, village_id = __strip(villages.loc[index, 'Full_Name'])
+    _, np_name = __strip(name)
+    df.loc[index, 'ID'] = village_id
+    df.loc[index, 'NP'] = np_name
+    df.loc[index, 'loc_np'] = loc_np
     df.loc[index, 'dist_NP'] = round(res_dist, 3)
     return df
 
@@ -222,7 +228,10 @@ def get_landuse(polygon: AnyStr,
 def get_urban_profile(villages: AnyStr,
                       parks: AnyStr,
                       landuse: AnyStr,
+                      population: AnyStr,
                       ndvi: AnyStr,
+                      swi: AnyStr,
+                      gws: AnyStr,
                       processing_directory: AnyStr
                       ) -> DataFrame:
     """
@@ -257,6 +266,10 @@ def get_urban_profile(villages: AnyStr,
     :type landuse: AnyStr
     :param ndvi: Path to the dataset file
     :type ndvi: AnyStr
+    :param swi: Path to the dataset file
+    :type swi: AnyStr
+    :param gws: Path to the dataset file
+    :type gws: AnyStr
     :param processing_directory: Path to the temporary directory used to store temporary files (then deleted)
     :type processing_directory: AnyStr
     :return: A DataFrame of the processed values
@@ -271,7 +284,9 @@ def get_urban_profile(villages: AnyStr,
     # Retrieves buffesr size for the vilages patches
     buffer_villages = int(__get_cfg_val('buffer_villages'))
     # Create a blank DataFrame to receive the result when iterating below
-    result = pd.DataFrame(columns=['ID', 'NP', 'dist_NP', 'ANO_DIV', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'HAB_DIV'])
+    cols = ['ID', 'NP', 'loc_NP', 'dist_NP', 'POP', 'ANO_DIV', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'SWI_min', 'SWI_mean',
+            'SWI_max', 'GWS', 'HAB_DIV']
+    result = pd.DataFrame(columns=cols)
 
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
@@ -291,6 +306,11 @@ def get_urban_profile(villages: AnyStr,
             path_poly = os.path.join(processing_directory, ''.join([p1, pext]))
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
+
+            path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
+            population_density = density(dataset=path_pop_aoi, area=path_poly)
+            result.loc[i, 'POP'] = population_density
+
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
@@ -298,10 +318,28 @@ def get_urban_profile(villages: AnyStr,
             result.loc[i, 'NDVI_mean'] = ndvi_mean
             result.loc[i, 'NDVI_max'] = ndvi_max
 
+            path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
+            swi_min, swi_mean, swi_max = raster_stats(path_swi_aoi)
+            result.loc[i, 'SWI_min'] = swi_min
+            result.loc[i, 'SWI_mean'] = swi_mean
+            result.loc[i, 'SWI_max'] = swi_max
+
+            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
+
+            try:
+                df_gwsd = df_gwsd.pivot_table(columns='Label', values='Proportion (%)', aggfunc='sum')  # noqa
+                df_gwsd.rename(index={'Proportion (%)': int(i)}, inplace=True)
+                result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values  # noqa
+            except KeyError:
+                print('Land use data missing')
+                pass
+
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
             result.loc[i, 'HAB_DIV'] = len_ctr
+
             try:
                 df_hd = df_hd.pivot_table(columns='Label', values='Proportion (%)', aggfunc='sum')  # noqa
                 df_hd.rename(index={'Proportion (%)': int(i)}, inplace=True)

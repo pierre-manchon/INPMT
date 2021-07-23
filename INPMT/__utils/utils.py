@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellanious cases
 import os
+import unicodedata
 from warnings import warn
 import xml.dom.minidom
 from datetime import datetime
@@ -93,6 +94,19 @@ def format_dataset_output(dataset: AnyStr = '',
 
     __output_path = os.path.join(Path(dataset).parent, ''.join([__dataset_name, __ext]))
     return __dataset_name, __ext, __output_path
+
+
+def __strip(text: AnyStr) -> AnyStr:
+    """
+    https://stackoverflow.com/a/44433664/12258568
+
+    :param text: String to strip
+    :type: text: AnyStr
+    :return: Stripped string
+    :rtype: AnyStr
+    """
+    text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode("utf-8")
+    return str(text), str(text).replace(' ', '')
 
 
 def __gather(pixel_values: Generator) -> List:

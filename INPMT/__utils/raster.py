@@ -186,3 +186,16 @@ def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, fl
         return 0, 0, 0
     except ValueError:
         return 0, 0, 0
+
+
+def density(dataset: AnyStr, area: AnyStr) -> SupportsInt:
+    poly = gpd.read_file(area)
+    with rasterio.open(dataset) as ro:
+        x = ro.read()
+        x = x[x != ro.nodata]
+    area_pop = x.sum()
+    area_surf = poly.area.values.max()
+    # area_pop*10 because the population values are minified by 10
+    # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
+    # expressed in sqaure kilometers
+    return (area_pop*10)/(area_surf*1000000)
