@@ -28,25 +28,49 @@ from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 
 try:
-    from __utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from __utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize, density
+    from __utils.vector import (
+        merge_touching,
+        to_wkt,
+        iter_geoseries_as_geodataframe,
+        intersect,
+        __read_shp_as_gdf,
+    )
+    from __utils.raster import (
+        raster_crop,
+        raster_stats,
+        get_pixel_count,
+        polygonize,
+        density,
+    )
     from __utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
 except ImportError:
-    from .__utils.vector import merge_touching, to_wkt, iter_geoseries_as_geodataframe, intersect, __read_shp_as_gdf
-    from .__utils.raster import raster_crop, raster_stats, get_pixel_count, polygonize, density
+    from .__utils.vector import (
+        merge_touching,
+        to_wkt,
+        iter_geoseries_as_geodataframe,
+        intersect,
+        __read_shp_as_gdf,
+    )
+    from .__utils.raster import (
+        raster_crop,
+        raster_stats,
+        get_pixel_count,
+        polygonize,
+        density,
+    )
     from .__utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
 
 
 def set_urban_profile(
-        urban_areas: GeoDataFrame,
-        path_urban_areas: AnyStr,
-        urban_treshold: SupportsInt,
-        export: bool = False
+    urban_areas: GeoDataFrame,
+    path_urban_areas: AnyStr,
+    urban_treshold: SupportsInt,
+    export: bool = False,
 ) -> GeoDataFrame:
     """
     # TODO
     """
-    merging_result = merge_touching(geodataframe=urban_areas, by='sum')
+    merging_result = merge_touching(geodataframe=urban_areas, by="sum")
 
     result = []
     for poly in merging_result.geometry:
@@ -60,7 +84,9 @@ def set_urban_profile(
     del result
 
     if export:
-        _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='urban_extent')
+        _, _, output_path = format_dataset_output(
+            dataset=path_urban_areas, name="urban_extent"
+        )
         merging_result.to_file(output_path)
         return merging_result
     else:
@@ -123,11 +149,9 @@ def get_distances(pas: GeoDataFrame,
 """
 
 
-def get_nearest_park(index: SupportsInt,
-                     df: DataFrame,
-                     villages: GeoDataFrame,
-                     parks: GeoDataFrame
-                     ) -> DataFrame:
+def get_nearest_park(
+    index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame
+) -> DataFrame:
     """
     For each polygon, I check the distance from the point to the boundary of the polygon and compare it to the minimum
     distance found yet (at the start it's 100000 but it is modified in the first occurence).
@@ -149,31 +173,34 @@ def get_nearest_park(index: SupportsInt,
     name = None
     loc_np = None
     res_dist = None
-    min_dist = int(__get_cfg_val('min_dist'))
+    min_dist = int(__get_cfg_val("min_dist"))
 
     for y in range(len(parks)):
-        dist = parks.loc[y, 'geometry'].boundary.distance(villages.loc[index, 'geometry'])
+        dist = parks.loc[y, "geometry"].boundary.distance(
+            villages.loc[index, "geometry"]
+        )
         if dist < min_dist:
             min_dist = dist
-            name = parks.loc[y, 'NAME']
-            if parks.loc[y, 'geometry'].distance(villages.loc[index, 'geometry']) == 0.0:
-                res_dist = - min_dist
-                loc_np = 'P'
+            name = parks.loc[y, "NAME"]
+            if (
+                parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"])
+                == 0.0
+            ):
+                res_dist = -min_dist
+                loc_np = "P"
             else:
                 res_dist = min_dist
-                loc_np = 'P'
-    _, village_id = __strip(villages.loc[index, 'Full_Name'])
+                loc_np = "B"
+    _, village_id = __strip(villages.loc[index, "Full_Name"])
     _, np_name = __strip(name)
-    df.loc[index, 'ID'] = village_id
-    df.loc[index, 'NP'] = np_name
-    df.loc[index, 'loc_np'] = loc_np
-    df.loc[index, 'dist_NP'] = round(res_dist, 3)
+    df.loc[index, "ID"] = village_id
+    df.loc[index, "NP"] = np_name
+    df.loc[index, "loc_np"] = loc_np
+    df.loc[index, "dist_NP"] = round(res_dist, 3)
     return df
 
 
-def get_landuse(polygon: AnyStr,
-                dataset: AnyStr
-                ) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
@@ -191,8 +218,10 @@ def get_landuse(polygon: AnyStr,
     __val = None
     __polygon = gpd.read_file(polygon)
     # Retrive the legend file's path
-    __data_dir = __get_cfg_val('datasets_storage_path')
-    __qml_path = os.path.join(__data_dir, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml')
+    __data_dir = __get_cfg_val("datasets_storage_path")
+    __qml_path = os.path.join(
+        __data_dir, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml"
+    )
     # Count every pixel from the raster and its value
     dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
     for c in ctr:
@@ -203,8 +232,9 @@ def get_landuse(polygon: AnyStr,
         percentage = round(((category_area * 100) / __polygon.area[0]), 3)
         __data.append([c, ctr[c], category_area, percentage])
     # Creates a DataFrame from the list processed previously
-    df_hab_div = pd.DataFrame(__data,
-                              columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
+    df_hab_div = pd.DataFrame(
+        __data, columns=["Category", "Nbr of pixels", "Surface (m2)", "Proportion (%)"]
+    )
     # Format the .qml file path from the dataset path
     # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
     # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
@@ -215,25 +245,26 @@ def get_landuse(polygon: AnyStr,
     __style = __read_qml(__qml_path)
     for m, r in df_hab_div.iterrows():
         for n in __style:
-            if int(r['Category']) == int(n[0]):
+            if int(r["Category"]) == int(n[0]):
                 __val = n[1]
                 break
             else:
-                __val = 'Unknown'
-        df_hab_div.loc[m, 'Label'] = __val
+                __val = "Unknown"
+        df_hab_div.loc[m, "Label"] = __val
 
     return df_hab_div, len(ctr)
 
 
-def get_urban_profile(villages: AnyStr,
-                      parks: AnyStr,
-                      landuse: AnyStr,
-                      population: AnyStr,
-                      ndvi: AnyStr,
-                      swi: AnyStr,
-                      gws: AnyStr,
-                      processing_directory: AnyStr
-                      ) -> DataFrame:
+def get_urban_profile(
+    villages: AnyStr,
+    parks: AnyStr,
+    landuse: AnyStr,
+    population: AnyStr,
+    ndvi: AnyStr,
+    swi: AnyStr,
+    gws: AnyStr,
+    processing_directory: AnyStr,
+) -> DataFrame:
     """
     I use 4 different data, 2 vectors that I read in a GeoDataFrame at the beginning of the script and 2 raster.
     Then, I iterate on the GeoDataFrame of the villages.
@@ -282,10 +313,24 @@ def get_urban_profile(villages: AnyStr,
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
     # Retrieves buffesr size for the vilages patches
-    buffer_villages = int(__get_cfg_val('buffer_villages'))
+    buffer_villages = int(__get_cfg_val("buffer_villages"))
     # Create a blank DataFrame to receive the result when iterating below
-    cols = ['ID', 'NP', 'loc_NP', 'dist_NP', 'POP', 'ANO_DIV', 'NDVI_min', 'NDVI_mean', 'NDVI_max', 'SWI_min', 'SWI_mean',
-            'SWI_max', 'GWS', 'HAB_DIV']
+    cols = [
+        "ID",
+        "NP",
+        "loc_NP",
+        "dist_NP",
+        "POP",
+        "ANO_DIV",
+        "NDVI_min",
+        "NDVI_mean",
+        "NDVI_max",
+        "SWI_min",
+        "SWI_mean",
+        "SWI_max",
+        "GWS",
+        "HAB_DIV",
+    ]
     result = pd.DataFrame(columns=cols)
 
     # Create the progress and the temporary directory used to save some temporary files
@@ -293,74 +338,90 @@ def get_urban_profile(villages: AnyStr,
         for i in range(len(gdf_villages)):
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
-            result = get_nearest_park(index=i, df=result, parks=gdf_parks, villages=gdf_villages)
-            result.loc[i, 'ANO_DIV'] = gdf_villages.iloc[i].str.count('Y').sum()
+            result = get_nearest_park(
+                index=i, df=result, parks=gdf_parks, villages=gdf_villages
+            )
+            result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
 
             # Transform the GeoSeries as a GeoDataFrame
-            p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]['geometry']))
-            p = p.rename(columns={0: 'geometry'}).set_geometry('geometry')
+            p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
+            p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
             p.crs = 3857
 
             # Format the path for the temporary file
-            p1, pext, _ = format_dataset_output(dataset=villages, name='tmp')
-            path_poly = os.path.join(processing_directory, ''.join([p1, pext]))
+            p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
+            path_poly = os.path.join(processing_directory, "".join([p1, pext]))
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
 
-            path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
+            path_pop_aoi = raster_crop(
+                dataset=population, shapefile=path_poly, processing=processing_directory
+            )
             population_density = density(dataset=path_pop_aoi, area=path_poly)
-            result.loc[i, 'POP'] = population_density
+            result.loc[i, "POP"] = population_density
 
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
+            path_ndvi_aoi = raster_crop(
+                dataset=ndvi, shapefile=path_poly, processing=processing_directory
+            )
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
-            result.loc[i, 'NDVI_min'] = ndvi_min
-            result.loc[i, 'NDVI_mean'] = ndvi_mean
-            result.loc[i, 'NDVI_max'] = ndvi_max
+            result.loc[i, "NDVI_min"] = ndvi_min
+            result.loc[i, "NDVI_mean"] = ndvi_mean
+            result.loc[i, "NDVI_max"] = ndvi_max
 
-            path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
+            path_swi_aoi = raster_crop(
+                dataset=swi, shapefile=path_poly, processing=processing_directory
+            )
             swi_min, swi_mean, swi_max = raster_stats(path_swi_aoi)
-            result.loc[i, 'SWI_min'] = swi_min
-            result.loc[i, 'SWI_mean'] = swi_mean
-            result.loc[i, 'SWI_max'] = swi_max
+            result.loc[i, "SWI_min"] = swi_min
+            result.loc[i, "SWI_mean"] = swi_mean
+            result.loc[i, "SWI_max"] = swi_max
 
-            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            path_gws_aoi = raster_crop(
+                dataset=gws, shapefile=path_poly, processing=processing_directory
+            )
             df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
 
             try:
-                df_gwsd = df_gwsd.pivot_table(columns='Label', values='Proportion (%)', aggfunc='sum')  # noqa
-                df_gwsd.rename(index={'Proportion (%)': int(i)}, inplace=True)
+                df_gwsd = df_gwsd.pivot_table(
+                    columns="Label", values="Proportion (%)", aggfunc="sum"
+                )  # noqa
+                df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values  # noqa
             except KeyError:
-                print('Land use data missing')
+                print("Land use data missing")
                 pass
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
-            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
+            path_landuse_aoi = raster_crop(
+                dataset=landuse, shapefile=path_poly, processing=processing_directory
+            )
             df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
-            result.loc[i, 'HAB_DIV'] = len_ctr
+            result.loc[i, "HAB_DIV"] = len_ctr
 
             try:
-                df_hd = df_hd.pivot_table(columns='Label', values='Proportion (%)', aggfunc='sum')  # noqa
-                df_hd.rename(index={'Proportion (%)': int(i)}, inplace=True)
+                df_hd = df_hd.pivot_table(
+                    columns="Label", values="Proportion (%)", aggfunc="sum"
+                )  # noqa
+                df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values  # noqa
             except KeyError:
-                print('Land use data missing')
+                print("Land use data missing")
                 pass
             pbar()
 
-    result.to_excel('profils_villages.xlsx')
+    result.to_excel("profils_villages.xlsx")
     return result
 
 
 def get_countries_profile(
-        aoi: AnyStr,
-        landuse: AnyStr,
-        landuse_polygonized: AnyStr,
-        processing_directory: AnyStr,
-        population: AnyStr = '',
-        anopheles: AnyStr = '',
-        distances: bool = False
+    aoi: AnyStr,
+    landuse: AnyStr,
+    landuse_polygonized: AnyStr,
+    processing_directory: AnyStr,
+    population: AnyStr = "",
+    anopheles: AnyStr = "",
+    distances: bool = False,
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
         Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
@@ -402,32 +463,32 @@ def get_countries_profile(
     result = GeoDataFrame()
     aoi_extract = GeoDataFrame()
     try:
-        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB', 0)
-        aoi_extract.insert(aoi_extract.shape[1] - 1, 'HAB_PROP', 0)
+        aoi_extract.insert(aoi_extract.shape[1] - 1, "HAB", 0)
+        aoi_extract.insert(aoi_extract.shape[1] - 1, "HAB_PROP", 0)
     except ValueError:
-        aoi_extract.insert(0, 'HAB', 0)
-        aoi_extract.insert(0, 'HAB_PROP', 0)
+        aoi_extract.insert(0, "HAB", 0)
+        aoi_extract.insert(0, "HAB_PROP", 0)
     geodataframe_aoi = __read_shp_as_gdf(shapefile=aoi)
-    geodataframe_aoi.index.name = 'id'
-    dist_treshold = __get_cfg_val('dist_treshold')
+    geodataframe_aoi.index.name = "id"
+    dist_treshold = __get_cfg_val("dist_treshold")
 
     # Format datasets outputs with the temporary directory's path
-    p1, p1ext, _ = format_dataset_output(dataset=aoi, name='tmp')
-    path_poly1 = os.path.join(processing_directory, ''.join([p1, p1ext]))
-    p2, p2ext, _ = format_dataset_output(dataset=landuse, name='tmp')
-    path_poly2 = os.path.join(processing_directory, ''.join([p2, p2ext]))
+    p1, p1ext, _ = format_dataset_output(dataset=aoi, name="tmp")
+    path_poly1 = os.path.join(processing_directory, "".join([p1, p1ext]))
+    p2, p2ext, _ = format_dataset_output(dataset=landuse, name="tmp")
+    path_poly2 = os.path.join(processing_directory, "".join([p2, p2ext]))
 
     # Inserts new columns if the data is given or not.
     if population:
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SUM_POP', 0)
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'DENS_POP', 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SUM_POP", 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "DENS_POP", 0)
     if distances:
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'MEAN_DIST', 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "MEAN_DIST", 0)
     if anopheles:
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'CATCH_SITE', 0)
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, 'SPECIE_DIV', 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "CATCH_SITE", 0)
+        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SPECIE_DIV", 0)
 
-    print('OK')
+    print("OK")
 
     # Progress bar for the first level
     with alive_bar(total=len(geodataframe_aoi)) as bar_main:
@@ -436,48 +497,65 @@ def get_countries_profile(
             p.to_file(filename=path_poly1)
             # TODO Multithreading to ce qui est en dessous
 
-            bar_main.text('Preparing')  # Pbar 1st level
+            bar_main.text("Preparing")  # Pbar 1st level
             # Crops the raster file with the first polygon boundaries then polygonize the result.
             # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
-            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1, processing=processing_directory)
-            gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857)
+            path_landuse_aoi = raster_crop(
+                dataset=landuse, shapefile=path_poly1, processing=processing_directory
+            )
+            gdf_os_pol = intersect(
+                base=landuse_polygonized, overlay=path_poly1, crs=3857
+            )
 
             # Intersects only if the __data is given at the start.
             if population:
-                _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
+                _, population_aoi = intersect(
+                    base=population, overlay=path_poly1, crs=3857, export=True
+                )
             if anopheles:
-                _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
+                _, anopheles_aoi = intersect(
+                    base=anopheles, overlay=path_poly1, crs=3857, export=True
+                )
 
-            bar_main.text('Processing')  # Pbar 1st level
+            bar_main.text("Processing")  # Pbar 1st level
 
             # Progress bar for the second level
-            with alive_bar(total=(len(gdf_os_pol)*5)) as bar_process:
+            with alive_bar(total=(len(gdf_os_pol) * 5)) as bar_process:
                 # Iterates over every polygon and yield its index too
                 for o, q in iter_geoseries_as_geodataframe(shapefile=gdf_os_pol):
                     # TODO Multiprocessing tout ce qui est en dessous
                     q.to_file(filename=path_poly2)
 
-                    bar_process.text('Preparing')  # Pbar 2nd level
+                    bar_process.text("Preparing")  # Pbar 2nd level
                     # Extracts the row from geodataframe_aoi corresponding to the entity we're currently iterating over
-                    aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
+                    aoi_extract = aoi_extract.append(
+                        geodataframe_aoi.loc[[i]], ignore_index=True
+                    )
 
                     # Crops the raster file with the second polygon bounaries
                     path_landuse_aoi_landuse = raster_crop(
                         dataset=path_landuse_aoi,
                         shapefile=path_poly2,
-                        processing=processing_directory)
+                        processing=processing_directory,
+                    )
                     if population:
-                        population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
+                        population_aoi_landuse = intersect(
+                            base=population_aoi, overlay=path_poly2, crs=3857
+                        )
                     if anopheles:
-                        anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
-                        anopheles_aoi_landuse['spnb'] = 0
+                        anopheles_aoi_landuse = intersect(
+                            base=anopheles_aoi, overlay=path_poly2, crs=3857
+                        )
+                        anopheles_aoi_landuse["spnb"] = 0
                     bar_process()  # Pbar 2nd level
                     # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
-                    bar_process.text('Habitat')  # Pbar 2nd level
-                    df_hd, _ = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
-                    aoi_extract.loc[i, 'HAB'] = df_hd.loc[0, 'Label']
-                    aoi_extract.loc[i, 'HAB_PROP'] = df_hd.loc[0, 'Proportion (%)']
+                    bar_process.text("Habitat")  # Pbar 2nd level
+                    df_hd, _ = get_landuse(
+                        polygon=path_poly2, dataset=path_landuse_aoi_landuse
+                    )
+                    aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
+                    aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
                     """
                     # Count every pixel from the raster and its value
                     dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
@@ -524,38 +602,50 @@ def get_countries_profile(
                     """
                     bar_process()  # Pbar 2nd level
 
-                    bar_process.text('Population')  # Pbar 2nd level
+                    bar_process.text("Population")  # Pbar 2nd level
                     if population:  # Population and urban patches
-                        aoi_extract.loc[o, 'SUM_POP'] = int(population_aoi_landuse['DN'].sum())
-                        aoi_extract.loc[o, 'DENS_POP'] = int(population_aoi_landuse['DN'].sum() / p.area[0])
+                        aoi_extract.loc[o, "SUM_POP"] = int(
+                            population_aoi_landuse["DN"].sum()
+                        )
+                        aoi_extract.loc[o, "DENS_POP"] = int(
+                            population_aoi_landuse["DN"].sum() / p.area[0]
+                        )
                     bar_process()  # Pbar 2nd level
 
-                    bar_process.text('Distances')  # Pbar 2nd level
+                    bar_process.text("Distances")  # Pbar 2nd level
                     if distances:  # Distances and urban fragmentation
                         # No need to intersect it again
                         # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
-                        dbc = lps.weights.DistanceBand.from_dataframe(population_aoi_landuse,
-                                                                      threshold=dist_treshold,
-                                                                      p=2,
-                                                                      binary=False,
-                                                                      build_sp=True,
-                                                                      silent=True)
-                        aoi_extract.loc[o, 'MEAN_DIST'] = round(dbc.mean_neighbors, 4)
+                        dbc = lps.weights.DistanceBand.from_dataframe(
+                            population_aoi_landuse,
+                            threshold=dist_treshold,
+                            p=2,
+                            binary=False,
+                            build_sp=True,
+                            silent=True,
+                        )
+                        aoi_extract.loc[o, "MEAN_DIST"] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Pbar 2nd level
 
-                    bar_process.text('Anopheles')  # Pbar 2nd level
+                    bar_process.text("Anopheles")  # Pbar 2nd level
                     if anopheles:  # Anopheles diversity and catching sites
                         for x in range(0, len(anopheles_aoi_landuse)):
-                            anopheles_aoi_landuse.loc[x, 'spnb'] = anopheles_aoi_landuse.iloc[x].str.count('Y').sum()
-                        aoi_extract.loc[o, 'CATCH_SITE'] = int(len(anopheles_aoi_landuse))
-                        aoi_extract.loc[o, 'SPECIE_DIV'] = anopheles_aoi_landuse['spnb'].max()
+                            anopheles_aoi_landuse.loc[x, "spnb"] = (
+                                anopheles_aoi_landuse.iloc[x].str.count("Y").sum()
+                            )
+                        aoi_extract.loc[o, "CATCH_SITE"] = int(
+                            len(anopheles_aoi_landuse)
+                        )
+                        aoi_extract.loc[o, "SPECIE_DIV"] = anopheles_aoi_landuse[
+                            "spnb"
+                        ].max()
                     bar_process()  # Pbar 2nd level
 
-            bar_main.text('Append')  # Pbar 1st level
+            bar_main.text("Append")  # Pbar 1st level
             result = result.append(aoi_extract, ignore_index=True)
 
-            bar_main.text('Done')  # Progress bar for the first level
-            print('[{}/{}]'.format(i+1, len(geodataframe_aoi)))
+            bar_main.text("Done")  # Progress bar for the first level
+            print("[{}/{}]".format(i + 1, len(geodataframe_aoi)))
             bar_main()  # Progress bar for the first level
 
         # End

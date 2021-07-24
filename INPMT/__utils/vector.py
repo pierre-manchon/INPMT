@@ -40,10 +40,10 @@ def __enable_speedups():
     """
     if speedups.available:
         speedups.enable()
-        print('speedups enabled')
+        print("speedups enabled")
     else:
         speedups.disable()
-        print('speedups disabled')
+        print("speedups disabled")
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -87,7 +87,7 @@ def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     :return:
     :rtype:
     """
-    gdf = gpd.read_file(shapefile, encoding='latin1')
+    gdf = gpd.read_file(shapefile, encoding="latin1")
     gdf.crs = 3857
     return gdf
 
@@ -127,7 +127,9 @@ def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
     return df
 
 
-def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> [GeoDataFrame, AnyStr]:
+def intersect(
+    base: AnyStr, overlay: AnyStr, crs: int, export: bool = False
+) -> [GeoDataFrame, AnyStr]:
     """
     Takes two GeoDataFrames as input files and returns their polygons that intersects as another GeoDataFrame.
 
@@ -142,20 +144,20 @@ def intersect(base: AnyStr, overlay: AnyStr, crs: int, export: bool = False) -> 
     :return:
     :rtype: [GeoDataFrame, AnyStr]
     """
-    gdf_base = gpd.read_file(base, encoding='latin1')
-    gdf_ol = gpd.read_file(overlay, encoding='latin1')
+    gdf_base = gpd.read_file(base, encoding="latin1")
+    gdf_ol = gpd.read_file(overlay, encoding="latin1")
     gdf_base.crs = crs
     gdf_ol.crs = crs
     inter_df = gpd.overlay(gdf_base, gdf_ol)
     inter_df.crs = crs
 
     if export:
-        _, _, output_path = format_dataset_output(dataset=base, name='intersect_tmp')
+        _, _, output_path = format_dataset_output(dataset=base, name="intersect_tmp")
         try:
             inter_df.to_file(output_path, index=False)
             return inter_df, output_path
         except ValueError:
-            print(UserWarning('Empty dataframe from {} was not saved.'.format(base)))
+            print(UserWarning("Empty dataframe from {} was not saved.".format(base)))
             pass
     else:
         return inter_df
@@ -174,14 +176,14 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
     :return: GeoDataFrame
     :rtype: GeoDataFrame
     """
-    base['intersects'] = False
+    base["intersects"] = False
     for w, x in iter_geoseries_as_geodataframe(shapefile=base):
         for y, z in iter_geoseries_as_geodataframe(shapefile=interest):
             if x.intersects(z)[0]:
-                base.loc[w, 'intersects'] = True
-    to_drop = base.loc[base.loc[:, 'intersects'] != True].index
+                base.loc[w, "intersects"] = True
+    to_drop = base.loc[base.loc[:, "intersects"] != True].index
     base.drop(to_drop, inplace=True)
-    base.drop(['intersects'], axis=1, inplace=True)
+    base.drop(["intersects"], axis=1, inplace=True)
     base = base.reset_index()
     return base
 
@@ -196,7 +198,7 @@ def iter_geoseries_as_geodataframe(shapefile: GeoDataFrame) -> Iterable:
     :rtype: Iterable
     """
     for i in range(0, len(shapefile)):
-        r = gpd.GeoDataFrame(gpd.GeoSeries(shapefile.iloc[i]['geometry']))
-        r = r.rename(columns={0: 'geometry'}).set_geometry('geometry')
+        r = gpd.GeoDataFrame(gpd.GeoSeries(shapefile.iloc[i]["geometry"]))
+        r = r.rename(columns={0: "geometry"}).set_geometry("geometry")
         r.crs = 3857
         yield i, r

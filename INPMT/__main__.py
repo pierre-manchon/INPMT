@@ -131,8 +131,8 @@ except ImportError:
     from .__utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 
 cfgparser = ConfigParser()
-cfgparser.read('setup.cfg')
-config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
+cfgparser.read("setup.cfg")
+config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 # Really not important tho
 # Use the qgis project to get the list of files and the list of legend files
@@ -140,10 +140,9 @@ config_file_path = ''.join([cfgparser.get('setup', 'name'), '/config.cfg'])
 # Appears to be impossible due to qgz project file being a binary type file
 
 
-def run(aoi: AnyStr,
-        export_dir: AnyStr = './results/',
-        export: bool = False
-        ) -> GeoDataFrame:
+def run(
+    aoi: AnyStr, export_dir: AnyStr = "./results/", export: bool = False
+) -> GeoDataFrame:
     """
     population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
     UNadj_constrained_merged_degraded.tif'
@@ -170,38 +169,52 @@ def run(aoi: AnyStr,
     :param export:
     :return:
     """
-    datasets = __get_cfg_val('datasets_storage_path')
+    datasets = __get_cfg_val("datasets_storage_path")
 
     # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
-    landuse = os.path.join(datasets, 'ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif')
-    ndvi = os.path.join(datasets, 'MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif')
+    landuse = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
+    ndvi = os.path.join(
+        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
+    )
 
-    landuse_polygonized = os.path.join(datasets, '')
+    landuse_polygonized = os.path.join(datasets, "")
     # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
-    anopheles_kyalo = os.path.join(datasets, 'VectorDB_1898-2016.shp')
+    anopheles_kyalo = os.path.join(datasets, "VectorDB_1898-2016.shp")
     # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'anopheles_in_PAs.shp')
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, 'anopheles_in_PAs_buffers.shp')
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(
+        datasets, "anopheles_in_PAs_buffers.shp"
+    )
     # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'PAs_buffers_anos.shp')
-    national_parks_with_anopheles_kyalo = os.path.join(datasets, 'WDPA_Africa_anopheles.shp')
+    national_parks_with_anopheles_kyalo = os.path.join(
+        datasets, "WDPA_Africa_anopheles.shp"
+    )
     # national_parks_with_anopheles_buffered = os.path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
-        gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(aoi=aoi,
-                                                                    landuse=landuse,
-                                                                    landuse_polygonized=landuse_polygonized,
-                                                                    anopheles=anopheles_kyalo,
-                                                                    processing_directory=tmp_directory)
-        gdf_urban_profiles_aoi = get_urban_profile(villages=anopheles_kyalo_in_national_parks_buffered,
-                                                   parks=national_parks_with_anopheles_kyalo,
-                                                   ndvi=ndvi,
-                                                   landuse=landuse,
-                                                   processing_directory=tmp_directory)
+        gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
+            aoi=aoi,
+            landuse=landuse,
+            landuse_polygonized=landuse_polygonized,
+            anopheles=anopheles_kyalo,
+            processing_directory=tmp_directory,
+        )
+        gdf_urban_profiles_aoi = get_urban_profile(
+            villages=anopheles_kyalo_in_national_parks_buffered,
+            parks=national_parks_with_anopheles_kyalo,
+            ndvi=ndvi,
+            landuse=landuse,
+            processing_directory=tmp_directory,
+        )
 
         if export:
             # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_profiles = format_dataset_output(dataset=export_dir, name='profiles')
-            _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name='urban_profiles')
+            _, _, output_profiles = format_dataset_output(
+                dataset=export_dir, name="profiles"
+            )
+            _, _, output_urban_profiles = format_dataset_output(
+                dataset=export_dir, name="urban_profiles"
+            )
             gdf_profiles_aoi.to_file(output_profiles)
             gdf_urban_profiles_aoi.to_file(output_urban_profiles)
             return gdf_profiles_aoi
@@ -217,7 +230,7 @@ def main():
     :rtype: None
     """
     # Clean the terminal everytime a command is triggered
-    os.system(shlex_quote('cls' if os.name == 'nt' else 'clear'))
+    os.system(shlex_quote("cls" if os.name == "nt" else "clear"))
 
     class ArgumentParser(argparse.ArgumentParser):
         """Object for parsing command line strings into Python objects.
@@ -246,7 +259,7 @@ def main():
 
             :param message:
             """
-            stderr.write('error: %s\n' % message)
+            stderr.write("error: %s\n" % message)
             self.print_help()
             exit(2)
 
@@ -263,29 +276,43 @@ def main():
         if os.path.isfile(normalized_filepath):
             return normalized_filepath
         else:
-            raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, '\n'))
+            raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, "\n"))
 
-    parser = ArgumentParser(prog='$ python {}'.format(cfgparser.get('setup', 'name')),
-                            description='',
-                            add_help=False,
-                            epilog='\n')
+    parser = ArgumentParser(
+        prog="$ python {}".format(cfgparser.get("setup", "name")),
+        description="",
+        add_help=False,
+        epilog="\n",
+    )
 
     # Create the arguments
-    parser.add_argument("-h", "--help",
-                        action="help",
-                        help="Show this help message and exit.")
-    parser.add_argument("-d", "--description", dest='description',
-                        action="store_true",
-                        help="Show the program's description and exit.")
-    parser.add_argument("-l", "--license", dest='license',
-                        action="store_true",
-                        help="Show the program's license and exit.")
-    parser.add_argument('-c', '--config',
-                        nargs='*',
-                        help='Read or overwrite local config file.')
-    parser.add_argument('-aoi', '--aoi',
-                        nargs='?', type=file_path,
-                        help='Shapefile of the area(s) of interest you want to process')
+    parser.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit."
+    )
+    parser.add_argument(
+        "-d",
+        "--description",
+        dest="description",
+        action="store_true",
+        help="Show the program's description and exit.",
+    )
+    parser.add_argument(
+        "-l",
+        "--license",
+        dest="license",
+        action="store_true",
+        help="Show the program's license and exit.",
+    )
+    parser.add_argument(
+        "-c", "--config", nargs="*", help="Read or overwrite local config file."
+    )
+    parser.add_argument(
+        "-aoi",
+        "--aoi",
+        nargs="?",
+        type=file_path,
+        help="Shapefile of the area(s) of interest you want to process",
+    )
 
     # If no arguments are given, print the help
     if len(argv) == 1:
@@ -298,17 +325,17 @@ def main():
     # Based on the dest vars execute methods with the arguments
     try:
         if args.license is True:
-            print(cfgparser.get('metadata', 'short_license'))
+            print(cfgparser.get("metadata", "short_license"))
         elif args.description is True:
-            print(cfgparser.get('setup', 'description'))
+            print(cfgparser.get("setup", "description"))
         elif args.config is not None:
             if len(args.config) == 2:
                 var, value = args.config
                 __set_cfg_val(var, value)
-                with open(config_file_path, 'r') as cfg:
+                with open(config_file_path, "r") as cfg:
                     print(cfg.read())
             elif len(args.config) == 0:
-                with open(config_file_path, 'r') as cfg:
+                with open(config_file_path, "r") as cfg:
                     print(cfg.read())
         elif args.aoi:
             _ = run(aoi=args.aoi, export=True)
@@ -319,7 +346,7 @@ def main():
 
 # Execute outside the if __name__ == '__main__' because I the main function to be accessible from the entry point in
 # setup.py
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 else:
     pass

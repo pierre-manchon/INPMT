@@ -86,7 +86,9 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     return __dataset, __ctr
 
 
-def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False) -> AnyStr:
+def raster_crop(
+    dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False
+) -> AnyStr:
     """
     Cut a raster based on the GeoDataFrame boundary and saves it in a new temporary file.
 
@@ -107,12 +109,18 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrit
         with rasterio.open(dataset) as src:
             cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
             output_meta = src.meta
-            output_meta.update({"driver": "GTiff",
-                                "height": cropped_dataset.shape[1],
-                                "width": cropped_dataset.shape[2],
-                                "transform": output_transform})
-            r, r_ext, _ = format_dataset_output(dataset=dataset, name='cropped_tmp', prevent_duplicate=False)
-            __output_path = os.path.join(processing, ''.join([r, r_ext]))
+            output_meta.update(
+                {
+                    "driver": "GTiff",
+                    "height": cropped_dataset.shape[1],
+                    "width": cropped_dataset.shape[2],
+                    "transform": output_transform,
+                }
+            )
+            r, r_ext, _ = format_dataset_output(
+                dataset=dataset, name="cropped_tmp", prevent_duplicate=False
+            )
+            __output_path = os.path.join(processing, "".join([r, r_ext]))
 
             if overwrite:
                 try:
@@ -125,7 +133,11 @@ def raster_crop(dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrit
         return __output_path
 
     except ValueError:
-        print(UserWarning('Raster does not overlap with {}.'.format(dataset, __sf.__hash__)))
+        print(
+            UserWarning(
+                "Raster does not overlap with {}.".format(dataset, __sf.__hash__)
+            )
+        )
         pass
 
 
@@ -140,10 +152,14 @@ def polygonize(dataset: AnyStr) -> GeoDataFrame:
     with rasterio.Env():
         with rasterio.open(dataset) as src:
             image = src.read(1)
-            results = ({'properties': {'val': v}, 'geometry': s}
-                       for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.transform)))
+            results = (
+                {"properties": {"val": v}, "geometry": s}
+                for i, (s, v) in enumerate(
+                    shapes(image, mask=mask, transform=src.transform)
+                )
+            )
     geoms = list(results)
-    gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms).dissolve(by='val')
+    gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms).dissolve(by="val")
     return gpd_polygonized_raster.loc[1:]
 
 
@@ -157,14 +173,16 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
     :rtype:
     """
     if args:
-        os.path.join(*args, 'mask.tif')
+        os.path.join(*args, "mask.tif")
     else:
-        'mask.tif'
-    with rasterio.open('mask.tif', "w") as output_file:
+        "mask.tif"
+    with rasterio.open("mask.tif", "w") as output_file:
         output_file.write(output_image)
 
 
-def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
+def raster_stats(
+    dataset: AnyStr,
+) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
     """
     Read any raster file then delete the no data values and returns some basic statistics about the said raster (min,
     mean and max)
@@ -181,7 +199,11 @@ def raster_stats(dataset: AnyStr) -> Union[tuple[Any, Any, Any], tuple[float, fl
             x = ro.read()
             x = x[x != ro.nodata]
         # Divide by 10.000 because NDVI is usually between -1 and 1 and these values are between -10000 and 10000
-        return round(x.min()/10000, 3), round(x.mean()/10000, 3), round(x.max()/10000, 3)
+        return (
+            round(x.min() / 10000, 3),
+            round(x.mean() / 10000, 3),
+            round(x.max() / 10000, 3),
+        )
     except TypeError:
         return 0, 0, 0
     except ValueError:
@@ -198,4 +220,4 @@ def density(dataset: AnyStr, area: AnyStr) -> SupportsInt:
     # area_pop*10 because the population values are minified by 10
     # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
     # expressed in sqaure kilometers
-    return (area_pop*10)/(area_surf*1000000)
+    return (area_pop * 10) / (area_surf * 1000000)
