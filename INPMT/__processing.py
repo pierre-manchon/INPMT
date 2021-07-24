@@ -295,6 +295,8 @@ def get_urban_profile(
     :type parks: AnyStr
     :param landuse: Path to the dataset file
     :type landuse: AnyStr
+    :param population: Path to the dataset file
+    :type population: AnyStr
     :param ndvi: Path to the dataset file
     :type ndvi: AnyStr
     :param swi: Path to the dataset file
