@@ -171,11 +171,11 @@ def run(
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    # population = path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
+    population = os.path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
     landuse = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(
-        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
-    )
+    ndvi = os.path.join(datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif")
+    swi = os.path.join(datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif")
+    gws = os.path.join(datasets, "GWS_yearlyclassification_2016.tif")
 
     landuse_polygonized = os.path.join(datasets, "")
     # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
@@ -192,6 +192,7 @@ def run(
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
+        """
         gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
             aoi=aoi,
             landuse=landuse,
@@ -199,27 +200,48 @@ def run(
             anopheles=anopheles_kyalo,
             processing_directory=tmp_directory,
         )
-        gdf_urban_profiles_aoi = get_urban_profile(
+        """
+        __set_cfg_val('buffer_villages', '500')
+        profile_villages_500 = get_urban_profile(
             villages=anopheles_kyalo_in_national_parks_buffered,
             parks=national_parks_with_anopheles_kyalo,
-            ndvi=ndvi,
             landuse=landuse,
+            population=population,
+            ndvi=ndvi,
+            swi=swi,
+            gws=gws,
             processing_directory=tmp_directory,
+        )
+        __set_cfg_val('buffer_villages', '2000')
+        profile_villages_2000 = get_urban_profile(
+            villages=anopheles_kyalo_in_national_parks_buffered,
+            parks=national_parks_with_anopheles_kyalo,
+            landuse=landuse,
+            population=population,
+            ndvi=ndvi,
+            swi=swi,
+            gws=gws,
+            processing_directory=tmp_directory,
+        )
+
+        # https://stackoverflow.com/a/50865526
+        # Merge the two dataframes in one (side by side) with the column suffix
+        profile_vilages = profile_villages_500.reset_index(drop=True).merge(profile_villages_2000.reset_index(
+            drop=True),
+            left_index=True,
+            right_index=True,
+            suffixes=("_500", "_2000")
         )
 
         if export:
             # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_profiles = format_dataset_output(
-                dataset=export_dir, name="profiles"
-            )
             _, _, output_urban_profiles = format_dataset_output(
                 dataset=export_dir, name="urban_profiles"
             )
-            gdf_profiles_aoi.to_file(output_profiles)
-            gdf_urban_profiles_aoi.to_file(output_urban_profiles)
-            return gdf_profiles_aoi
-        else:
-            return gdf_profiles_aoi
+            profile_vilages.to_file(output_urban_profiles)
+            _, _, output_profiles = format_dataset_output(
+                dataset=export_dir, name="profiles"
+            )
 
 
 def main():
