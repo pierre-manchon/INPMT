@@ -19,17 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+from pathlib import Path
+from typing import Any, AnyStr, Counter, Generator, Optional, SupportsInt, Union
+
+import geopandas as gpd
 import rasterio
 import rasterio.mask
-import geopandas as gpd
+from geopandas import GeoDataFrame
+from numpy import ndarray
 from rasterio.features import shapes
 
-from numpy import ndarray
-from pathlib import Path
-from geopandas import GeoDataFrame
-from typing import Any, AnyStr, Generator, Optional, Counter, SupportsInt, Union
-
-from .utils import format_dataset_output, __gather, __count_values
+from .utils import __count_values, __gather, format_dataset_output
 from .vector import __read_shapefile
 
 
@@ -74,9 +74,6 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     :return:
     """
     __pixel_value = 0
-    __val = None
-    __dataset = None
-    __output_path = None
 
     with rasterio.open(dataset_path) as __dataset:
         __band = __dataset.read()[band]
@@ -135,7 +132,7 @@ def raster_crop(
     except ValueError:
         print(
             UserWarning(
-                "Raster does not overlap with {}.".format(dataset, __sf.__hash__)
+                "Raster does not overlap with {}.".format(__sf.__hash__)
             )
         )
         pass

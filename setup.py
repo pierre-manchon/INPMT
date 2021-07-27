@@ -19,8 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-import pip
 from configparser import ConfigParser
+
+import pip
 from setuptools import find_packages
 from setuptools.command.install import install as _install
 

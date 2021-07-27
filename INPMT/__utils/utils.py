@@ -21,13 +21,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # Function for basic processing and miscellanious cases
 import os
 import unicodedata
-from warnings import warn
 import xml.dom.minidom
-from datetime import datetime
-from pathlib import Path
 from collections import Counter
 from configparser import ConfigParser
-from typing import AnyStr, List, Generator, Union
+from datetime import datetime
+from pathlib import Path
+from typing import AnyStr, Generator, List, Union
+from warnings import warn
 
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
@@ -72,7 +72,7 @@ def format_dataset_output(
     __dataset_name = Path(dataset).name.replace(__ext, "")
 
     if not Path(dataset).is_dir():
-        __dataset = dataset
+        __dataset_name = dataset
     else:
         __dataset_name = os.path.join(
             dataset, "".join(["output_", datetime.now().strftime("%Y%m%d%H%M%S")])
@@ -96,7 +96,7 @@ def format_dataset_output(
     return __dataset_name, __ext, __output_path
 
 
-def __strip(text: AnyStr) -> AnyStr:
+def __strip(text: AnyStr) -> tuple[str, str]:
     """
     https://stackoverflow.com/a/44433664/12258568
 

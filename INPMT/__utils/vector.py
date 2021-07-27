@@ -18,18 +18,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from collections import Iterable
+from typing import AnyStr
+
 # Functions for basic vector processing
 import fiona
+import geopandas as gpd
 import libpysal
 import pandas as pd
-import geopandas as gpd
 import shapefile as shp
-from shapely import speedups
-from shapefile import Reader
-from pandas import DataFrame
 from geopandas import GeoDataFrame
-from typing import AnyStr
-from collections import Iterable
+from pandas import DataFrame
+from shapefile import Reader
+from shapely import speedups
+
 from .utils import format_dataset_output
 
 
@@ -181,7 +183,7 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
         for y, z in iter_geoseries_as_geodataframe(shapefile=interest):
             if x.intersects(z)[0]:
                 base.loc[w, "intersects"] = True
-    to_drop = base.loc[base.loc[:, "intersects"] != True].index
+    to_drop = base.loc[base.loc[:, "intersects"] != True].index  # noqa
     base.drop(to_drop, inplace=True)
     base.drop(["intersects"], axis=1, inplace=True)
     base = base.reset_index()

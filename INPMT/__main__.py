@@ -113,15 +113,14 @@ gdf_pa_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_urban_aoi)
 gdf_pa_aoi_anos_pop_buffer_tmp = gdf_pa_aoi.buffer(1)
 gdf_pa_buffered_aoi_anos_pop = is_of_interest(base=gdf_pa_aoi, interest=gdf_pa_aoi_anos_pop_buffer_tmp)
 """
-import os
 import argparse
-from tempfile import TemporaryDirectory
-from sys import argv, stderr, exit
-from typing import AnyStr
-from geopandas import GeoDataFrame
+import os
+from argparse import ArgumentTypeError
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
-from argparse import ArgumentTypeError
+from sys import argv, exit, stderr
+from tempfile import TemporaryDirectory
+from typing import AnyStr
 
 try:
     from __processing import get_countries_profile, get_urban_profile
@@ -141,8 +140,12 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 
 def run(
-    aoi: AnyStr, export_dir: AnyStr = "./results/", export: bool = False
-) -> GeoDataFrame:
+    aoi: AnyStr,
+    countries: bool,
+    villages: bool,
+    export_dir: AnyStr = "./results/",
+    export: bool = False,
+):
     """
     population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
     UNadj_constrained_merged_degraded.tif'
@@ -163,18 +166,17 @@ def run(
     datasets/anopheles_in_PAs_buffers.shp'
     national_parks_buffered_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
     datasets/PAs_buffers_anos.shp'
-
-    :param aoi:
-    :param export_dir:
-    :param export:
-    :return:
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    population = os.path.join(datasets, 'UNadj_constrained_merged_degraded.tif')
+    population = os.path.join(datasets, "UNadj_constrained_merged_degraded.tif")
     landuse = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif")
-    swi = os.path.join(datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif")
+    ndvi = os.path.join(
+        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
+    )
+    swi = os.path.join(
+        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
+    )
     gws = os.path.join(datasets, "GWS_yearlyclassification_2016.tif")
 
     landuse_polygonized = os.path.join(datasets, "")
@@ -192,56 +194,61 @@ def run(
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
-        """
-        gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
-            aoi=aoi,
-            landuse=landuse,
-            landuse_polygonized=landuse_polygonized,
-            anopheles=anopheles_kyalo,
-            processing_directory=tmp_directory,
-        )
-        """
-        __set_cfg_val('buffer_villages', '500')
-        profile_villages_500 = get_urban_profile(
-            villages=anopheles_kyalo_in_national_parks_buffered,
-            parks=national_parks_with_anopheles_kyalo,
-            landuse=landuse,
-            population=population,
-            ndvi=ndvi,
-            swi=swi,
-            gws=gws,
-            processing_directory=tmp_directory,
-        )
-        __set_cfg_val('buffer_villages', '2000')
-        profile_villages_2000 = get_urban_profile(
-            villages=anopheles_kyalo_in_national_parks_buffered,
-            parks=national_parks_with_anopheles_kyalo,
-            landuse=landuse,
-            population=population,
-            ndvi=ndvi,
-            swi=swi,
-            gws=gws,
-            processing_directory=tmp_directory,
-        )
-
-        # https://stackoverflow.com/a/50865526
-        # Merge the two dataframes in one (side by side) with the column suffix
-        profile_vilages = profile_villages_500.reset_index(drop=True).merge(profile_villages_2000.reset_index(
-            drop=True),
-            left_index=True,
-            right_index=True,
-            suffixes=("_500", "_2000")
-        )
-
-        if export:
-            # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_urban_profiles = format_dataset_output(
-                dataset=export_dir, name="urban_profiles"
+        if countries:
+            gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
+                aoi=aoi,
+                landuse=landuse,
+                landuse_polygonized=landuse_polygonized,
+                anopheles=anopheles_kyalo,
+                processing_directory=tmp_directory,
             )
-            profile_vilages.to_file(output_urban_profiles)
-            _, _, output_profiles = format_dataset_output(
-                dataset=export_dir, name="profiles"
+            if export:
+                # Retrieves the directory the dataset is in and joins it the output filename
+                _, _, output_profiles = format_dataset_output(
+                    dataset=export_dir, name="profiles"
+                )
+                gdf_profiles_aoi.to_file(output_profiles)
+            else:
+                return gdf_profiles_aoi
+        if villages:
+            __set_cfg_val("buffer_villages", "500")
+            profile_villages_500 = get_urban_profile(
+                villages=anopheles_kyalo_in_national_parks_buffered,
+                parks=national_parks_with_anopheles_kyalo,
+                landuse=landuse,
+                population=population,
+                ndvi=ndvi,
+                swi=swi,
+                gws=gws,
+                processing_directory=tmp_directory,
             )
+            __set_cfg_val("buffer_villages", "2000")
+            profile_villages_2000 = get_urban_profile(
+                villages=anopheles_kyalo_in_national_parks_buffered,
+                parks=national_parks_with_anopheles_kyalo,
+                landuse=landuse,
+                population=population,
+                ndvi=ndvi,
+                swi=swi,
+                gws=gws,
+                processing_directory=tmp_directory,
+            )
+
+            # https://stackoverflow.com/a/50865526
+            # Merge the two dataframes in one (side by side) with the column suffix
+            profile_vilages = profile_villages_500.reset_index(drop=True).merge(
+                profile_villages_2000.reset_index(drop=True),
+                left_index=True,
+                right_index=True,
+                suffixes=("_500", "_2000"),
+            )
+            if export:
+                _, _, output_urban_profiles = format_dataset_output(
+                    dataset=export_dir, name="urban_profiles"
+                )
+                profile_vilages.to_file(output_urban_profiles)
+            else:
+                return profile_vilages
 
 
 def main():
@@ -360,7 +367,7 @@ def main():
                 with open(config_file_path, "r") as cfg:
                     print(cfg.read())
         elif args.aoi:
-            _ = run(aoi=args.aoi, export=True)
+            run(aoi=args.aoi, villages=True, export=True)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)

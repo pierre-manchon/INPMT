@@ -19,46 +19,43 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-import pandas as pd
-import geopandas as gpd
-import libpysal as lps
-from alive_progress import alive_bar
-from pandas import DataFrame
-from geopandas import GeoDataFrame
 from typing import AnyStr, SupportsInt
 
+import geopandas as gpd
+import libpysal as lps
+import pandas as pd
+from alive_progress import alive_bar
+from geopandas import GeoDataFrame
+from pandas import DataFrame
+
 try:
-    from __utils.vector import (
-        merge_touching,
-        to_wkt,
-        iter_geoseries_as_geodataframe,
-        intersect,
-        __read_shp_as_gdf,
-    )
     from __utils.raster import (
+        density,
+        get_pixel_count,
         raster_crop,
         raster_stats,
-        get_pixel_count,
-        polygonize,
-        density,
     )
-    from __utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
-except ImportError:
-    from .__utils.vector import (
-        merge_touching,
-        to_wkt,
-        iter_geoseries_as_geodataframe,
-        intersect,
+    from __utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
+    from __utils.vector import (
         __read_shp_as_gdf,
+        intersect,
+        iter_geoseries_as_geodataframe,
+        merge_touching,
     )
+except ImportError:
     from .__utils.raster import (
+        density,
+        get_pixel_count,
         raster_crop,
         raster_stats,
-        get_pixel_count,
-        polygonize,
-        density,
     )
-    from .__utils.utils import format_dataset_output, __strip, __get_cfg_val, __read_qml
+    from .__utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
+    from .__utils.vector import (
+        __read_shp_as_gdf,
+        intersect,
+        iter_geoseries_as_geodataframe,
+        merge_touching,
+    )
 
 
 def set_urban_profile(

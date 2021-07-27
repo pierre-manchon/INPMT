@@ -18,24 +18,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from configparser import ConfigParser as __ConfigParser
+
 # Built-ins
 from os import environ as __environ
-from sys import (
-    version_info as __version_info,
-    modules as __modules,
-    executable as __executable,
-)
-from configparser import ConfigParser as __ConfigParser
+from sys import executable as __executable
+from sys import modules as __modules
+from sys import version_info as __version_info
+
 from alive_progress import config_handler as __config_handler
 
 try:
     from __main__ import run
     from __utils.vector import __enable_speedups
-    from __utils.utils import format_dataset_output
 except ImportError:
     from .__main__ import run
     from .__utils.vector import __enable_speedups
-    from .__utils.utils import format_dataset_output
 
 # Si la version de python est trop ancienne, le code ne s'execute
 __current_python_version = "{}.{}".format(__version_info[0], __version_info[1])
