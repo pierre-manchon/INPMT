@@ -45,6 +45,7 @@ def read_pixels(dataset: AnyStr, band: ndarray) -> Generator:
     :return: Generator of one pixel at a time
     :rtype: GeneratorType
     """
+    # TODO CC
     for __row in range(band.shape[0]):
         for __col in range(band.shape[1]):
             if band[__row, __col] != dataset.nodata:
@@ -58,6 +59,7 @@ def read_pixels_from_array(dataset: ndarray) -> Generator:
     :return:
     :rtype:
     """
+    # TODO CC
     for p in dataset:
         for r in p:
             for c in r:
@@ -101,7 +103,6 @@ def raster_crop(
     :rtype: AnyStr
     """
     __sf = __read_shapefile(shapefile=shapefile)
-
     try:
         with rasterio.open(dataset) as src:
             cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
@@ -114,9 +115,7 @@ def raster_crop(
                     "transform": output_transform,
                 }
             )
-            r, r_ext, _ = format_dataset_output(
-                dataset=dataset, name="cropped_tmp", prevent_duplicate=False
-            )
+            r, r_ext, _ = format_dataset_output(dataset=dataset, name="cropped_tmp")
             __output_path = os.path.join(processing, "".join([r, r_ext]))
 
             if overwrite:
