@@ -133,11 +133,6 @@ cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
 config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
-# Really not important tho
-# Use the qgis project to get the list of files and the list of legend files
-# TODO Use a list of files to unpack rather than multiple line vars
-# Appears to be impossible due to qgz project file being a binary type file
-
 
 def run(
     aoi: AnyStr,
@@ -169,27 +164,19 @@ def run(
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    population = os.path.join(datasets, "UNadj_constrained_merged_degraded.tif")
+    population = os.path.join(datasets, "UNadj_constrained.tif")
     landuse = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(
-        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
-    )
-    swi = os.path.join(
-        datasets, "MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif"
-    )
-    gws = os.path.join(datasets, "GWS_yearlyclassification_2016.tif")
+    ndvi = os.path.join(datasets, "MOD13A1.006__300m_16_days_NDVI_doy2020161_aid0001_subsetted.tif")
+    swi = os.path.join(datasets, "")
+    gws = os.path.join(datasets, "GWS_yearlyClassification2016_degraded.tif")
 
-    landuse_polygonized = os.path.join(datasets, "")
+    landuse_polygonized = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
     anopheles_kyalo = os.path.join(datasets, "VectorDB_1898-2016.shp")
     # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'anopheles_in_PAs.shp')
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(
-        datasets, "anopheles_in_PAs_buffers.shp"
-    )
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "anopheles_in_PAs_buffers.shp")
     # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'PAs_buffers_anos.shp')
-    national_parks_with_anopheles_kyalo = os.path.join(
-        datasets, "WDPA_Africa_anopheles.shp"
-    )
+    national_parks_with_anopheles_kyalo = os.path.join(datasets, "WDPA_Africa_anopheles.shp")
     # national_parks_with_anopheles_buffered = os.path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
 
     with TemporaryDirectory() as tmp_directory:
@@ -204,9 +191,7 @@ def run(
             )
             if export:
                 # Retrieves the directory the dataset is in and joins it the output filename
-                _, _, output_profiles = format_dataset_output(
-                    dataset=export_dir, name="profiles"
-                )
+                _, _, output_profiles = format_dataset_output(dataset=export_dir, name="profiles")
                 gdf_profiles_aoi.to_file(output_profiles)
             else:
                 return gdf_profiles_aoi
@@ -243,10 +228,9 @@ def run(
                 suffixes=("_500", "_2000"),
             )
             if export:
-                _, _, output_urban_profiles = format_dataset_output(
-                    dataset=export_dir, name="urban_profiles"
-                )
-                profile_vilages.to_file(output_urban_profiles)
+                _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name="urban_profiles", ext='.xlsx')
+                profile_vilages.to_excel(output_urban_profiles)
+                return profile_vilages
             else:
                 return profile_vilages
 
