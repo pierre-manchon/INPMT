@@ -178,6 +178,7 @@ def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
     :return: GeoDataFrame
     :rtype: GeoDataFrame
     """
+    # TODO CC
     base["intersects"] = False
     for w, x in iter_geoseries_as_geodataframe(shapefile=base):
         for y, z in iter_geoseries_as_geodataframe(shapefile=interest):
