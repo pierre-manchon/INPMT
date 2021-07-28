@@ -34,25 +34,6 @@ cfgparser.read("setup.cfg")
 config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 
-def var_dump(var, prefix=""):
-    """
-    You know you're a php developer when the first thing you ask for
-    when learning a new language is 'Where's var_dump?????'
-    https://stackoverflow.com/a/21791626
-    """
-    my_type = "[" + var.__class__.__name__ + "(" + str(len(var)) + ")]:"
-    print(prefix, my_type, sep="")
-    prefix += "    "
-    for i in var:
-        if type(i) in (list, tuple, dict, set):
-            var_dump(i, prefix)
-        else:
-            if isinstance(var, dict):
-                print(prefix, i, ": (", var[i].__class__.__name__, ") ", var[i], sep="")
-            else:
-                print(prefix, "(", i.__class__.__name__, ") ", i, sep="")
-
-
 def format_dataset_output(
     dataset: AnyStr = "", name: AnyStr = "", ext: AnyStr = "", prevent_duplicate=True
 ) -> tuple[str, Union[AnyStr, str], str]:
@@ -68,15 +49,13 @@ def format_dataset_output(
     :return: Dataset name, dataset extension, output path formatted
     :rtype: tuple[str, Union[AnyStr, str], str]
     """
+    # TODO CC
     __ext = Path(dataset).suffix
-    __dataset_name = Path(dataset).name.replace(__ext, "")
 
     if not Path(dataset).is_dir():
-        __dataset_name = dataset
+        __dataset_name = Path(dataset).name.replace(__ext, "")
     else:
-        __dataset_name = os.path.join(
-            dataset, "".join(["output_", datetime.now().strftime("%Y%m%d%H%M%S")])
-        )
+        __dataset_name = os.path.join(dataset, "".join(["output_", datetime.now().strftime("%Y%m%d%H%M%S")]))
         if ext == "":
             raise UserWarning("Custom dataset path must have attribute 'ext' set")
         pass
