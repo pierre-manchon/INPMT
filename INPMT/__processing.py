@@ -337,64 +337,70 @@ def get_urban_profile(
         for i in range(len(gdf_villages)):
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
-            result = get_nearest_park(
-                index=i, df=result, parks=gdf_parks, villages=gdf_villages
-            )
+            result = get_nearest_park(index=i, df=result, parks=gdf_parks, villages=gdf_villages)
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
-
             # Transform the GeoSeries as a GeoDataFrame
             p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
             p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
             p.crs = 3857
-
             # Format the path for the temporary file
             p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
             path_poly = os.path.join(processing_directory, "".join([p1, pext]))
+
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
-
-            path_pop_aoi = raster_crop(
-                dataset=population, shapefile=path_poly, processing=processing_directory
-            )
+            path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
             population_density = density(dataset=path_pop_aoi, area=path_poly)
             result.loc[i, "POP"] = population_density
 
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-            path_ndvi_aoi = raster_crop(
-                dataset=ndvi, shapefile=path_poly, processing=processing_directory
-            )
+            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
             result.loc[i, "NDVI_min"] = ndvi_min
             result.loc[i, "NDVI_mean"] = ndvi_mean
             result.loc[i, "NDVI_max"] = ndvi_max
-
-            path_swi_aoi = raster_crop(
-                dataset=swi, shapefile=path_poly, processing=processing_directory
-            )
+            # TODO SWI Raster
+            """
+            path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
             swi_min, swi_mean, swi_max = raster_stats(path_swi_aoi)
             result.loc[i, "SWI_min"] = swi_min
             result.loc[i, "SWI_mean"] = swi_mean
             result.loc[i, "SWI_max"] = swi_max
+            
+            # TODO Can't MASk VRT dataset
+            Traceback (most recent call last):
+              File "rasterio\_io.pyx", line 688, in rasterio._io.DatasetReaderBase._read
+              File "rasterio\_base.pyx", line 1186, in rasterio._base.DatasetBase.colorinterp.__get__
+              File "rasterio\_err.pyx", line 192, in rasterio._err.exc_wrap_int
+            rasterio._err.CPLE_AppDefinedError: PROJ: proj_create_from_database: Cannot find proj.db
+            During handling of the above exception, another exception occurred:
+            Traceback (most recent call last):
+              File "<input>", line 1, in <module>
+              File "H:\dev\python\INPMT\INPMT\__main__.py", line 202, in run
+                profile_villages_500 = get_urban_profile(
+              File "H:\dev\python\INPMT\INPMT\__processing.py", line 372, in get_urban_profile
+                path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+              File "H:\dev\python\INPMT\INPMT\__utils\raster.py", line 110, in raster_crop
+                cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
+              File "H:\dev\python\INPMT\venv\lib\site-packages\rasterio\mask.py", line 189, in mask
+                out_image = dataset.read(
+              File "rasterio\_io.pyx", line 368, in rasterio._io.DatasetReaderBase.read
+              File "rasterio\_io.pyx", line 699, in rasterio._io.DatasetReaderBase._read
+            rasterio.errors.RasterioIOError: Read or write failed. PROJ: proj_create_from_database: Cannot find proj.db
 
-            path_gws_aoi = raster_crop(
-                dataset=gws, shapefile=path_poly, processing=processing_directory
-            )
+            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
             df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
 
             try:
-                df_gwsd = df_gwsd.pivot_table(
-                    columns="Label", values="Proportion (%)", aggfunc="sum"
-                )  # noqa
+                df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
                 df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values  # noqa
+                result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
-                print("Land use data missing")
+                print("GWS data missing")
                 pass
-
+            """
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
-            path_landuse_aoi = raster_crop(
-                dataset=landuse, shapefile=path_poly, processing=processing_directory
-            )
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
             result.loc[i, "HAB_DIV"] = len_ctr
 
@@ -403,7 +409,7 @@ def get_urban_profile(
                     columns="Label", values="Proportion (%)", aggfunc="sum"
                 )  # noqa
                 df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                result.loc[i, df_hd.columns] = df_hd.loc[i, :].values  # noqa
+                result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
                 print("Land use data missing")
                 pass
@@ -499,22 +505,14 @@ def get_countries_profile(
             bar_main.text("Preparing")  # Pbar 1st level
             # Crops the raster file with the first polygon boundaries then polygonize the result.
             # TODO check if intersecting a polygonized land use of Africa isn't faster than polygonizing small rasters ?
-            path_landuse_aoi = raster_crop(
-                dataset=landuse, shapefile=path_poly1, processing=processing_directory
-            )
-            gdf_os_pol = intersect(
-                base=landuse_polygonized, overlay=path_poly1, crs=3857
-            )
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly1, processing=processing_directory)
+            gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857)
 
             # Intersects only if the __data is given at the start.
             if population:
-                _, population_aoi = intersect(
-                    base=population, overlay=path_poly1, crs=3857, export=True
-                )
+                _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
             if anopheles:
-                _, anopheles_aoi = intersect(
-                    base=anopheles, overlay=path_poly1, crs=3857, export=True
-                )
+                _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
 
             bar_main.text("Processing")  # Pbar 1st level
 
@@ -527,9 +525,7 @@ def get_countries_profile(
 
                     bar_process.text("Preparing")  # Pbar 2nd level
                     # Extracts the row from geodataframe_aoi corresponding to the entity we're currently iterating over
-                    aoi_extract = aoi_extract.append(
-                        geodataframe_aoi.loc[[i]], ignore_index=True
-                    )
+                    aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
 
                     # Crops the raster file with the second polygon bounaries
                     path_landuse_aoi_landuse = raster_crop(
@@ -538,21 +534,15 @@ def get_countries_profile(
                         processing=processing_directory,
                     )
                     if population:
-                        population_aoi_landuse = intersect(
-                            base=population_aoi, overlay=path_poly2, crs=3857
-                        )
+                        population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
                     if anopheles:
-                        anopheles_aoi_landuse = intersect(
-                            base=anopheles_aoi, overlay=path_poly2, crs=3857
-                        )
+                        anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                         anopheles_aoi_landuse["spnb"] = 0
                     bar_process()  # Pbar 2nd level
                     # TODO performance issue au dessus là
                     # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
                     bar_process.text("Habitat")  # Pbar 2nd level
-                    df_hd, _ = get_landuse(
-                        polygon=path_poly2, dataset=path_landuse_aoi_landuse
-                    )
+                    df_hd, _ = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
                     aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
                     aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
                     """
@@ -603,12 +593,8 @@ def get_countries_profile(
 
                     bar_process.text("Population")  # Pbar 2nd level
                     if population:  # Population and urban patches
-                        aoi_extract.loc[o, "SUM_POP"] = int(
-                            population_aoi_landuse["DN"].sum()
-                        )
-                        aoi_extract.loc[o, "DENS_POP"] = int(
-                            population_aoi_landuse["DN"].sum() / p.area[0]
-                        )
+                        aoi_extract.loc[o, "SUM_POP"] = int(population_aoi_landuse["DN"].sum())
+                        aoi_extract.loc[o, "DENS_POP"] = int(population_aoi_landuse["DN"].sum() / p.area[0])
                     bar_process()  # Pbar 2nd level
 
                     bar_process.text("Distances")  # Pbar 2nd level
@@ -629,15 +615,9 @@ def get_countries_profile(
                     bar_process.text("Anopheles")  # Pbar 2nd level
                     if anopheles:  # Anopheles diversity and catching sites
                         for x in range(0, len(anopheles_aoi_landuse)):
-                            anopheles_aoi_landuse.loc[x, "spnb"] = (
-                                anopheles_aoi_landuse.iloc[x].str.count("Y").sum()
-                            )
-                        aoi_extract.loc[o, "CATCH_SITE"] = int(
-                            len(anopheles_aoi_landuse)
-                        )
-                        aoi_extract.loc[o, "SPECIE_DIV"] = anopheles_aoi_landuse[
-                            "spnb"
-                        ].max()
+                            anopheles_aoi_landuse.loc[x, "spnb"] = (anopheles_aoi_landuse.iloc[x].str.count("Y").sum())
+                        aoi_extract.loc[o, "CATCH_SITE"] = int(len(anopheles_aoi_landuse))
+                        aoi_extract.loc[o, "SPECIE_DIV"] = anopheles_aoi_landuse["spnb"].max()
                     bar_process()  # Pbar 2nd level
 
             bar_main.text("Append")  # Pbar 1st level
