@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-07-29T13:10:50.349Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="GFpB6ELOgdbeqGNYyg4X" version="14.9.1" type="github">
+<mxfile host="app.diagrams.net" modified="2021-07-29T13:14:25.433Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="BEJXflko4uRztK5Fokc5" version="14.9.1" type="github">
   <diagram id="YLtcainnFTUNkcoA6CSY" name="Page-1">
     <mxGraphModel dx="1038" dy="592" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -26,31 +26,43 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--7" value="Je fait un buffer de 10km autour de mes parcs nationaux" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="210" y="50" width="120" height="70" as="geometry" />
+          <mxGeometry x="280" y="50" width="120" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--10" value="Je ne garde que les villages qui se trouvent dans ces buffer (2733)" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="350" y="50" width="120" height="70" as="geometry" />
+          <mxGeometry x="420" y="50" width="120" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=13;fontColor=#7EA6E0;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--14" target="49MzPBeOzlvqZ0RAgaE--15">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--14" value="Je fusionne les données en un seul fichier" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="50" y="130" width="120" height="70" as="geometry" />
+          <mxGeometry x="120" y="135" width="120" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=13;fontColor=#7EA6E0;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--15" target="49MzPBeOzlvqZ0RAgaE--17">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--15" value="Je découpe la donnée à l&#39;échelle de l&#39;Afrique" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="200" y="130" width="120" height="70" as="geometry" />
+          <mxGeometry x="260" y="135" width="120" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--17" value="Je dégrade ou j&#39;améliore la qualité de la donnée afin qu&#39;elle ai une résolution de 300m" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="350" y="130" width="150" height="70" as="geometry" />
+          <mxGeometry x="400" y="135" width="150" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=13;fontColor=#7EA6E0;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--19" target="49MzPBeOzlvqZ0RAgaE--7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--19" value="Je charge mes couches vecteurs des parcs nationaux&amp;nbsp; (468) et des villages (13464)" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="50" y="50" width="140" height="70" as="geometry" />
+          <mxGeometry x="120" y="50" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--21" value="NDVI &amp;amp; SWI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="60" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--22" value="IRISH &amp;amp; KYALO" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="60" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--23" value="Je dégrade la donnée à 300m" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="150" y="210" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--24" value="LANDUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="210" width="90" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
