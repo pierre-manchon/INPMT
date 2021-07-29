@@ -2,16 +2,16 @@
 ### This configuration file is used by CircleCI build server
 ### https://circleci.com/docs/config-sample
 ### =============================================================
-#version: 2.1
-#jobs:
-#  toxify:
-#      docker:
-#        - image: python:3.9
-#      steps:
-#        - checkout
-#        - run: pip install tox && tox
-#workflows:
-#  version: 2
-#  INPMT_tox:
-#    jobs:
-#      - toxify
+version: 2.1
+jobs:
+  toxify:
+      docker:
+        - image: python:3.9
+      steps:
+        - checkout
+        - run: pip install tox && tox
+workflows:
+  version: 2
+  INPMT_tox:
+    jobs:
+      - toxify
