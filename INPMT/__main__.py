@@ -351,7 +351,7 @@ def main():
                 with open(config_file_path, "r") as cfg:
                     print(cfg.read())
         elif args.aoi:
-            run(aoi=args.aoi, villages=True, export=True)
+            run(aoi=args.aoi, countries=args.countries, villages=args.villages, export=args.export)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)

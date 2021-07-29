@@ -85,7 +85,7 @@ def __strip(text: AnyStr) -> tuple[str, str]:
     :rtype: AnyStr
     """
     text = unicodedata.normalize("NFD", text).encode("ascii", "ignore").decode("utf-8")
-    return str(text), str(text).replace(" ", "")
+    return str(text), str(text).replace(" ", "_")
 
 
 def __gather(pixel_values: Generator) -> List:
