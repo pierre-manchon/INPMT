@@ -1,20 +1,20 @@
-<mxfile host="app.diagrams.net" modified="2021-07-29T13:14:25.433Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="BEJXflko4uRztK5Fokc5" version="14.9.1" type="github">
+<mxfile host="app.diagrams.net" modified="2021-07-29T13:47:54.919Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="RKBua5Lq-ebg8rpX4_5X" version="14.9.1" type="github">
   <diagram id="YLtcainnFTUNkcoA6CSY" name="Page-1">
-    <mxGraphModel dx="1038" dy="592" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="865" dy="493" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="49MzPBeOzlvqZ0RAgaE--1" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#82b366;dashed=1;strokeWidth=2;fillColor=#d5e8d4;allowArrows=0;connectable=0;container=0;opacity=30;shadow=0;sketch=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="770" height="260" as="geometry" />
+          <mxGeometry x="40" y="40" width="770" height="330" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--2" value="Préparation des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;fontColor=#97D077;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;" vertex="1" parent="1">
           <mxGeometry x="60" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--3" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6c8ebf;dashed=1;strokeWidth=2;fillColor=#dae8fc;allowArrows=0;connectable=0;container=0;opacity=30;sketch=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="360" width="770" height="400" as="geometry" />
+          <mxGeometry x="40" y="420" width="770" height="340" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--4" value="Traitement des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;fontColor=#7EA6E0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="320" width="280" height="40" as="geometry" />
+          <mxGeometry x="60" y="380" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--5" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#d6b656;dashed=1;strokeWidth=2;fillColor=#fff2cc;allowArrows=0;connectable=0;container=0;opacity=30;sketch=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="820" width="770" height="260" as="geometry" />
@@ -52,17 +52,47 @@
         <mxCell id="49MzPBeOzlvqZ0RAgaE--19" value="Je charge mes couches vecteurs des parcs nationaux&amp;nbsp; (468) et des villages (13464)" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
           <mxGeometry x="120" y="50" width="140" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--21" value="NDVI &amp;amp; SWI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="50" y="130" width="60" height="70" as="geometry" />
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--21" value="NDVI, GWS &amp;amp; SWI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="135" width="60" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--22" value="IRISH &amp;amp; KYALO" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="50" y="50" width="60" height="70" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--23" value="Je dégrade la donnée à 300m" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="150" y="210" width="120" height="70" as="geometry" />
+          <mxGeometry x="180" y="210" width="120" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--24" value="LANDUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="50" y="210" width="90" height="70" as="geometry" />
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--24" value="LANDUSE&lt;br&gt;&amp;amp; POPULATION" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="210" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--25" value="LANDUSE POLYGONIZED" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="290" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--26" target="49MzPBeOzlvqZ0RAgaE--27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--26" value="Je découpe l&#39;occupation du sol pour chaque pays" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="190" y="290" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--27" target="49MzPBeOzlvqZ0RAgaE--28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--27" value="Je convertis ces occupations du sol en vecteur" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="330" y="290" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--28" target="49MzPBeOzlvqZ0RAgaE--29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--28" value="je regroupe ces vecteurs selon les valeurs" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="440" y="290" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;" edge="1" parent="1" source="49MzPBeOzlvqZ0RAgaE--29" target="49MzPBeOzlvqZ0RAgaE--30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--29" value="je fusionne les pays en un seul fichier" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="540" y="290" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--30" value="je regroupe les entités par valeurs" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="640" y="290" width="80" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
