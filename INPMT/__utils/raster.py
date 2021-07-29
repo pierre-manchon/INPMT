@@ -207,6 +207,11 @@ def raster_stats(
 
 
 def density(dataset: AnyStr, area: AnyStr) -> SupportsInt:
+    """
+    AA
+    """
+    # TODO Convertir les pixels en vecteur => Diviser la valeur par le pourcentage de l'air du pixel
+    #  (1/3 du pixel de 300m) => Utiliser les valeurs restantes pour faire la moyenne dans le buffer
     poly = gpd.read_file(area)
     with rasterio.open(dataset) as ro:
         x = ro.read()
