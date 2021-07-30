@@ -164,11 +164,11 @@ def run(
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    population = os.path.join(datasets, "UNadj_constrained.tif")
-    landuse = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(datasets, "MOD13A1.006__300m_16_days_NDVI_doy2020161_aid0001_subsetted.tif")
-    swi = os.path.join(datasets, "")
-    gws = os.path.join(datasets, "GWS_yearlyClassification2016_degraded.tif")
+    population = os.path.join(datasets, "/POPULATION/UNadj_constrained.tif")
+    landuse = os.path.join(datasets, "/LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
+    ndvi = os.path.join(datasets, "/NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
+    swi = os.path.join(datasets, "/SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
+    gws = os.path.join(datasets, "/GWS/GWS_yearlyClassification2016_degraded.tif")
 
     landuse_polygonized = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
