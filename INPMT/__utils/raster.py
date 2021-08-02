@@ -22,18 +22,18 @@ import os
 from pathlib import Path
 from typing import Any, AnyStr, Counter, Generator, Optional, SupportsInt, Union
 
+import numpy as np
 import geopandas as gpd
 import rasterio
 import rasterio.mask
 from geopandas import GeoDataFrame
-from numpy import ndarray
 from rasterio.features import shapes
 
 from .utils import __count_values, __gather, format_dataset_output
 from .vector import __read_shapefile
 
 
-def read_pixels(dataset: AnyStr, band: ndarray) -> Generator:
+def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
     """
     Using a dataset filepath and a band numbern i read every pixel values
     one by one for each row then and for each columns.
@@ -52,7 +52,7 @@ def read_pixels(dataset: AnyStr, band: ndarray) -> Generator:
                 yield str(band[__row, __col])
 
 
-def read_pixels_from_array(dataset: ndarray) -> Generator:
+def read_pixels_from_array(dataset: np.ndarray) -> Generator:
     """
     :param dataset:
     :type dataset:
@@ -155,8 +155,8 @@ def polygonize(dataset: AnyStr) -> GeoDataFrame:
                 )
             )
     geoms = list(results)
-    gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms).dissolve(by="val")
-    return gpd_polygonized_raster.loc[1:]
+    gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms)
+    return gpd_polygonized_raster
 
 
 def export_raster(output_image, *args: Optional[Path]) -> None:
@@ -213,12 +213,17 @@ def density(dataset: AnyStr, area: AnyStr) -> SupportsInt:
     # TODO Convertir les pixels en vecteur => Diviser la valeur par le pourcentage de l'air du pixel
     #  (1/3 du pixel de 300m) => Utiliser les valeurs restantes pour faire la moyenne dans le buffer
     poly = gpd.read_file(area)
-    with rasterio.open(dataset) as ro:
-        x = ro.read()
-        x = x[x != ro.nodata]
-    area_pop = x.sum()
-    area_surf = poly.area.values.max()
-    # area_pop*10 because the population values are minified by 10
-    # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
-    # expressed in sqaure kilometers
-    return (area_pop * 10) / (area_surf * 1000000)
+    with rasterio.open(dataset) as src:
+        res_x, res_y = src.res
+    polygonized = polygonize(dataset)
+    polygonized.insert(0, "valpop", np.nan)
+    for i in range(len(polygonized)):
+        # area_pop*10 because the population values are minified by 10
+        # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
+        # expressed in sqaure kilometers
+        percentage = round(polygonized.loc[i, 'geometry'].area/(res_x*res_y), 2)
+        val = polygonized.loc[i, 'val']
+        print('AreaPoly:[{}] AreaRaster:[{}] Perc:[{}] Val:[{}] Res:[{}]'.format(polygonized.loc[i, 'geometry'].area, res_x*res_y, val, percentage, val*percentage))
+        polygonized.loc[i, 'valpop'] = val*percentage
+    print('{}, {}, {}'.format(len(polygonized), polygonized['val'].sum(), polygonized['valpop'].sum()))
+    return polygonized['valpop'].sum()
