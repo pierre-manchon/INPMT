@@ -164,20 +164,20 @@ def run(
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    population = os.path.join(datasets, "/POPULATION/UNadj_constrained.tif")
-    landuse = os.path.join(datasets, "/LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(datasets, "/NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
-    swi = os.path.join(datasets, "/SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
-    gws = os.path.join(datasets, "/GWS/GWS_yearlyClassification2016_degraded.tif")
+    population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
+    landuse = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
+    ndvi = os.path.join(datasets, "NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
+    swi = os.path.join(datasets, "SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
+    gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016_degraded.tif")
 
-    landuse_polygonized = os.path.join(datasets, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
-    # countries_irish = os.path.join(datasets, 'africa_countries_irish_tmp.shp')
-    anopheles_kyalo = os.path.join(datasets, "VectorDB_1898-2016.shp")
-    # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'anopheles_in_PAs.shp')
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "anopheles_in_PAs_buffers.shp")
-    # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'PAs_buffers_anos.shp')
-    national_parks_with_anopheles_kyalo = os.path.join(datasets, "WDPA_Africa_anopheles.shp")
-    # national_parks_with_anopheles_buffered = os.path.join(datasets, 'WDPA_Africa_anopheles_buffer10km.shp')
+    landuse_polygonized = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
+    # countries_irish = os.path.join(datasets, 'IRISH/africa_countries_irish_tmp.shp')
+    anopheles_kyalo = os.path.join(datasets, "KYALO/VectorDB_1898-2016.shp")
+    # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'KYALO/anopheles_in_PAs.shp')
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO/anopheles_in_PAs_buffers.shp")
+    # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'NATIONAL PARKS/PAs_buffers_anos.shp')
+    national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL PARKS/WDPA_Africa_anopheles.shp")
+    # national_parks_with_anopheles_buffered = os.path.join(datasets, 'NATIONAL PARKS/WDPA_Africa_anopheles_buffer10km.shp')
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
