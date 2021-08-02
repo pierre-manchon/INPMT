@@ -216,9 +216,7 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
     __polygon = gpd.read_file(polygon)
     # Retrive the legend file's path
     __data_dir = __get_cfg_val("datasets_storage_path")
-    __qml_path = os.path.join(
-        __data_dir, "ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml"
-    )
+    __qml_path = os.path.join(__data_dir, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
     # Count every pixel from the raster and its value
     dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
     for c in ctr:
