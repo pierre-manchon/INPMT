@@ -26,11 +26,12 @@ import numpy as np
 import geopandas as gpd
 import rasterio
 import rasterio.mask
+import matplotlib.pyplot as plt
 from geopandas import GeoDataFrame
 from rasterio.features import shapes
 
 from .utils import __count_values, __gather, format_dataset_output
-from .vector import __read_shapefile
+from .vector import __read_shapefile, intersect
 
 
 def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
@@ -137,7 +138,7 @@ def raster_crop(
         pass
 
 
-def polygonize(dataset: AnyStr) -> GeoDataFrame:
+def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
     """
     Read a raster file and transform each pixel in a vector entity
 
@@ -156,7 +157,11 @@ def polygonize(dataset: AnyStr) -> GeoDataFrame:
             )
     geoms = list(results)
     gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms)
-    return gpd_polygonized_raster
+    gpd_polygonized_raster.crs = 3857
+    p, p_ext, _ = format_dataset_output(dataset=dataset, name='polygonized_tmp', ext='.shp')
+    __output_path = os.path.join(processing, "".join([p, p_ext]))
+    gpd_polygonized_raster.to_file(__output_path)
+    return __output_path
 
 
 def export_raster(output_image, *args: Optional[Path]) -> None:
@@ -206,24 +211,32 @@ def raster_stats(
         return 0, 0, 0
 
 
-def density(dataset: AnyStr, area: AnyStr) -> SupportsInt:
+def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     """
     AA
     """
     # TODO Convertir les pixels en vecteur => Diviser la valeur par le pourcentage de l'air du pixel
     #  (1/3 du pixel de 300m) => Utiliser les valeurs restantes pour faire la moyenne dans le buffer
-    poly = gpd.read_file(area)
     with rasterio.open(dataset) as src:
         res_x, res_y = src.res
-    polygonized = polygonize(dataset)
-    polygonized.insert(0, "valpop", np.nan)
-    for i in range(len(polygonized)):
+    polygonized = polygonize(dataset, processing=processing)
+    polygon = intersect(base=polygonized, overlay=area, crs=3857)
+    polygon.insert(0, "valpop", np.nan)
+    for i in range(len(polygon)):
+        val = None
+        percentage = None
         # area_pop*10 because the population values are minified by 10
         # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
         # expressed in sqaure kilometers
-        percentage = round(polygonized.loc[i, 'geometry'].area/(res_x*res_y), 2)
-        val = polygonized.loc[i, 'val']
-        print('AreaPoly:[{}] AreaRaster:[{}] Perc:[{}] Val:[{}] Res:[{}]'.format(polygonized.loc[i, 'geometry'].area, res_x*res_y, val, percentage, val*percentage))
-        polygonized.loc[i, 'valpop'] = val*percentage
-    print('{}, {}, {}'.format(len(polygonized), polygonized['val'].sum(), polygonized['valpop'].sum()))
-    return polygonized['valpop'].sum()
+        percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
+        val = polygon.loc[i, 'val']*10
+        if percentage > 1.0:
+            print('AreaPoly:[{}] AreaRaster:[{}] Val:[{}] Perc:[{}] Res:[{}]'.format(
+                polygon.loc[i, 'geometry'].area,
+                res_x*res_y,
+                val,
+                percentage,
+                val*percentage))
+        polygon.loc[i, 'valpop'] = val*percentage
+    print('{}, {}, {}'.format(len(polygon), polygon['val'].sum(), polygon['valpop'].sum()))
+    return polygon['valpop'].sum()
