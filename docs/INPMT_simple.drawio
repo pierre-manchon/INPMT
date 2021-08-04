@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-08-04T13:52:31.569Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="5c7jLZO2XQiZBruETT7I" version="14.9.3" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2021-08-04T13:53:59.587Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36" etag="2WgwxUdtcOcrKl0LgC7v" version="14.9.3" type="github" pages="2">
   <diagram id="YLtcainnFTUNkcoA6CSY" name="Global I/O">
     <mxGraphModel dx="865" dy="1593" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -56,7 +56,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--24" value="LANDUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" parent="1" vertex="1">
-          <mxGeometry x="65" y="40" width="150" height="40" as="geometry" />
+          <mxGeometry x="65" y="55" width="150" height="10" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--25" value="LANDUSE POLYGONIZED" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=16;fontColor=#1A1A1A;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="680" y="-30" width="120" height="70" as="geometry" />
@@ -83,25 +83,37 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-4" value="POPULATION" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" vertex="1" parent="1">
-          <mxGeometry x="225" y="40" width="150" height="40" as="geometry" />
+          <mxGeometry x="225" y="55" width="150" height="10" as="geometry" />
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;" edge="1" parent="1" source="SCPs35aV1NnULm3B9HY3-10" target="SCPs35aV1NnULm3B9HY3-12">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="70" />
+              <mxPoint x="440" y="70" />
+              <mxPoint x="440" y="100" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-10" value="SWI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" vertex="1" parent="1">
-          <mxGeometry x="400" y="40" width="40" height="40" as="geometry" />
+          <mxGeometry x="400" y="55" width="40" height="10" as="geometry" />
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;" edge="1" parent="1" source="SCPs35aV1NnULm3B9HY3-11" target="SCPs35aV1NnULm3B9HY3-12">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="70" />
+              <mxPoint x="440" y="70" />
+              <mxPoint x="440" y="100" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-11" value="GWS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" vertex="1" parent="1">
-          <mxGeometry x="440" y="40" width="40" height="40" as="geometry" />
+          <mxGeometry x="440" y="55" width="40" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="SCPs35aV1NnULm3B9HY3-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.635;entryY=-0.011;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;" edge="1" parent="1" source="SCPs35aV1NnULm3B9HY3-12" target="49MzPBeOzlvqZ0RAgaE--23">
+        <mxCell id="SCPs35aV1NnULm3B9HY3-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.642;entryY=0.017;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;" edge="1" parent="1" source="SCPs35aV1NnULm3B9HY3-12" target="49MzPBeOzlvqZ0RAgaE--23">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="SCPs35aV1NnULm3B9HY3-12" value="Fusion temporelle des données en un seul fichier" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="375" y="100" width="120" height="50" as="geometry" />
+          <mxGeometry x="380" y="100" width="120" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
