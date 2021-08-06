@@ -348,7 +348,7 @@ def get_urban_profile(
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
-            population_density = density(dataset=path_pop_aoi, area=path_poly)
+            population_density = density(dataset=path_pop_aoi, area=path_poly, processing=processing_directory)
             result.loc[i, "POP"] = population_density
 
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
