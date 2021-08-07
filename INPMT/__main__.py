@@ -191,7 +191,7 @@ def run(
             )
             if export:
                 # Retrieves the directory the dataset is in and joins it the output filename
-                _, _, output_profiles = format_dataset_output(dataset=export_dir, name="profiles")
+                _, _, output_profiles = format_dataset_output(dataset=export_dir, name="countries_profiles")
                 gdf_profiles_aoi.to_file(output_profiles)
             else:
                 return gdf_profiles_aoi
