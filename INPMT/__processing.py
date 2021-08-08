@@ -358,34 +358,13 @@ def get_urban_profile(
             result.loc[i, "NDVI_mean"] = ndvi_mean
             result.loc[i, "NDVI_max"] = ndvi_max
             # TODO SWI Raster
-            """
+
             path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
             swi_min, swi_mean, swi_max = raster_stats(path_swi_aoi)
             result.loc[i, "SWI_min"] = swi_min
             result.loc[i, "SWI_mean"] = swi_mean
             result.loc[i, "SWI_max"] = swi_max
             
-            # TODO Can't MASk VRT dataset
-            Traceback (most recent call last):
-              File "rasterio\_io.pyx", line 688, in rasterio._io.DatasetReaderBase._read
-              File "rasterio\_base.pyx", line 1186, in rasterio._base.DatasetBase.colorinterp.__get__
-              File "rasterio\_err.pyx", line 192, in rasterio._err.exc_wrap_int
-            rasterio._err.CPLE_AppDefinedError: PROJ: proj_create_from_database: Cannot find proj.db
-            During handling of the above exception, another exception occurred:
-            Traceback (most recent call last):
-              File "<input>", line 1, in <module>
-              File "H:\dev\python\INPMT\INPMT\__main__.py", line 202, in run
-                profile_villages_500 = get_urban_profile(
-              File "H:\dev\python\INPMT\INPMT\__processing.py", line 372, in get_urban_profile
-                path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-              File "H:\dev\python\INPMT\INPMT\__utils\raster.py", line 110, in raster_crop
-                cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
-              File "H:\dev\python\INPMT\venv\lib\site-packages\rasterio\mask.py", line 189, in mask
-                out_image = dataset.read(
-              File "rasterio\_io.pyx", line 368, in rasterio._io.DatasetReaderBase.read
-              File "rasterio\_io.pyx", line 699, in rasterio._io.DatasetReaderBase._read
-            rasterio.errors.RasterioIOError: Read or write failed. PROJ: proj_create_from_database: Cannot find proj.db
-
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
             df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
 
@@ -396,7 +375,7 @@ def get_urban_profile(
             except KeyError:
                 print("GWS data missing")
                 pass
-            """
+
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
