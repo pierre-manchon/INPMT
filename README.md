@@ -6,6 +6,30 @@
 
 Impact of National Parks on Malaria Transmission
 
+You need to have every type of data specified [here](#data) downloaded and stored in whatever directory you choose. Then you'll need to specify the directory link in the config file.
+
+### Configure
+1. CLI in the package directory: `python INPMT`:
+
+   You can use `python INPMT --config` to visualise the config file then `python INPMT --config <variable> <new value>` to set a new value.
+
+2. Package in a python file or console: `import INPMT`:
+
+   You can use `INPMT.get_config()` to visualise the config file then `INPMT.set_config_value(varname=<varname>, value=<value>)` to set a new value.
+
+### Run
+You have two ways of executing two commands:
+
+1. CLI in the package directory: `python INPMT`
+    1. get_urban_profile `python INPMT --villages --export`
+    2. get_countries `python INPMT --aoi="" --countries --export`
+4. Package in a python file or console: `import INPMT`
+    1. get_urban_profile `INPMT.run(aoi="", countries=False, villages=True, export=True)`
+    2. get_countries `INPMT.run(aoi="", countries=True, villages=False, export=True)`
+
+###Data
+TODO
+
 <!--
 jenkins: needs java (https://www.jenkins.io/)
 travis ci: ci/cd not reliable on the long term (https://www.travis-ci.com/)
