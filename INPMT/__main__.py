@@ -170,7 +170,8 @@ def run(
     """
     datasets = __get_cfg_val("datasets_storage_path")
 
-    population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
+    # population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
+    population = os.path.join(datasets, "POPULATION/UNadj_constrained_reprj3857.tif")
     landuse = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
     ndvi = os.path.join(datasets, "NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
     swi = os.path.join(datasets, "SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
@@ -212,6 +213,7 @@ def run(
                 ndvi=ndvi,
                 swi=swi,
                 gws=gws,
+                prevalence=prevalence,
                 processing_directory=tmp_directory,
             )
             __set_cfg_val("buffer_villages", "2000")
@@ -223,6 +225,7 @@ def run(
                 ndvi=ndvi,
                 swi=swi,
                 gws=gws,
+                prevalence=prevalence,
                 processing_directory=tmp_directory,
             )
 
