@@ -24,6 +24,7 @@ from typing import AnyStr, SupportsInt
 import geopandas as gpd
 import libpysal as lps
 import pandas as pd
+import numpy as np
 from alive_progress import alive_bar
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -258,6 +259,7 @@ def get_urban_profile(
     ndvi: AnyStr,
     swi: AnyStr,
     gws: AnyStr,
+    prevalence: AnyStr,
     processing_directory: AnyStr,
 ) -> DataFrame:
     """
@@ -318,6 +320,7 @@ def get_urban_profile(
         "loc_NP",
         "dist_NP",
         "POP",
+        "PREVALENCE",
         "ANO_DIV",
         "NDVI_min",
         "NDVI_mean",
@@ -350,7 +353,7 @@ def get_urban_profile(
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
             population_density = density(dataset=path_pop_aoi, area=path_poly, processing=processing_directory)
             result.loc[i, "POP"] = population_density
-
+            """
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
@@ -364,6 +367,16 @@ def get_urban_profile(
             result.loc[i, "SWI_min"] = swi_min
             result.loc[i, "SWI_mean"] = swi_mean
             result.loc[i, "SWI_max"] = swi_max
+
+            with rasterio.open(prevalence) as src:
+                x, y = list(gdf_villages.loc[i, 'geometry'].coords)[0]
+                # get pixel x+y of the coordinate
+                py, px = src.index(x, y)
+                # create 1x1px window of the pixel
+                window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
+                # read rgb values of the window
+                value = src.read(window=window)
+            result.loc[i, "PREVALENCE"] = value
             
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
             df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
@@ -374,13 +387,13 @@ def get_urban_profile(
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
                 print("GWS data missing")
+                result.loc[i, df_gwsd.columns] = np.nan
                 pass
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
             result.loc[i, "HAB_DIV"] = len_ctr
-
             try:
                 df_hd = df_hd.pivot_table(
                     columns="Label", values="Proportion (%)", aggfunc="sum"
@@ -389,7 +402,9 @@ def get_urban_profile(
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
                 print("Land use data missing")
+                result.loc[i, df_hd.columns] = np.nan
                 pass
+            """
             pbar()
 
     result.to_excel("profils_villages.xlsx")
