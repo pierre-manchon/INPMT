@@ -175,6 +175,7 @@ def run(
     ndvi = os.path.join(datasets, "NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
     swi = os.path.join(datasets, "SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
     gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016_degraded.tif")
+    prevalence = os.path.join(datasets, "PREVALENCE/2019_Global_PfPR_2016_reprj3857.tif")
 
     landuse_polygonized = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     # countries_irish = os.path.join(datasets, 'IRISH/africa_countries_irish_tmp.shp')
