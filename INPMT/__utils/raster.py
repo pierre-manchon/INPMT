@@ -109,13 +109,10 @@ def raster_crop(
             cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
             output_meta = src.meta
             output_meta.update(
-                {
-                    "driver": "GTiff",
-                    "height": cropped_dataset.shape[1],
-                    "width": cropped_dataset.shape[2],
-                    "transform": output_transform,
-                }
-            )
+                {"driver": "GTiff",
+                 "height": cropped_dataset.shape[1],
+                 "width": cropped_dataset.shape[2],
+                 "transform": output_transform,})
             r, r_ext, _ = format_dataset_output(dataset=dataset, name="cropped_tmp")
             __output_path = os.path.join(processing, "".join([r, r_ext]))
 
@@ -130,11 +127,7 @@ def raster_crop(
         return __output_path
 
     except ValueError:
-        print(
-            UserWarning(
-                "Raster does not overlap with {}.".format(__sf.__hash__)
-            )
-        )
+        print(UserWarning("Raster does not overlap with {}.".format(__sf.__hash__)))
         pass
 
 
@@ -222,6 +215,10 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     polygonized = polygonize(dataset, processing=processing)
     polygon = intersect(base=polygonized, overlay=area, crs=3857)
     polygon.insert(0, "valpop", np.nan)
+    print('on est la')
+    zda = gpd.read_file(polygonized)
+    zda.plot()
+    polygon.plot()
     for i in range(len(polygon)):
         val = None
         percentage = None
@@ -230,13 +227,13 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
         # expressed in sqaure kilometers
         percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
         val = polygon.loc[i, 'val']*10
-        if percentage > 1.0:
+        """if percentage > 1.0:
             print('AreaPoly:[{}] AreaRaster:[{}] Val:[{}] Perc:[{}] Res:[{}]'.format(
                 polygon.loc[i, 'geometry'].area,
                 res_x*res_y,
                 val,
                 percentage,
-                val*percentage))
+                val*percentage))"""
         polygon.loc[i, 'valpop'] = val*percentage
-    print('{}, {}, {}'.format(len(polygon), polygon['val'].sum(), polygon['valpop'].sum()))
+    print('{}, {}, {}, {}, {}, {}, {}'.format(len(polygon), polygon.loc[i, 'geometry'].area, res_x*res_y, val, percentage, polygon['val'].sum(), polygon['valpop'].sum()))
     return polygon['valpop'].sum()
