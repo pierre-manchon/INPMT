@@ -57,7 +57,7 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     :return: List of dicts of geometries and their types
     :rtype: list
     """
-    with fiona.open(shapefile, encoding='windows-1252') as shapefile:
+    with fiona.open(shapefile, "r") as shapefile:  # , encoding='windows-1252'
         shapes = [feature["geometry"] for feature in shapefile]
     return shapes
 
