@@ -143,7 +143,6 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 def run(
     method: AnyStr = ['villages', 'countries'],
     export_dir: AnyStr = "results/",
-    export: bool = False,
 ):
     """
     population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
@@ -199,12 +198,9 @@ def run(
                 anopheles=anopheles_kyalo,
                 processing_directory=tmp_directory,
             )
-            if export:
-                # Retrieves the directory the dataset is in and joins it the output filename
-                _, _, output_profiles = format_dataset_output(dataset=export_dir, name="countries_profiles")
-                gdf_profiles_aoi.to_file(output_profiles)
-            else:
-                return gdf_profiles_aoi
+            # Retrieves the directory the dataset is in and joins it the output filename
+            _, _, output_profiles = format_dataset_output(dataset=export_dir, name="countries_profiles")
+            gdf_profiles_aoi.to_file(output_profiles)
         if method == 'villages':
             __set_cfg_val("buffer_villages", "500")
             profile_villages_500 = get_urban_profile(
@@ -239,12 +235,9 @@ def run(
                 right_index=True,
                 suffixes=("_500", "_2000"),
             )
-            if export:
-                _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name="urban_profiles", ext='.xlsx')
-                profile_vilages.to_excel(output_urban_profiles)
-                return profile_vilages
-            else:
-                return profile_vilages
+            # Retrieves the directory the dataset is in and joins it the output filename
+            _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name="urban_profiles", ext='.xlsx')
+            profile_vilages.to_excel(output_urban_profiles)
 
 
 def main():
@@ -332,13 +325,19 @@ def main():
         "-c", "--config", nargs="*", help="Read or overwrite local config file."
     )
     parser.add_argument(
-        "-aoi",
-        "--aoi",
+        "-m",
+        "--method",
         nargs="?",
         type=file_path,
-        help="Shapefile of the area(s) of interest you want to process",
+        help="How do you want to process the data ['countries', 'villages'].",
     )
-
+    parser.add_argument(
+        "-e",
+        "--export",
+        nargs="?",
+        type=file_path,
+        help="Where do you the result to be saved.",
+    )
     # If no arguments are given, print the help
     if len(argv) == 1:
         parser.print_help(stderr)
@@ -362,8 +361,8 @@ def main():
             elif len(args.config) == 0:
                 with open(config_file_path, "r") as cfg:
                     print(cfg.read())
-        elif args.aoi:
-            run(countries=args.countries, villages=args.villages, export=args.export)
+        elif args.method:
+            run(method=args.method, export_dir=args.export)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)
