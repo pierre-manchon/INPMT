@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 from typing import AnyStr, SupportsInt
 
+import rasterio
 import geopandas as gpd
 import libpysal as lps
 import pandas as pd
