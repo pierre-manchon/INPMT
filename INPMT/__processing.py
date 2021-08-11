@@ -300,6 +300,8 @@ def get_urban_profile(
     :type swi: AnyStr
     :param gws: Path to the dataset file
     :type gws: AnyStr
+    :param prevalence: Path to the dataset file
+    :type prevalence: AnyStr
     :param processing_directory: Path to the temporary directory used to store temporary files (then deleted)
     :type processing_directory: AnyStr
     :return: A DataFrame of the processed values
@@ -353,7 +355,7 @@ def get_urban_profile(
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
             population_density = density(dataset=path_pop_aoi, area=path_poly, processing=processing_directory)
             result.loc[i, "POP"] = population_density
-            """
+
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
@@ -404,7 +406,6 @@ def get_urban_profile(
                 print("Land use data missing")
                 result.loc[i, df_hd.columns] = np.nan
                 pass
-            """
             pbar()
 
     result.to_excel("profils_villages.xlsx")
@@ -476,16 +477,16 @@ def get_countries_profile(
     path_poly2 = os.path.join(processing_directory, "".join([p2, p2ext]))
 
     # Inserts new columns if the data is given or not.
+    """
     if population:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SUM_POP", 0)
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "DENS_POP", 0)
     if distances:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "MEAN_DIST", 0)
+    """
     if anopheles:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "CATCH_SITE", 0)
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SPECIE_DIV", 0)
-
-    print("OK")
 
     # Progress bar for the first level
     with alive_bar(total=len(geodataframe_aoi)) as bar_main:
@@ -501,8 +502,10 @@ def get_countries_profile(
             gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857)
 
             # Intersects only if the __data is given at the start.
+            """
             if population:
                 _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
+            """
             if anopheles:
                 _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
 
@@ -525,8 +528,10 @@ def get_countries_profile(
                         shapefile=path_poly2,
                         processing=processing_directory,
                     )
+                    """
                     if population:
                         population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
+                    """
                     if anopheles:
                         anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                         anopheles_aoi_landuse["spnb"] = 0
@@ -537,8 +542,9 @@ def get_countries_profile(
                     df_hd, _ = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
                     aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
                     aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
-                    """
+
                     # Count every pixel from the raster and its value
+                    __data = []
                     dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
                     for c in ctr:
                         # Multiply the number of pixels by the resolution of a pixel
@@ -570,6 +576,7 @@ def get_countries_profile(
                         df_hab_div.loc[m, 'Label'] = __val
                     # Checks the __data has been given to process only what is available
                     # TODO Est-ce que ça fait pas bugger par rapport à l'itération de mettre method =='append' ?
+                    """
                     if method == 'append:':
                         aoi_extract.loc[o, 'HAB_DIV'] = len(ctr)
                         df_hab_div = df_hab_div.pivot_table(columns='Label',
@@ -581,14 +588,16 @@ def get_countries_profile(
                         aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
                         aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
                     """
+                    aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
+                    aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
                     bar_process()  # Pbar 2nd level
-
+                    """
                     bar_process.text("Population")  # Pbar 2nd level
                     if population:  # Population and urban patches
                         aoi_extract.loc[o, "SUM_POP"] = int(population_aoi_landuse["DN"].sum())
                         aoi_extract.loc[o, "DENS_POP"] = int(population_aoi_landuse["DN"].sum() / p.area[0])
                     bar_process()  # Pbar 2nd level
-
+                    
                     bar_process.text("Distances")  # Pbar 2nd level
                     if distances:  # Distances and urban fragmentation
                         # No need to intersect it again
@@ -603,6 +612,7 @@ def get_countries_profile(
                         )
                         aoi_extract.loc[o, "MEAN_DIST"] = round(dbc.mean_neighbors, 4)
                     bar_process()  # Pbar 2nd level
+                    """
 
                     bar_process.text("Anopheles")  # Pbar 2nd level
                     if anopheles:  # Anopheles diversity and catching sites
