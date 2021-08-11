@@ -41,51 +41,41 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 def run(
     method: AnyStr = ['villages', 'countries'],
-    export_dir: AnyStr = "results/",
-):
+    export_dir: AnyStr = "results",
+) -> None:
     """
-    population = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
-    UNadj_constrained_merged_degraded.tif'
-    landuse = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
-    ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif'
-    ndvi = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/test NDVI/1an/
-    MOD13A1.006__500m_16_days_NDVI_doy2020145_aid0001.tif'
-
-    countries_irish = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/africa_countries_irish.shp'
-    anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/VectorDB_1898-2016.shp'
-    national_parks_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
-    WDPA_Africa_anopheles.shp'
-    national_parks_with_anopheles_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
-    WDPA_Africa_anopheles_buffer10km.shp'
-    anopheles_kyalo_in_national_parks = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/
-    anopheles_in_PAs.shp'
-    anopheles_kyalo_in_national_parks_buffered = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
-    datasets/anopheles_in_PAs_buffers.shp'
-    national_parks_buffered_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
-    datasets/PAs_buffers_anos.shp'
+    Retrieves the datasets path and executes the functions.
+    For the countries, i only execute it like that.
+    For the villagegs, i execute first after setting the buffer parameter to 500, then i execute it after setting the
+    parameter to 2000. Then i merge the two results.
+    
+    :param method: Execute whether by villages or countries
+    :type method: AnyStr
+    :param export_dir:
+    :type export_dir: AnyStr
+    :return: Nothing
+    :rtype: None
     """
     valid_method = ['countries', 'villages']
     if method not in valid_method:
         raise ValueError("Invalid method parameter. Expected one of {}".format(valid_method))
     datasets = __get_cfg_val("datasets_storage_path")
-
-    # population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
+    export = os.path.join(datasets, export_dir)
+    
+    # Raster data
     population = os.path.join(datasets, "POPULATION/UNadj_constrained_reprj3857.tif")
     landuse = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
     ndvi = os.path.join(datasets, "NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
     swi = os.path.join(datasets, "SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
     gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016_degraded.tif")
     prevalence = os.path.join(datasets, "PREVALENCE/2019_Global_PfPR_2016_reprj3857.tif")
-
+    
+    # Vector data
     irish = os.path.join(datasets, "IRISH/africa_countries_irish.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
-    # countries_irish = os.path.join(datasets, 'IRISH/africa_countries_irish_tmp.shp')
     anopheles_kyalo = os.path.join(datasets, "KYALO/VectorDB_1898-2016.shp")
-    # anopheles_kyalo_in_national_parks = os.path.join(datasets, 'KYALO/anopheles_in_PAs.shp')
     anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO/anopheles_in_PAs_buffers.shp")
-    # national_parks_buffered_with_anopheles_kyalo = os.path.join(datasets, 'NATIONAL PARKS/PAs_buffers_anos.shp')
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL PARKS/WDPA_Africa_anopheles.shp")
-    # national_parks_with_anopheles_buffered = os.path.join(datasets, 'NATIONAL PARKS/WDPA_Africa_anopheles_buffer10km.shp')
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
@@ -135,7 +125,7 @@ def run(
                 suffixes=("_500", "_2000"),
             )
             # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_urban_profiles = format_dataset_output(dataset=export_dir, name="urban_profiles", ext='.xlsx')
+            _, _, output_urban_profiles = format_dataset_output(dataset=export, name="urban_profiles", ext='.xlsx')
             profile_vilages.to_excel(output_urban_profiles)
 
 
