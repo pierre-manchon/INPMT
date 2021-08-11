@@ -22,12 +22,12 @@ You have two ways of executing two commands:
 
 1. CLI in the package directory: `python INPMT`
     1. get_urban_profile `python INPMT --villages --export`
-    2. get_countries `python INPMT --aoi="" --countries --export`
+    2. get_countries `python INPMT --countries --export`
 4. Package in a python file or console: `import INPMT`
-    1. get_urban_profile `INPMT.run(aoi="", countries=False, villages=True, export=True)`
-    2. get_countries `INPMT.run(aoi="", countries=True, villages=False, export=True)`
+    1. get_urban_profile `INPMT.run(method='villages', export=True)`
+    2. get_countries `INPMT.run(method='countries', export=True)`
 
-###Data
+### Data
 TODO
 
 <!--
