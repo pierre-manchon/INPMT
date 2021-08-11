@@ -31,9 +31,20 @@ from alive_progress import config_handler as __config_handler
 try:
     from __main__ import run
     from __utils.vector import __enable_speedups
+    from __utils.utils import __set_cfg_val as set_config_value
 except ImportError:
     from .__main__ import run
     from .__utils.vector import __enable_speedups
+    from .__utils.utils import __set_cfg_val as set_config_value
+
+
+def get_config():
+    """
+    Open and view the config file
+    """
+    with open('INPMT/config.cfg', "r") as cfg:
+        print(cfg.read())
+
 
 # Si la version de python est trop ancienne, le code ne s'execute
 __current_python_version = "{}.{}".format(__version_info[0], __version_info[1])
@@ -65,8 +76,6 @@ __all__ = (
     "run",
 )
 
-print(r"H:\Cours\M2\Cours\HGADU03 - Mémoire\Projet Impact PN Anophèles\datasets")
-
 # Workaround but not a permanent solution
 # https://github.com/Toblerity/Shapely/issues/1005#issuecomment-709982861
 # I don't know specifically why but it appears to have resolved itself (I recall deleting and reinstalling cleanly all
@@ -84,6 +93,4 @@ __environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
 __environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
 
 # Progress bar settings
-__config_handler.set_global(
-    length=20, spinner="dots_reverse", unknown="long_message", force_tty=True
-)
+__config_handler.set_global(length=20, spinner="dots_reverse", unknown="long_message", force_tty=True)
