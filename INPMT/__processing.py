@@ -91,62 +91,6 @@ def set_urban_profile(
         return merging_result
 
 
-"""
-def get_distances(pas: GeoDataFrame,
-                  urban_areas: GeoDataFrame,
-                  path_urban_areas: AnyStr,
-                  export: bool = False
-                  ) -> DataFrame:
-    urban_treshold = __get_cfg_val('area_treshold')
-    ug = set_urban_profile(urban_areas=urban_areas,
-                           path_urban_areas=path_urban_areas,
-                           urban_treshold=urban_treshold)
-
-    centros = []
-    for r in zip(ug.fid, ug.DN, ug.Size, ug.geometry):
-        if r[2] == 'small':
-            centros.append([r[0], str(r[3].centroid)])
-        else:
-            centros.append([r[0]])
-            pass
-    del r
-    df = pd.DataFrame(centros, columns=['fid', 'centro'])
-    del centros
-    df = to_wkt(df=df, column='centro')
-    ug = ug.merge(df, on='fid')
-    del df
-
-    result = []
-    weighted_dist = None
-    for u in ug.values:
-        min_dist = __get_cfg_val('min_dist')
-        name = None
-        for p in pas.values:
-            dist = p[3].distance(u[3])
-            if dist < min_dist:
-                min_dist = dist
-                try:
-                    weighted_dist = u[1]/(min_dist*math.sqrt(p[3].area))
-                except ZeroDivisionError:
-                    weighted_dist = u[1]
-                name = p[1]
-        result.append([u[0], u[1], u[2], u[3], name, min_dist, weighted_dist])
-    del dist, min_dist, name, p, u
-
-    cols = ug.keys().values.tolist()
-    cols.append('distance')
-    df = pd.DataFrame(result, columns=cols)
-    del result
-
-    if export:
-        _, _, output_path = format_dataset_output(dataset=path_urban_areas, name='distances', ext='.xlsx')
-        df.to_excel(output_path, index=False)
-        return df
-    else:
-        return df
-"""
-
-
 def get_nearest_park(
     index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame
 ) -> DataFrame:
@@ -233,7 +177,7 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
     )
     # Format the .qml file path from the dataset path
     # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
-    # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
+    # TODO val 200 inconnue mais présente de manière normale = la légende ne la répertorie pas ?
     # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
     # TODO Might improve performance by associating the label when searching for the categories
     # Reads the corresponding legend style from the .qml file
@@ -407,8 +351,6 @@ def get_urban_profile(
                 result.loc[i, df_hd.columns] = np.nan
                 pass
             pbar()
-
-    result.to_excel("profils_villages.xlsx")
     return result
 
 
