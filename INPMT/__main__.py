@@ -168,7 +168,7 @@ def run(
     """
     valid_method = ['countries', 'villages']
     if method not in valid_method:
-        raise ValueError("Invalid method parameter. Expected one of: {}".format(valid_method))
+        raise ValueError("Invalid method parameter. Expected one of {}".format(valid_method))
     datasets = __get_cfg_val("datasets_storage_path")
 
     # population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
