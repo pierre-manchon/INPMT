@@ -141,10 +141,8 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 
 def run(
-    aoi: AnyStr,
-    countries: bool,
-    villages: bool,
-    export_dir: AnyStr = "./results/",
+    method: AnyStr = ['villages', 'countries'],
+    export_dir: AnyStr = "results/",
     export: bool = False,
 ):
     """
@@ -168,6 +166,9 @@ def run(
     national_parks_buffered_with_anopheles_kyalo = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/
     datasets/PAs_buffers_anos.shp'
     """
+    valid_method = ['countries', 'villages']
+    if method not in valid_method:
+        raise ValueError("Invalid method parameter. Expected one of: {}".format(valid_method))
     datasets = __get_cfg_val("datasets_storage_path")
 
     # population = os.path.join(datasets, "POPULATION/UNadj_constrained.tif")
@@ -178,6 +179,7 @@ def run(
     gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016_degraded.tif")
     prevalence = os.path.join(datasets, "PREVALENCE/2019_Global_PfPR_2016_reprj3857.tif")
 
+    irish = os.path.join(datasets, "IRISH/africa_countries_irish.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     # countries_irish = os.path.join(datasets, 'IRISH/africa_countries_irish_tmp.shp')
     anopheles_kyalo = os.path.join(datasets, "KYALO/VectorDB_1898-2016.shp")
@@ -189,9 +191,9 @@ def run(
 
     with TemporaryDirectory() as tmp_directory:
         # Read file as a geodataframe
-        if countries:
+        if method == 'countries':
             gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
-                aoi=aoi,
+                aoi=irish,
                 landuse=landuse,
                 landuse_polygonized=landuse_polygonized,
                 anopheles=anopheles_kyalo,
@@ -203,7 +205,7 @@ def run(
                 gdf_profiles_aoi.to_file(output_profiles)
             else:
                 return gdf_profiles_aoi
-        if villages:
+        if method == 'villages':
             __set_cfg_val("buffer_villages", "500")
             profile_villages_500 = get_urban_profile(
                 villages=anopheles_kyalo_in_national_parks_buffered,
@@ -361,7 +363,7 @@ def main():
                 with open(config_file_path, "r") as cfg:
                     print(cfg.read())
         elif args.aoi:
-            run(aoi=args.aoi, countries=args.countries, villages=args.villages, export=args.export)
+            run(countries=args.countries, villages=args.villages, export=args.export)
     except AttributeError:
         parser.print_help(stderr)
         exit(1)
