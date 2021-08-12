@@ -131,17 +131,12 @@ class APPEEARSapi:
         return self.file_id
 
     def download_product(self):
-        response = requests.get(
-            "https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{0}/{1}".format(
-                self.task_id, self.file_id
-            ),
-            stream=True,
-        )
+        response = requests.get("https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{0}/{1}".format(
+            self.task_id,
+            self.file_id), stream=True)
 
         # parse the filename from the Content-Disposition header
-        content_disposition = cgi.parse_header(response.headers["Content-Disposition"])[
-            1
-        ]
+        content_disposition = cgi.parse_header(response.headers["Content-Disposition"])[1]
         filename = os.path.basename(content_disposition["filename"])
 
         # create a destination directory to store the file in

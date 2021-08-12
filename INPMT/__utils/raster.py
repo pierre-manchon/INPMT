@@ -26,8 +26,6 @@ import numpy as np
 import geopandas as gpd
 import rasterio
 import rasterio.mask
-import matplotlib.pyplot as plt
-from geopandas import GeoDataFrame
 from rasterio.features import shapes
 
 from .utils import __count_values, __gather, format_dataset_output
@@ -112,7 +110,7 @@ def raster_crop(
                 {"driver": "GTiff",
                  "height": cropped_dataset.shape[1],
                  "width": cropped_dataset.shape[2],
-                 "transform": output_transform,})
+                 "transform": output_transform})
             r, r_ext, _ = format_dataset_output(dataset=dataset, name="cropped_tmp")
             __output_path = os.path.join(processing, "".join([r, r_ext]))
 
@@ -225,8 +223,8 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
         # area_pop*10 because the population values are minified by 10
         # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
         # expressed in sqaure kilometers
-        percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
         val = polygon.loc[i, 'val']*10
+        percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
         """if percentage > 1.0:
             print('AreaPoly:[{}] AreaRaster:[{}] Val:[{}] Perc:[{}] Res:[{}]'.format(
                 polygon.loc[i, 'geometry'].area,
