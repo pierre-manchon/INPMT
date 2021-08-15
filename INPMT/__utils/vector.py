@@ -30,22 +30,8 @@ import shapefile as shp
 from geopandas import GeoDataFrame
 from pandas import DataFrame
 from shapefile import Reader
-from shapely import speedups
 
 from .utils import format_dataset_output
-
-
-def __enable_speedups():
-    """
-    Check if shapely's speedups are available or not and either case, activate them or not
-    :return:
-    """
-    if speedups.available:
-        speedups.enable()
-        print("speedups enabled")
-    else:
-        speedups.disable()
-        print("speedups disabled")
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -57,8 +43,8 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     :return: List of dicts of geometries and their types
     :rtype: list
     """
-    with fiona.open(shapefile, "r") as shapefile:  # , encoding='windows-1252'
-        shapes = [feature["geometry"] for feature in shapefile]
+    with fiona.open(shapefile) as shp:  # , encoding='windows-1252'
+        shapes = [feature["geometry"] for feature in shp]
     return shapes
 
 
