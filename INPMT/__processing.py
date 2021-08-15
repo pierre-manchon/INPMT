@@ -138,7 +138,7 @@ def get_nearest_park(
     _, np_name = __strip(name)
     df.loc[index, "ID"] = village_id
     df.loc[index, "NP"] = np_name
-    df.loc[index, "loc_np"] = loc_np
+    df.loc[index, "loc_NP"] = loc_np
     df.loc[index, "dist_NP"] = round(res_dist, 3)
     return df
 
@@ -297,9 +297,11 @@ def get_urban_profile(
 
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
+            """
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
             population_density = density(dataset=path_pop_aoi, area=path_poly, processing=processing_directory)
             result.loc[i, "POP"] = population_density
+            """
 
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
@@ -323,10 +325,12 @@ def get_urban_profile(
                 window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
                 # read rgb values of the window
                 value = src.read(window=window)
-            result.loc[i, "PREVALENCE"] = value
-            
+            result.loc[i, "PREVALENCE"] = value[0][0]
+            """
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            print(path_gws_aoi)
             df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
+            
 
             try:
                 df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
@@ -336,6 +340,7 @@ def get_urban_profile(
                 print("GWS data missing")
                 result.loc[i, df_gwsd.columns] = np.nan
                 pass
+            """
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
@@ -365,7 +370,7 @@ def get_countries_profile(
     distances: bool = False,
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
-        Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
+    Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
 
     For every of those polygons, this function does two types of things:
         - Crop/Intersect the __data
