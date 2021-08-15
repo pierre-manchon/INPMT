@@ -25,16 +25,15 @@ from os import environ as __environ
 from sys import executable as __executable
 from sys import modules as __modules
 from sys import version_info as __version_info
+from shapely import speedups
 
 from alive_progress import config_handler as __config_handler
 
 try:
     from __main__ import run
-    from __utils.vector import __enable_speedups
     from __utils.utils import __set_cfg_val as set_config_value
 except ImportError:
     from .__main__ import run
-    from .__utils.vector import __enable_speedups
     from .__utils.utils import __set_cfg_val as set_config_value
 
 
@@ -81,7 +80,12 @@ __all__ = (
 # I don't know specifically why but it appears to have resolved itself (I recall deleting and reinstalling cleanly all
 # of the dependencies but i already tried that back when i got that error so i doubt this fixed it.)
 # Made as a function to be hidden on import
-__enable_speedups()
+if speedups.available:
+    speedups.enable()
+    print("Speedups: {}".format(speedups.available))
+else:
+    speedups.disable()
+    print("Speedups: {}".format(speedups.available))
 
 # Modify environement variables so shapely finds the correct proj.db file (the one from the GDAL install and not the
 # POSTGRES SQL install or either one it founds)
