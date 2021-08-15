@@ -17,9 +17,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-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
 """
+
 import argparse
 import os
 from argparse import ArgumentTypeError
