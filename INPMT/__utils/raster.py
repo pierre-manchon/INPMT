@@ -75,7 +75,6 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     :return:
     """
     __pixel_value = 0
-
     with rasterio.open(dataset_path) as __dataset:
         __band = __dataset.read()[band]
         __pixel_value = read_pixels(dataset=__dataset, band=__band)
