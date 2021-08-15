@@ -17,6 +17,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+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
 """
 import argparse
 import os
@@ -67,7 +69,7 @@ def run(
     landuse = os.path.join(datasets, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
     ndvi = os.path.join(datasets, "NDVI/MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
     swi = os.path.join(datasets, "SWI/c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
-    gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016_degraded.tif")
+    gws = os.path.join(datasets, "GWS/GWS_yearlyClassification2016.tif")
     prevalence = os.path.join(datasets, "PREVALENCE/2019_Global_PfPR_2016_reprj3857.tif")
     
     # Vector data
@@ -193,40 +195,31 @@ def main():
     )
 
     # Create the arguments
-    parser.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit."
-    )
-    parser.add_argument(
-        "-d",
-        "--description",
-        dest="description",
-        action="store_true",
-        help="Show the program's description and exit.",
-    )
-    parser.add_argument(
-        "-l",
-        "--license",
-        dest="license",
-        action="store_true",
-        help="Show the program's license and exit.",
-    )
-    parser.add_argument(
-        "-c", "--config", nargs="*", help="Read or overwrite local config file."
-    )
-    parser.add_argument(
-        "-m",
-        "--method",
-        nargs="?",
-        type=file_path,
-        help="How do you want to process the data ['countries', 'villages'].",
-    )
-    parser.add_argument(
-        "-e",
-        "--export",
-        nargs="?",
-        type=file_path,
-        help="Where do you the result to be saved.",
-    )
+    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit.")
+    parser.add_argument("-d",
+                        "--description",
+                        dest="description",
+                        action="store_true",
+                        help="Show the program's description and exit.")
+    parser.add_argument("-l",
+                        "--license",
+                        dest="license",
+                        action="store_true",
+                        help="Show the program's license and exit.",)
+    parser.add_argument("-c",
+                        "--config",
+                        nargs="*",
+                        help="Read or overwrite local config file.")
+    parser.add_argument("-m",
+                        "--method",
+                        nargs="?",
+                        type=file_path,
+                        help="How do you want to process the data ['countries', 'villages'].",)
+    parser.add_argument("-e",
+                        "--export",
+                        nargs="?",
+                        type=file_path,
+                        help="Where do you the result to be saved.",)
     # If no arguments are given, print the help
     if len(argv) == 1:
         parser.print_help(stderr)
