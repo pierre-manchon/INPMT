@@ -23,9 +23,7 @@ from typing import AnyStr, SupportsInt
 
 import rasterio
 import geopandas as gpd
-import libpysal as lps
 import pandas as pd
-import numpy as np
 from alive_progress import alive_bar
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -97,8 +95,8 @@ def get_nearest_park(
 ) -> DataFrame:
     """
     For each polygon, I check the distance from the point to the boundary of the polygon and compare it to the minimum
-    distance found yet (at the start it's 100000 but it is modified in the first occurence).
-    Every time a distance is smaller, the minimum distance it's resetted.
+    distance found yet (at the start it's 100000 but it is modified in the first occurrence).
+    Every time a distance is smaller, the minimum distance it's reset.
     Every time the distance from point to the centroid of the polygon equals 0, it means the polygon of villages is
     inside the polygon of parks. In these cases I set it as a negative value.
 
@@ -143,13 +141,14 @@ def get_nearest_park(
     return df
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
     Then I retrieve a number of pixels by values using the Counter object.
     I process the category area and the landuse percentage using the pixel area and the polygon area
 
+    :param legend_filename:
     :param polygon: Path to the shapefile
     :type polygon: AnyStr
     :param dataset: Path to the dataset file
@@ -160,15 +159,15 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
     __data = []
     __val = None
     __polygon = gpd.read_file(polygon)
-    # Retrive the legend file's path
+    # Retrieve the legend file's path
     __data_dir = __get_cfg_val("datasets_storage_path")
-    __qml_path = os.path.join(__data_dir, "LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
+    __qml_path = os.path.join(__data_dir, legend_filename)
     # Count every pixel from the raster and its value
     dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
     for c in ctr:
         # Multiply the number of pixels by the resolution of a pixel
         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
-        # Cross product with the geodataframe_aoi's polygon's area to get the percetage of land use of
+        # Cross product with the geodataframe_aoi's polygon's area to get the percentage of land use of
         # the current category
         percentage = round(((category_area * 100) / __polygon.area[0]), 3)
         __data.append([c, ctr[c], category_area, percentage])
@@ -177,12 +176,12 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr) -> tuple[DataFrame, int]:
         __data, columns=["Category", "Nbr of pixels", "Surface (m2)", "Proportion (%)"]
     )
     # Format the .qml file path from the dataset path
-    # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
-    # TODO val 200 inconnue mais présente de manière normale = la légende ne la répertorie pas ?
-    # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
+    # TODO NBR habitats column != Habitats columns: two back columns not inserted?
+    # TODO val 200 unknown but normally present = legend does not list it?
+    # TODO Snow ice and no data are not inserted: merged with other columns?
     # TODO Might improve performance by associating the label when searching for the categories
-    # Reads the corresponding legend style from the .qml file
-    # Associates the category number the label name of the legend values (ridden from a .qml file)
+    # TODO Reads the corresponding legend style from the .qml file
+    # TODO Associates the category number the label name of the legend values (ridden from a .qml file)
     __style = __read_qml(__qml_path)
     for m, r in df_hab_div.iterrows():
         for n in __style:
@@ -258,7 +257,7 @@ def get_urban_profile(
     # Set the projection to 3857 to have distance, etc as meters
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
-    # Retrieves buffesr size for the vilages patches
+    # Retrieves buffer size for the villages patches
     buffer_villages = int(__get_cfg_val("buffer_villages"))
     # Create a blank DataFrame to receive the result when iterating below
     cols = [
@@ -297,22 +296,21 @@ def get_urban_profile(
 
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
-            """
+            
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
-            population_density = density(dataset=path_pop_aoi, area=path_poly, processing=processing_directory)
-            result.loc[i, "POP"] = population_density
-            """
-
+            population_sum, *_ = raster_stats(dataset=path_pop_aoi)
+            result.loc[i, "POP"] = population_sum
+            
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
-            ndvi_min, ndvi_mean, ndvi_max = raster_stats(path_ndvi_aoi)
-            result.loc[i, "NDVI_min"] = ndvi_min
-            result.loc[i, "NDVI_mean"] = ndvi_mean
-            result.loc[i, "NDVI_max"] = ndvi_max
+            _, ndvi_min, ndvi_mean, ndvi_max = raster_stats(dataset=path_ndvi_aoi)
+            result.loc[i, "NDVI_min"] = ndvi_min / 10000
+            result.loc[i, "NDVI_mean"] = ndvi_mean / 10000
+            result.loc[i, "NDVI_max"] = ndvi_max / 10000
             # TODO SWI Raster
 
             path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
-            swi_min, swi_mean, swi_max = raster_stats(path_swi_aoi)
+            _, swi_min, swi_mean, swi_max = raster_stats(dataset=path_swi_aoi)
             result.loc[i, "SWI_min"] = swi_min
             result.loc[i, "SWI_mean"] = swi_mean
             result.loc[i, "SWI_max"] = swi_max
@@ -326,11 +324,11 @@ def get_urban_profile(
                 # read rgb values of the window
                 value = src.read(window=window)
             result.loc[i, "PREVALENCE"] = value[0][0]
-            """
-            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-            print(path_gws_aoi)
-            df_gwsd, _ = get_landuse(polygon=path_poly, dataset=path_gws_aoi)
             
+            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            df_gwsd, _ = get_landuse(polygon=path_poly,
+                                     dataset=path_gws_aoi,
+                                     legend_filename="GWS/GWS_yearlyClassification2016.qml")
 
             try:
                 df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
@@ -338,13 +336,14 @@ def get_urban_profile(
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
                 print("GWS data missing")
-                result.loc[i, df_gwsd.columns] = np.nan
+                result.loc[i, df_gwsd.columns] = 'NULL'
                 pass
-            """
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
-            df_hd, len_ctr = get_landuse(polygon=path_poly, dataset=path_landuse_aoi)
+            df_hd, len_ctr = get_landuse(polygon=path_poly,
+                                         dataset=path_landuse_aoi,
+                                         legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
                 df_hd = df_hd.pivot_table(
@@ -354,9 +353,10 @@ def get_urban_profile(
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
                 print("Land use data missing")
-                result.loc[i, df_hd.columns] = np.nan
+                result.loc[i, df_hd.columns] = 'NULL'
                 pass
             pbar()
+            print(result.iloc[i])
     return result
 
 
@@ -365,9 +365,7 @@ def get_countries_profile(
     landuse: AnyStr,
     landuse_polygonized: AnyStr,
     processing_directory: AnyStr,
-    population: AnyStr = "",
     anopheles: AnyStr = "",
-    distances: bool = False,
 ) -> tuple[GeoDataFrame, AnyStr]:
     """
     Takes a Geodataframe as an input and iterate over every of its polygons, each as a new GeoDataFrame.
@@ -387,7 +385,7 @@ def get_countries_profile(
             - Calculate the mean distance for every polygons of urban settlement to get the fragmentation index
         - Anopheles species (mosquitoes)
             - Count every point in the polygon to get the number of sites where anopheles (mosquitoes) where captured
-            - Count the number of species found for each captur sites (sums the number of 'Y' in every rows)
+            - Count the number of species found for each capture sites (sums the number of 'Y' in every rows)
 
     :param landuse_polygonized:
     :param processing_directory:
@@ -395,12 +393,8 @@ def get_countries_profile(
     :type aoi: AnyStr
     :param landuse: Raster file path for the land cover of Africa (ESA, 2016), degraded to 300m).
     :type landuse: AnyStr
-    :param population: Vector file path for the population of Africa (WorldPop, 2020), Unconstrained, UN adjusted, 100m
-    :type population: AnyStr
     :param anopheles: Vector file path of the Anopheles species present in countries in sub-Saharan Africa (Kyalo, 2019)
     :type anopheles: AnyStr
-    :param distances: Boolean parameter to know wether or not the distances must be processed.
-    :type distances: bool
     :return: Same file as input but with additional columns corresponding to the results of the calculations
     :rtype: tuple[GeoDataFrame, AnyStr]
     """
@@ -425,13 +419,6 @@ def get_countries_profile(
     path_poly2 = os.path.join(processing_directory, "".join([p2, p2ext]))
 
     # Inserts new columns if the data is given or not.
-    """
-    if population:
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SUM_POP", 0)
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "DENS_POP", 0)
-    if distances:
-        geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "MEAN_DIST", 0)
-    """
     if anopheles:
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "CATCH_SITE", 0)
         geodataframe_aoi.insert(geodataframe_aoi.shape[1] - 1, "SPECIE_DIV", 0)
@@ -441,7 +428,7 @@ def get_countries_profile(
         # Iterates over every polygon and yield its index too
         for i, p in iter_geoseries_as_geodataframe(shapefile=geodataframe_aoi):
             p.to_file(filename=path_poly1)
-            # TODO Multithreading to ce qui est en dessous
+            # TODO Multithreading everything below
 
             bar_main.text("Preparing")  # Pbar 1st level
             # Crops the raster file with the first polygon boundaries then polygonize the result.
@@ -450,10 +437,6 @@ def get_countries_profile(
             gdf_os_pol = intersect(base=landuse_polygonized, overlay=path_poly1, crs=3857)
 
             # Intersects only if the __data is given at the start.
-            """
-            if population:
-                _, population_aoi = intersect(base=population, overlay=path_poly1, crs=3857, export=True)
-            """
             if anopheles:
                 _, anopheles_aoi = intersect(base=anopheles, overlay=path_poly1, crs=3857, export=True)
 
@@ -463,31 +446,29 @@ def get_countries_profile(
             with alive_bar(total=(len(gdf_os_pol) * 5)) as bar_process:
                 # Iterates over every polygon and yield its index too
                 for o, q in iter_geoseries_as_geodataframe(shapefile=gdf_os_pol):
-                    # TODO Multiprocessing tout ce qui est en dessous
+                    # TODO Multiprocessing everything below
                     q.to_file(filename=path_poly2)
 
                     bar_process.text("Preparing")  # Pbar 2nd level
                     # Extracts the row from geodataframe_aoi corresponding to the entity we're currently iterating over
                     aoi_extract = aoi_extract.append(geodataframe_aoi.loc[[i]], ignore_index=True)
 
-                    # Crops the raster file with the second polygon bounaries
+                    # Crops the raster file with the second polygon boundaries
                     path_landuse_aoi_landuse = raster_crop(
                         dataset=path_landuse_aoi,
                         shapefile=path_poly2,
                         processing=processing_directory,
                     )
-                    """
-                    if population:
-                        population_aoi_landuse = intersect(base=population_aoi, overlay=path_poly2, crs=3857)
-                    """
                     if anopheles:
                         anopheles_aoi_landuse = intersect(base=anopheles_aoi, overlay=path_poly2, crs=3857)
                         anopheles_aoi_landuse["spnb"] = 0
                     bar_process()  # Pbar 2nd level
-                    # TODO performance issue au dessus là
-                    # TODO Est-ce que je le calcule pas plusieurs fois vu que j'itère plusieurs fois dessus ici ?
+                    # TODO performance issue above there
+                    # TODO Am I not calculating it several times as I iterate on it several times here?
                     bar_process.text("Habitat")  # Pbar 2nd level
-                    df_hd, _ = get_landuse(polygon=path_poly2, dataset=path_landuse_aoi_landuse)
+                    df_hd, _ = get_landuse(polygon=path_poly2,
+                                           dataset=path_landuse_aoi_landuse,
+                                           legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
                     aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
                     aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
 
@@ -497,20 +478,14 @@ def get_countries_profile(
                     for c in ctr:
                         # Multiply the number of pixels by the resolution of a pixel
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
-                        # Cross product with the geodataframe_aoi's polygon's area to get the percetage of land use of
+                        # Cross product with the geodataframe_aoi's polygon's area to get the percentage of land use of
                         # the current category
                         percentage = ((category_area * 100) / p.area[0])
                         __data.append([c, ctr[c], category_area, percentage])
                     # Creates a DataFrame from the list processed previously
                     df_hab_div = pd.DataFrame(__data,
                                               columns=['Category', 'Nbr of pixels', 'Surface (m2)', 'Proportion (%)'])
-                    # Format the .qml file path from the dataset path
-                    # TODO NBR colonne habitats != Colonnes habitats: deux derières colonnes pas insérées ?
-                    # TODO val 200 inconnue mais présente de manièrre normale = la légende ne la répertorie pas ?
-                    # Snow ice et Nodata ne sont pas insérés: merged avec d'autres colonnes ?
-                    # TODO export style files from cropped raster so it can be read flawlessly here. Right now i have to
-                    #  load it into qgis export it into a qml file by hand.
-                    # TODO Might improve performance by associating the label when searching for the categories
+
                     __dataset_name, _, __qml_path = format_dataset_output(dataset=path_landuse_aoi, ext='.qml')
                     # Reads the corresponding legend style from the .qml file
                     __style = __read_qml(__qml_path)
@@ -523,44 +498,9 @@ def get_countries_profile(
                                 __val = 'Unknown'
                         df_hab_div.loc[m, 'Label'] = __val
                     # Checks the __data has been given to process only what is available
-                    # TODO Est-ce que ça fait pas bugger par rapport à l'itération de mettre method =='append' ?
-                    """
-                    if method == 'append:':
-                        aoi_extract.loc[o, 'HAB_DIV'] = len(ctr)
-                        df_hab_div = df_hab_div.pivot_table(columns='Label',
-                                                            values='Proportion (%)',
-                                                            aggfunc='sum')
-                        df_hab_div.rename(index={'Proportion (%)': int(o)}, inplace=True)
-                        aoi_extract.loc[o, df_hab_div.columns] = df_hab_div.loc[o, :].values
-                    elif method == 'duplicate':
-                        aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
-                        aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
-                    """
                     aoi_extract.loc[o, 'HAB'] = df_hab_div.loc[0, 'Label']
                     aoi_extract.loc[o, 'HAB_PROP'] = round(df_hab_div.loc[0, 'Proportion (%)'], 3)
                     bar_process()  # Pbar 2nd level
-                    """
-                    bar_process.text("Population")  # Pbar 2nd level
-                    if population:  # Population and urban patches
-                        aoi_extract.loc[o, "SUM_POP"] = int(population_aoi_landuse["DN"].sum())
-                        aoi_extract.loc[o, "DENS_POP"] = int(population_aoi_landuse["DN"].sum() / p.area[0])
-                    bar_process()  # Pbar 2nd level
-                    
-                    bar_process.text("Distances")  # Pbar 2nd level
-                    if distances:  # Distances and urban fragmentation
-                        # No need to intersect it again
-                        # https://splot.readthedocs.io/en/stable/users/tutorials/weights.html#weights-from-other-python-objects
-                        dbc = lps.weights.DistanceBand.from_dataframe(
-                            population_aoi_landuse,
-                            threshold=dist_treshold,
-                            p=2,
-                            binary=False,
-                            build_sp=True,
-                            silent=True,
-                        )
-                        aoi_extract.loc[o, "MEAN_DIST"] = round(dbc.mean_neighbors, 4)
-                    bar_process()  # Pbar 2nd level
-                    """
 
                     bar_process.text("Anopheles")  # Pbar 2nd level
                     if anopheles:  # Anopheles diversity and catching sites
