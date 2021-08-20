@@ -6,7 +6,8 @@
 
 Impact of National Parks on Malaria Transmission
 
-You need to have every type of data specified [here](#data) downloaded and stored in whatever directory you choose. Then you'll need to specify the directory link in the config file.
+You need to have every type of data specified [here](#data) downloaded and stored in whatever directory you choose.
+Then you'll need to specify the directory link in the config file.
 
 ### Configure
 1. CLI in the package directory: `python INPMT`:
@@ -28,24 +29,9 @@ You have two ways of executing two commands:
     2. get_countries `INPMT.run(method='countries', export=True)`
 
 ### Data
-TODO
-
-<!--
-jenkins: needs java (https://www.jenkins.io/)
-travis ci: ci/cd not reliable on the long term (https://www.travis-ci.com/)
-non
-circleci: ci/cd (https://app.circleci.com/pipelines/github/pierre-manchon)
-appveyor: ci/cd (https://ci.appveyor.com/login)
-tox: differnt versions and interpreters (https://github.com/tox-dev/tox)
-voir si je peux test les builds sur plusieurs plateformes à partir de circle ci directement
-requires.io: dependencies security (http://requires.io/)
-safety: venv and packages security issues (https://pyup.io/safety/)
-voir si j'utilises requires ou plutôt safety
-bandit: security issue (https://github.com/PyCQA/bandit)
-scrutinizer: code quality (https://scrutinizer-ci.com/)
-black: syntax formatting (https://github.com/psf/black)
-ok
-twine: 
-flit:
-which is better to publish package to pypi
--->
+To download the data, you can either download it [here]() or produce it yourself.
+Either way you'll need to modify the `<datasets_storage_path>` variable in the config file so the program can find it.
+If you choose to use your own data you'll need to provide:
+- a .qml (legend file) file along with your raster files,
+- data at the scale of the African continent,
+- data projected to WGS 84 / Pseudo-Mercator (EPSG:3857)
