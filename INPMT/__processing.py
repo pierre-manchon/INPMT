@@ -325,25 +325,26 @@ def get_urban_profile(
                 value = src.read(window=window)
             result.loc[i, "PREVALENCE"] = value[0][0]
             
+            path_qml_gws, _, _ = format_dataset_output(dataset=gws, ext='.qml')
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
             df_gwsd, _ = get_landuse(polygon=path_poly,
                                      dataset=path_gws_aoi,
-                                     legend_filename="GWS/GWS_yearlyClassification2016.qml")
+                                     legend_filename=path_qml_gws)
 
             try:
                 df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
                 df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
-                print("GWS data missing")
                 result.loc[i, df_gwsd.columns] = 'NULL'
                 pass
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
+            path_qml_landuse, _, _ = format_dataset_output(dataset=landuse, ext='.qml')
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly,
                                          dataset=path_landuse_aoi,
-                                         legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
+                                         legend_filename=path_qml_landuse)
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
                 df_hd = df_hd.pivot_table(
@@ -352,7 +353,6 @@ def get_urban_profile(
                 df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
-                print("Land use data missing")
                 result.loc[i, df_hd.columns] = 'NULL'
                 pass
             pbar()
