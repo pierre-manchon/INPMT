@@ -173,7 +173,7 @@ def export_raster(output_image, *args: Optional[Path]) -> None:
 
 def raster_stats(
     dataset: AnyStr,
-) -> Union[tuple[Any, Any, Any], tuple[float, float, float]]:
+) -> Union[tuple[Any, Any, Any, Any], tuple[int, int, int, int]]:
     """
     Read any raster file then delete the no data values and returns some basic statistics about the said raster (min,
     mean and max)
@@ -191,14 +191,15 @@ def raster_stats(
             x = x[x != ro.nodata]
         # Divide by 10.000 because NDVI is usually between -1 and 1 and these values are between -10000 and 10000
         return (
-            round(x.min() / 10000, 3),
-            round(x.mean() / 10000, 3),
-            round(x.max() / 10000, 3),
+            round(x.sum(), 3),
+            round(x.min(), 3),
+            round(x.mean(), 3),
+            round(x.max(), 3),
         )
     except TypeError:
-        return 0, 0, 0
+        return 0, 0, 0, 0
     except ValueError:
-        return 0, 0, 0
+        return 0, 0, 0, 0
 
 
 def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
@@ -221,16 +222,9 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
         percentage = None
         # area_pop*10 because the population values are minified by 10
         # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
-        # expressed in sqaure kilometers
+        # expressed in square kilometers
         val = polygon.loc[i, 'val']*10
         percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
-        """if percentage > 1.0:
-            print('AreaPoly:[{}] AreaRaster:[{}] Val:[{}] Perc:[{}] Res:[{}]'.format(
-                polygon.loc[i, 'geometry'].area,
-                res_x*res_y,
-                val,
-                percentage,
-                val*percentage))"""
         polygon.loc[i, 'valpop'] = val*percentage
     print('{}, {}, {}, {}, {}, {}, {}'.format(len(polygon), polygon.loc[i, 'geometry'].area, res_x*res_y, val, percentage, polygon['val'].sum(), polygon['valpop'].sum()))
     return polygon['valpop'].sum()
