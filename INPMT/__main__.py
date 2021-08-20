@@ -18,7 +18,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
 import argparse
 import os
 from argparse import ArgumentTypeError
@@ -41,7 +40,7 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 
 def run(
-    method: AnyStr = ['villages', 'countries'],
+    method: AnyStr = ('villages', 'countries'),
     export_dir: AnyStr = "results",
 ) -> None:
     """
