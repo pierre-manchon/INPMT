@@ -47,7 +47,8 @@ class APPEEARSapi:
             "https://lpdaacsvc.cr.usgs.gov/appeears/api/login",
             auth=(
                 "pierre.manchon",
-                "u7-VYcL3BWv_BFnN#dpy4GGhf#4Sz^2@kqwa%Be$ddGZA?fAb4@jLj*bVS$QkRM4dV?XX4xdVkjD@u@xT+X3AMNpHy!$m!gmgnr2WQ5m+%QT2A&TV99X*nDLcWswYQ2x",
+                "u7-VYcL3BWv_BFnN#dpy4GGhf#4Sz^2@kqwa%Be$ddGZA?fAb4@jLj*bVS$QkRM4dV?XX4xdVkjD@u@xT+X3AMNpHy!$m"
+                "!gmgnr2WQ5m+%QT2A&TV99X*nDLcWswYQ2x",
             ),
         )
         self.token_response = self.response.json()
@@ -61,7 +62,8 @@ class APPEEARSapi:
             headers={"Authorization": "Bearer {0}".format(self.token)},
         )
 
-    def __to_geojson(self, area):
+    @staticmethod
+    def __to_geojson(area):
         with TemporaryDirectory() as tmp_directory:
             area_shapefile = gpd.read_file(area)
             *_, geojson_path = format_dataset_output(
@@ -72,7 +74,7 @@ class APPEEARSapi:
         j = json.load(geojson_file)
         return j["features"]
 
-    def send_request(self, area, startDate, endDate, layer, product, projection):
+    def send_request(self, area, startdate, enddate, layer, product, projection):
         # create the task request
         task = {
             "task_type": "area",
@@ -80,8 +82,8 @@ class APPEEARSapi:
             "params": {
                 "dates": [
                     {
-                        "startDate": "{}".format(startDate),
-                        "endDate": "{}".format(endDate),
+                        "startDate": "{}".format(startdate),
+                        "endDate": "{}".format(enddate),
                     }
                 ],
                 "layers": [

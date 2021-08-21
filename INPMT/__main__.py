@@ -46,7 +46,7 @@ def run(
     """
     Retrieves the datasets path and executes the functions.
     For the countries, i only execute it like that.
-    For the villagegs, i execute first after setting the buffer parameter to 500, then i execute it after setting the
+    For the villages, i execute first after setting the buffer parameter to 500, then i execute it after setting the
     parameter to 2000. Then i merge the two results.
     
     :param method: Execute whether by villages or countries
@@ -118,7 +118,7 @@ def run(
 
             # https://stackoverflow.com/a/50865526
             # Merge the two dataframes in one (side by side) with the column suffix
-            profile_vilages = profile_villages_500.reset_index(drop=True).merge(
+            profile_villages = profile_villages_500.reset_index(drop=True).merge(
                 profile_villages_2000.reset_index(drop=True),
                 left_index=True,
                 right_index=True,
@@ -126,7 +126,7 @@ def run(
             )
             # Retrieves the directory the dataset is in and joins it the output filename
             _, _, output_urban_profiles = format_dataset_output(dataset=export, name="urban_profiles", ext='.xlsx')
-            profile_vilages.to_excel(output_urban_profiles)
+            profile_villages.to_excel(output_urban_profiles)
 
 
 def main():
@@ -141,7 +141,7 @@ def main():
 
     class ArgumentParser(argparse.ArgumentParser):
         """Object for parsing command line strings into Python objects.
-        Overridden to print the help whenever an error occured (For example, no arguments error)
+        Overridden to print the help whenever an error occurred (For example, no arguments error)
 
         Keyword Arguments:
             - prog -- The name of the program (default: sys.argv[0])

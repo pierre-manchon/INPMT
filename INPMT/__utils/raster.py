@@ -34,7 +34,7 @@ from .vector import __read_shapefile, intersect
 
 def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
     """
-    Using a dataset filepath and a band numbern i read every pixel values
+    Using a dataset filepath and a band number i read every pixel values
     one by one for each row then and for each columns.
 
     :param dataset: Link to a .tif raster file
@@ -132,6 +132,8 @@ def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
     """
     Read a raster file and transform each pixel in a vector entity
 
+    :param processing:
+    :type processing:
     :param dataset:
     :return:
     """
@@ -206,8 +208,8 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     """
     AA
     """
-    # TODO Convertir les pixels en vecteur => Diviser la valeur par le pourcentage de l'air du pixel
-    #  (1/3 du pixel de 300m) => Utiliser les valeurs restantes pour faire la moyenne dans le buffer
+    # TODO Convert the pixels to vector => Divide the value by the percentage of air in the pixel
+    # (1/3 of the pixel of 300m) => Use the remaining values to average in the buffer
     with rasterio.open(dataset) as src:
         res_x, res_y = src.res
     polygonized = polygonize(dataset, processing=processing)
@@ -217,14 +219,21 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     zda = gpd.read_file(polygonized)
     zda.plot()
     polygon.plot()
+    i = None
+    val = None
+    percentage = None
     for i in range(len(polygon)):
-        val = None
-        percentage = None
         # area_pop*10 because the population values are minified by 10
         # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
         # expressed in square kilometers
         val = polygon.loc[i, 'val']*10
         percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
         polygon.loc[i, 'valpop'] = val*percentage
-    print('{}, {}, {}, {}, {}, {}, {}'.format(len(polygon), polygon.loc[i, 'geometry'].area, res_x*res_y, val, percentage, polygon['val'].sum(), polygon['valpop'].sum()))
+    print('{}, {}, {}, {}, {}, {}, {}'.format(len(polygon),
+                                              polygon.loc[i, 'geometry'].area,
+                                              res_x*res_y,
+                                              val,
+                                              percentage,
+                                              polygon['val'].sum(),
+                                              polygon['valpop'].sum()))
     return polygon['valpop'].sum()

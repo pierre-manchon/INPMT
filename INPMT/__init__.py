@@ -45,7 +45,7 @@ def get_config():
         print(cfg.read())
 
 
-# Si la version de python est trop ancienne, le code ne s'execute
+# If the python version is too old, the code will not execute
 __current_python_version = "{}.{}".format(__version_info[0], __version_info[1])
 if __current_python_version != "3.9":
     raise Exception("Python 3.9 is required.")
@@ -87,7 +87,7 @@ else:
     speedups.disable()
     print("Speedups: {}".format(speedups.available))
 
-# Modify environement variables so shapely finds the correct proj.db file (the one from the GDAL install and not the
+# Modify environment variables so shapely finds the correct proj.db file (the one from the GDAL install and not the
 # POSTGRES SQL install or either one it founds)
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?

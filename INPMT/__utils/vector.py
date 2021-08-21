@@ -43,8 +43,8 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     :return: List of dicts of geometries and their types
     :rtype: list
     """
-    with fiona.open(shapefile) as shp:  # , encoding='windows-1252'
-        shapes = [feature["geometry"] for feature in shp]
+    with fiona.open(shapefile) as shape:  # , encoding='windows-1252'
+        shapes = [feature["geometry"] for feature in shape]
     return shapes
 
 
@@ -60,9 +60,9 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     sf = shp.Reader(shapefile)
     fields = [x[0] for x in sf.fields][1:]
     records = sf.records()
-    shps = [s.points for s in sf.shapes()]
+    shapes = [s.points for s in sf.shapes()]
     df = pd.DataFrame(columns=fields, data=records)
-    df = df.assign(coords=shps)
+    df = df.assign(coords=shapes)
     return df, sf
 
 

@@ -410,7 +410,6 @@ def get_countries_profile(
         aoi_extract.insert(0, "HAB_PROP", 0)
     geodataframe_aoi = __read_shp_as_gdf(shapefile=aoi)
     geodataframe_aoi.index.name = "id"
-    dist_treshold = __get_cfg_val("dist_treshold")
 
     # Format datasets outputs with the temporary directory's path
     p1, p1ext, _ = format_dataset_output(dataset=aoi, name="tmp")

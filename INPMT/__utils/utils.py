@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Function for basic processing and miscellanious cases
+# Function for basic processing and miscellaneous cases
 import os
 import unicodedata
 import xml.dom.minidom
@@ -44,7 +44,7 @@ def format_dataset_output(
     :type name: AnyStr
     :param prevent_duplicate:
     :type prevent_duplicate:
-    :param ext: Extension of the output file. If blank, then the input file's etension will be used.
+    :param ext: Extension of the output file. If blank, then the input file's extension will be used.
     :type ext: AnyStr
     :return: Dataset name, dataset extension, output path formatted
     :rtype: tuple[str, Union[AnyStr, str], str]
