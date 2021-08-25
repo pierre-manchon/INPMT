@@ -158,7 +158,7 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr) -> tu
     """
     __data = []
     __val = None
-    __polygon = gpd.read_file(polygon)
+    __polygon = gpd.read_file(polygon, encoding='windows-1252')
     # Retrieve the legend file's path
     __data_dir = __get_cfg_val("datasets_storage_path")
     __qml_path = os.path.join(__data_dir, legend_filename)
@@ -252,8 +252,8 @@ def get_urban_profile(
     :rtype: DataFrame
     """
     # Read the shapefiles as GeoDataFrames
-    gdf_villages = gpd.read_file(villages)
-    gdf_parks = gpd.read_file(parks)
+    gdf_villages = gpd.read_file(villages, encoding='windows-1252')
+    gdf_parks = gpd.read_file(parks, encoding='windows-1252')
     # Set the projection to 3857 to have distance, etc as meters
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
@@ -262,6 +262,8 @@ def get_urban_profile(
     # Create a blank DataFrame to receive the result when iterating below
     cols = [
         "ID",
+        'x',
+        'y',
         "NP",
         "loc_NP",
         "dist_NP",
@@ -274,7 +276,6 @@ def get_urban_profile(
         "SWI_min",
         "SWI_mean",
         "SWI_max",
-        "GWS",
         "HAB_DIV",
     ]
     result = pd.DataFrame(columns=cols)
@@ -290,6 +291,11 @@ def get_urban_profile(
             p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
             p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
             p.crs = 3857
+            
+            # Coordinates
+            result.loc[i, 'x'] = p.centroid.x.values[0]
+            result.loc[i, 'y'] = p.centroid.y.values[0]
+            
             # Format the path for the temporary file
             p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
             path_poly = os.path.join(processing_directory, "".join([p1, pext]))
@@ -325,9 +331,9 @@ def get_urban_profile(
                 value = src.read(window=window)
             result.loc[i, "PREVALENCE"] = value[0][0]
             
-            path_qml_gws, _, _ = format_dataset_output(dataset=gws, ext='.qml')
+            _, _, path_qml_gws = format_dataset_output(dataset=gws, ext='.qml')
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-            df_gwsd, _ = get_landuse(polygon=path_poly,
+            df_gwsd, lengws = get_landuse(polygon=path_poly,
                                      dataset=path_gws_aoi,
                                      legend_filename=path_qml_gws)
 
@@ -340,7 +346,7 @@ def get_urban_profile(
                 pass
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
-            path_qml_landuse, _, _ = format_dataset_output(dataset=landuse, ext='.qml')
+            _, _, path_qml_landuse = format_dataset_output(dataset=landuse, ext='.qml')
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly,
                                          dataset=path_landuse_aoi,
@@ -357,6 +363,7 @@ def get_urban_profile(
                 pass
             pbar()
             print(result.iloc[i])
+            print(lengws, len_ctr)
     return result
 
 
