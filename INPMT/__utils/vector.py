@@ -43,7 +43,7 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     :return: List of dicts of geometries and their types
     :rtype: list
     """
-    with fiona.open(shapefile) as shape:  # , encoding='windows-1252'
+    with fiona.open(shapefile, encoding='windows-1252') as shape:  # , encoding='windows-1252'
         shapes = [feature["geometry"] for feature in shape]
     return shapes
 
@@ -57,7 +57,7 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     :return: DataFrame with a coords column
     :rtype: [DataFrame, Reader]
     """
-    sf = shp.Reader(shapefile)
+    sf = shp.Reader(shapefile, encoding='windows-1252')
     fields = [x[0] for x in sf.fields][1:]
     records = sf.records()
     shapes = [s.points for s in sf.shapes()]
@@ -75,7 +75,7 @@ def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     :return:
     :rtype:
     """
-    gdf = gpd.read_file(shapefile, encoding="latin1")
+    gdf = gpd.read_file(shapefile, encoding='windows-1252')
     gdf.crs = 3857
     return gdf
 
@@ -132,8 +132,8 @@ def intersect(
     :return:
     :rtype: [GeoDataFrame, AnyStr]
     """
-    gdf_base = gpd.read_file(base, encoding="latin1")
-    gdf_ol = gpd.read_file(overlay, encoding="latin1")
+    gdf_base = gpd.read_file(base, encoding='windows-1252')
+    gdf_ol = gpd.read_file(overlay, encoding='windows-1252')
     gdf_base.crs = crs
     gdf_ol.crs = crs
     inter_df = gpd.overlay(gdf_base, gdf_ol)

@@ -216,7 +216,7 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     polygon = intersect(base=polygonized, overlay=area, crs=3857)
     polygon.insert(0, "valpop", np.nan)
     print('on est la')
-    zda = gpd.read_file(polygonized)
+    zda = gpd.read_file(polygonized, encoding='windows-1252')
     zda.plot()
     polygon.plot()
     i = None
