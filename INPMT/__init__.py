@@ -73,6 +73,8 @@ __all__ = (
     "__author__",
     "__email__",
     "run",
+    "get_config",
+    "set_config_value",
 )
 
 # Workaround but not a permanent solution
