@@ -351,9 +351,7 @@ def get_urban_profile(
                                          type='item')
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
-                df_hd = df_hd.pivot_table(
-                    columns="Label", values="Proportion (%)", aggfunc="sum"
-                )  # noqa
+                df_hd = df_hd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")  # noqa
                 df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
