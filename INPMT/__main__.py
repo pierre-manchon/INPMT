@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import argparse
 import os
+import numpy as np
 from argparse import ArgumentTypeError
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
@@ -63,7 +64,7 @@ def run(
     export = os.path.join(datasets, export_dir)
     
     # Raster data
-    population = os.path.join(datasets, "POPULATION_population_AFRICA_reprj3857.tif")
+    population = os.path.join(datasets, "POPULATION_AFRICA_150m_reprj3857.tif")
     landuse = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
     ndvi = os.path.join(datasets, "NDVI_MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
     swi = os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
@@ -124,6 +125,22 @@ def run(
                 right_index=True,
                 suffixes=("_500", "_2000"),
             )
+            # Rename and delete the duplicated columns
+            profile_villages.rename(columns={'ID_500': 'ID',
+                                             'x_500': 'x',
+                                             'y_500': 'y',
+                                             'NP_500': 'NP',
+                                             'loc_NP_500': 'loc_NP',
+                                             'dist_NP_500': 'dist_NP'}, inplace=True)
+            profile_villages = profile_villages.drop(['ID_2000',
+                                                      'x_2000',
+                                                      'y_2000',
+                                                      'NP_2000',
+                                                      'loc_NP_2000',
+                                                      'dist_NP_2000'], axis=1)
+            # Change nan values to NULL string
+            # https://stackoverflow.com/a/26838140/12258568
+            profile_villages = profile_villages.replace(np.nan, 'NULL', regex=True)
             # Retrieves the directory the dataset is in and joins it the output filename
             _, _, output_urban_profiles = format_dataset_output(dataset=export, name="urban_profiles", ext='.xlsx')
             profile_villages.to_excel(output_urban_profiles)
