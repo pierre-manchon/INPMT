@@ -28,6 +28,8 @@ import rasterio
 import rasterio.mask
 from rasterio.features import shapes
 
+from geopandas import GeoDataFrame
+
 from .utils import __count_values, __gather, format_dataset_output
 from .vector import __read_shapefile, intersect
 
@@ -81,6 +83,18 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
         __pixel_array = __gather(pixel_values=__pixel_value)
         __ctr = __count_values(pixel_array=__pixel_array)
     return __dataset, __ctr
+
+
+def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
+    with rasterio.open(dataset) as src:
+        x, y = list(shapefile.loc[index, 'geometry'].coords)[0]
+        # get pixel x+y of the coordinate
+        py, px = src.index(x, y)
+        # create 1x1px window of the pixel
+        window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
+        # read rgb values of the window
+        value = src.read(window=window)
+    return value[0][0]
 
 
 def raster_crop(
@@ -191,7 +205,6 @@ def raster_stats(
         with rasterio.open(dataset) as ro:
             x = ro.read()
             x = x[x != ro.nodata]
-        # Divide by 10.000 because NDVI is usually between -1 and 1 and these values are between -10000 and 10000
         return (
             round(x.sum(), 3),
             round(x.min(), 3),
