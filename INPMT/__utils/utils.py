@@ -136,9 +136,9 @@ def __set_cfg_val(var, value):
         print("\n")
 
 
-def __read_qml(path_qml: AnyStr) -> List:
+def __read_qml(path_qml: AnyStr, type: AnyStr) -> List:
     xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
-    for item in xml_data.getElementsByTagName("item"):
+    for item in xml_data.getElementsByTagName(type):
         legend.append([item.getAttribute("value"), item.getAttribute("label")])
     return legend
