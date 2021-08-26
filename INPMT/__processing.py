@@ -24,6 +24,7 @@ from typing import AnyStr, SupportsInt
 import rasterio
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 from alive_progress import alive_bar
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -32,6 +33,7 @@ try:
     from __utils.raster import (
         density,
         get_pixel_count,
+        get_value_from_coord,
         raster_crop,
         raster_stats,
     )
@@ -46,6 +48,7 @@ except ImportError:
     from .__utils.raster import (
         density,
         get_pixel_count,
+        get_value_from_coord,
         raster_crop,
         raster_stats,
     )
@@ -141,7 +144,7 @@ def get_nearest_park(
     return df
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, type: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
@@ -182,10 +185,11 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr) -> tu
     # TODO Might improve performance by associating the label when searching for the categories
     # TODO Reads the corresponding legend style from the .qml file
     # TODO Associates the category number the label name of the legend values (ridden from a .qml file)
-    __style = __read_qml(__qml_path)
+    __style = __read_qml(path_qml=__qml_path, type=type)
     for m, r in df_hab_div.iterrows():
         for n in __style:
-            if int(r["Category"]) == int(n[0]):
+            # https://stackoverflow.com/a/8948303/12258568
+            if int(float(r["Category"])) == int(n[0]):
                 __val = n[1]
                 break
             else:
@@ -270,12 +274,10 @@ def get_urban_profile(
         "POP",
         "PREVALENCE",
         "ANO_DIV",
+        "SWI",
         "NDVI_min",
         "NDVI_mean",
         "NDVI_max",
-        "SWI_min",
-        "SWI_mean",
-        "SWI_max",
         "HAB_DIV",
     ]
     result = pd.DataFrame(columns=cols)
@@ -304,45 +306,40 @@ def get_urban_profile(
             p.buffer(buffer_villages).to_file(path_poly)
             
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
-            population_sum, *_ = raster_stats(dataset=path_pop_aoi)
-            result.loc[i, "POP"] = population_sum
+            pop = np.nan
+            with rasterio.open(path_pop_aoi) as src:
+                pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
+            result.loc[i, "POP"] = pop
             
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
             path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
             _, ndvi_min, ndvi_mean, ndvi_max = raster_stats(dataset=path_ndvi_aoi)
-            result.loc[i, "NDVI_min"] = ndvi_min / 10000
-            result.loc[i, "NDVI_mean"] = ndvi_mean / 10000
-            result.loc[i, "NDVI_max"] = ndvi_max / 10000
-            # TODO SWI Raster
-
-            path_swi_aoi = raster_crop(dataset=swi, shapefile=path_poly, processing=processing_directory)
-            _, swi_min, swi_mean, swi_max = raster_stats(dataset=path_swi_aoi)
-            result.loc[i, "SWI_min"] = swi_min
-            result.loc[i, "SWI_mean"] = swi_mean
-            result.loc[i, "SWI_max"] = swi_max
-
-            with rasterio.open(prevalence) as src:
-                x, y = list(gdf_villages.loc[i, 'geometry'].coords)[0]
-                # get pixel x+y of the coordinate
-                py, px = src.index(x, y)
-                # create 1x1px window of the pixel
-                window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
-                # read rgb values of the window
-                value = src.read(window=window)
-            result.loc[i, "PREVALENCE"] = value[0][0]
+            # I divide by 10 000 because Normalized Difference Vegetation Index is usually between -1 and 1.
+            result.loc[i, "NDVI_min"] = ndvi_min/10000
+            result.loc[i, "NDVI_mean"] = ndvi_mean/10000
+            result.loc[i, "NDVI_max"] = ndvi_max/10000
+            
+            val_swi = get_value_from_coord(index=i, dataset=swi, shapefile=gdf_villages)
+            # https://land.copernicus.eu/global/products/SWI I divide by a factor 2 because SWI data must be between 0
+            # and 100.
+            result.loc[i, "SWI"] = val_swi/2
+            val_prevalence = get_value_from_coord(index=i, dataset=prevalence, shapefile=gdf_villages)
+            # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE data is a percentage between 0
+            # and 100.
+            result.loc[i, "PREVALENCE"] = val_prevalence*100
             
             _, _, path_qml_gws = format_dataset_output(dataset=gws, ext='.qml')
             path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-            df_gwsd, lengws = get_landuse(polygon=path_poly,
+            df_gwsd, _ = get_landuse(polygon=path_poly,
                                      dataset=path_gws_aoi,
-                                     legend_filename=path_qml_gws)
-
+                                     legend_filename=path_qml_gws,
+                                     type='paletteEntry')
             try:
                 df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
                 df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
-                result.loc[i, df_gwsd.columns] = 'NULL'
+                result.loc[i, df_gwsd.columns] = np.nan
                 pass
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
@@ -350,7 +347,8 @@ def get_urban_profile(
             path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
             df_hd, len_ctr = get_landuse(polygon=path_poly,
                                          dataset=path_landuse_aoi,
-                                         legend_filename=path_qml_landuse)
+                                         legend_filename=path_qml_landuse,
+                                         type='item')
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
                 df_hd = df_hd.pivot_table(
@@ -359,11 +357,9 @@ def get_urban_profile(
                 df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
-                result.loc[i, df_hd.columns] = 'NULL'
+                result.loc[i, df_hd.columns] = np.nan
                 pass
             pbar()
-            print(result.iloc[i])
-            print(lengws, len_ctr)
     return result
 
 
