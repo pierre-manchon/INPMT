@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Pierre"
+  given-names: "Manchon"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "INPMT"
+version: 0.1.1
+doi: 10.5281/zenodo.5269134
+date-released: 2021-08-26
+url: "https://github.com/pierre-manchon/INPMT/tree/v0.1.1"
