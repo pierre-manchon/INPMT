@@ -61,38 +61,6 @@ except ImportError:
     )
 
 
-def set_urban_profile(
-    urban_areas: GeoDataFrame,
-    path_urban_areas: AnyStr,
-    urban_treshold: SupportsInt,
-    export: bool = False,
-) -> GeoDataFrame:
-    """
-    # TODO
-    """
-    merging_result = merge_touching(geodataframe=urban_areas, by="sum")
-
-    result = []
-    for poly in merging_result.geometry:
-        if poly.area <= urban_treshold:
-            result.append("small")
-        else:
-            result.append("large")
-    del poly
-
-    merging_result["Size"] = result
-    del result
-
-    if export:
-        _, _, output_path = format_dataset_output(
-            dataset=path_urban_areas, name="urban_extent"
-        )
-        merging_result.to_file(output_path)
-        return merging_result
-    else:
-        return merging_result
-
-
 def get_nearest_park(
     index: SupportsInt, df: DataFrame, villages: GeoDataFrame, parks: GeoDataFrame
 ) -> DataFrame:
