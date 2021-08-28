@@ -112,7 +112,7 @@ def get_nearest_park(
     return df
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, type: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, item_type: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
@@ -124,6 +124,8 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, type:
     :type polygon: AnyStr
     :param dataset: Path to the dataset file
     :type dataset: AnyStr
+    :param item_type: Type of the item containing labels, values and colors for the legend.
+    :type item_type: AnyStr
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
@@ -153,7 +155,7 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, type:
     # TODO Might improve performance by associating the label when searching for the categories
     # TODO Reads the corresponding legend style from the .qml file
     # TODO Associates the category number the label name of the legend values (ridden from a .qml file)
-    __style = __read_qml(path_qml=__qml_path, type=type)
+    __style = __read_qml(path_qml=__qml_path, item_type=item_type)
     for m, r in df_hab_div.iterrows():
         for n in __style:
             # https://stackoverflow.com/a/8948303/12258568
@@ -274,7 +276,6 @@ def get_urban_profile(
             p.buffer(buffer_villages).to_file(path_poly)
             
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
-            pop = np.nan
             with rasterio.open(path_pop_aoi) as src:
                 pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
             result.loc[i, "POP"] = pop
@@ -301,7 +302,7 @@ def get_urban_profile(
             df_gwsd, _ = get_landuse(polygon=path_poly,
                                      dataset=path_gws_aoi,
                                      legend_filename=path_qml_gws,
-                                     type='paletteEntry')
+                                     item_type='paletteEntry')
             try:
                 df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
                 df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
@@ -316,7 +317,7 @@ def get_urban_profile(
             df_hd, len_ctr = get_landuse(polygon=path_poly,
                                          dataset=path_landuse_aoi,
                                          legend_filename=path_qml_landuse,
-                                         type='item')
+                                         item_type='item')
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
                 df_hd = df_hd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")  # noqa
@@ -436,7 +437,8 @@ def get_countries_profile(
                     bar_process.text("Habitat")  # Pbar 2nd level
                     df_hd, _ = get_landuse(polygon=path_poly2,
                                            dataset=path_landuse_aoi_landuse,
-                                           legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml")
+                                           legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml",
+                                           item_type='item')
                     aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
                     aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
 
@@ -456,7 +458,7 @@ def get_countries_profile(
 
                     __dataset_name, _, __qml_path = format_dataset_output(dataset=path_landuse_aoi, ext='.qml')
                     # Reads the corresponding legend style from the .qml file
-                    __style = __read_qml(__qml_path)
+                    __style = __read_qml(path_qml=__qml_path, item_type='item')
                     # Associates the category number the label name of the legend values (ridden from a .qml file)
                     for m, r in df_hab_div.iterrows():
                         for n in __style:
