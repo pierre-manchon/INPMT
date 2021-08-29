@@ -70,12 +70,13 @@ def run(
     swi = os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
     gws = os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif")
     prevalence = os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif")
-    
+
     # Vector data
     irish = os.path.join(datasets, "IRISH_countries.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     anopheles_kyalo = os.path.join(datasets, "KYALO/VectorDB_1898-2016.shp")
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO/anopheles_in_PAs_buffers.shp")
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")
+    anopheles_kyalo_out_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
 
     with TemporaryDirectory() as tmp_directory:
@@ -94,7 +95,7 @@ def run(
         if method == 'villages':
             __set_cfg_val("buffer_villages", "500")
             profile_villages_500 = get_urban_profile(
-                villages=anopheles_kyalo_in_national_parks_buffered,
+                villages=anopheles_kyalo_out_national_parks_buffered,
                 parks=national_parks_with_anopheles_kyalo,
                 landuse=landuse,
                 population=population,
@@ -103,10 +104,11 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
+                loc=False
             )
             __set_cfg_val("buffer_villages", "2000")
             profile_villages_2000 = get_urban_profile(
-                villages=anopheles_kyalo_in_national_parks_buffered,
+                villages=anopheles_kyalo_out_national_parks_buffered,
                 parks=national_parks_with_anopheles_kyalo,
                 landuse=landuse,
                 population=population,
@@ -115,6 +117,7 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
+                loc=False
             )
 
             # https://stackoverflow.com/a/50865526
