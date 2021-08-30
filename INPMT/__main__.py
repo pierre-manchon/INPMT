@@ -43,6 +43,7 @@ config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 def run(
     method: AnyStr = ('villages', 'countries'),
     export_dir: AnyStr = "results",
+    loc: bool = True
 ) -> None:
     """
     Retrieves the datasets path and executes the functions.
@@ -50,6 +51,7 @@ def run(
     For the villages, i execute first after setting the buffer parameter to 500, then i execute it after setting the
     parameter to 2000. Then i merge the two results.
     
+    :param loc:
     :param method: Execute whether by villages or countries
     :type method: AnyStr
     :param export_dir:
@@ -104,7 +106,7 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
-                loc=False
+                loc=loc
             )
             __set_cfg_val("buffer_villages", "2000")
             profile_villages_2000 = get_urban_profile(
@@ -117,7 +119,7 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
-                loc=False
+                loc=loc
             )
 
             # https://stackoverflow.com/a/50865526
