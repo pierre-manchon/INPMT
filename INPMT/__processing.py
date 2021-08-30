@@ -295,11 +295,11 @@ def get_urban_profile(
                 result.loc[i, "NDVI_max"] = ndvi_max/10000
                 
                 val_swi = get_value_from_coord(index=i, dataset=swi, shapefile=gdf_villages)
-                # https://land.copernicus.eu/global/products/SWI I divide by a factor 2 because SWI data must be between 0
+                # https://land.copernicus.eu/global/products/SWI I divide by a 2 because SWI data must be between 0
                 # and 100.
                 result.loc[i, "SWI"] = val_swi/2
                 val_prevalence = get_value_from_coord(index=i, dataset=prevalence, shapefile=gdf_villages)
-                # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE data is a percentage between 0
+                # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
                 # and 100.
                 result.loc[i, "PREVALENCE"] = val_prevalence*100
                 
