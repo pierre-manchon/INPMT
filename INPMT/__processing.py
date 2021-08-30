@@ -257,6 +257,7 @@ def get_urban_profile(
             try:
                 _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
                 result.loc[i, "ID"] = village_id
+                result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
                 # Get the minimum distance from the village the park edge border and return the said distance and the
                 # park's name
                 if loc:
@@ -264,7 +265,6 @@ def get_urban_profile(
                     result.loc[i, "NP"] = np_name
                     result.loc[i, "loc_NP"] = loc_np
                     result.loc[i, "dist_NP"] = round(res_dist, 3)
-                    result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
                 # Transform the GeoSeries as a GeoDataFrame
                 p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
                 p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
@@ -334,6 +334,9 @@ def get_urban_profile(
                     pass
             except IndexError:
                 print('Found village with no geometry')
+                pass
+            except TypeError:
+                print('No sé')
                 pass
             pbar()
     return result
