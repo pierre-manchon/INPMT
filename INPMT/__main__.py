@@ -76,8 +76,8 @@ def run(
     # Vector data
     irish = os.path.join(datasets, "IRISH_countries.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
-    anopheles_kyalo = os.path.join(datasets, "KYALO/VectorDB_1898-2016.shp")
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")
+    anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
+    # anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")
     anopheles_kyalo_out_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
 
@@ -149,6 +149,7 @@ def run(
             # Retrieves the directory the dataset is in and joins it the output filename
             _, _, output_urban_profiles = format_dataset_output(dataset=export, name="urban_profiles", ext='.xlsx')
             profile_villages.to_excel(output_urban_profiles)
+            print('Jesus was black.')
 
 
 def main():
