@@ -68,7 +68,8 @@ def run(
     # Raster data
     population = os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif")
     landuse = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(datasets, "NDVI_MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
+    # ndvi = os.path.join(datasets, "NDVI_MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif")
+    ndvi = os.path.join(datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif")
     swi = os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
     gws = os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif")
     prevalence = os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif")
