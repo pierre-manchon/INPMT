@@ -5,7 +5,7 @@ from .utils import __get_cfg_val, format_dataset_output
 
 datasets = __get_cfg_val("datasets_storage_path")
 export = os.path.join(datasets, 'result')
-result = os.path.join(datasets, "results_urban_profiles_6.100.xlsx")
+result = os.path.join(datasets, "results_urban_profiles.xlsx")
 _, _, output_path = format_dataset_output(dataset=result, name='corr_plot', ext='.png')
 df = pd.read_excel(result)
 
