@@ -1,5 +1,5 @@
 setuptools~=57.0.0
-alive-progress==1.6.2
+alive-progress==2.0.0
 
 pandas==1.2.4
 openpyxl==3.0.7
