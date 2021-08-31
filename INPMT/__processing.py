@@ -336,7 +336,6 @@ def get_urban_profile(
                 print('Found village with no geometry')
                 pass
             except TypeError:
-                print('No sé')
                 pass
             pbar()
     return result
