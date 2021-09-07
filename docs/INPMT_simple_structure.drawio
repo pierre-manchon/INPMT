@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-09-07T15:47:03.072Z" agent="5.0 (Windows)" etag="pDTO5FGQUWZrxrCOfuN9" version="15.1.0" type="github">
+<mxfile host="app.diagrams.net" modified="2021-09-07T15:47:41.940Z" agent="5.0 (Windows)" etag="mxX1-mBQmVpccU1jjQvt" version="15.1.0" type="github">
   <diagram id="MnK0ORM86gz5xZihdEy-" name="Page-1">
     <mxGraphModel dx="1185" dy="658" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -8,7 +8,7 @@
           <mxGeometry x="200" y="280" width="120" height="250" as="geometry" />
         </mxCell>
         <mxCell id="LlRQoz635zSCLX_kE1pg-2" value="&lt;ul style=&quot;font-size: 13px&quot;&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;2d1a46e&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;41a9945&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;443ac7d&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;1a91cff&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;13c187b&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;dbb1bc3&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;fa6969bb&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;586d3bf9&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;94805ad&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;9863ead&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;3314afa5&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;b5316e3&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=top;overflow=hidden;align=left;horizontal=1;fontSize=13;fontStyle=0;fontFamily=Garamond;connectable=0;" parent="1" vertex="1">
-          <mxGeometry x="230" y="310" width="120" height="210" as="geometry" />
+          <mxGeometry x="230" y="310" width="120" height="220" as="geometry" />
         </mxCell>
         <mxCell id="LlRQoz635zSCLX_kE1pg-4" value="INPMT" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;fontFamily=Garamond;fontSize=13;align=left;verticalAlign=top;" parent="1" vertex="1">
           <mxGeometry x="380" y="260" width="480" height="260" as="geometry" />
@@ -131,11 +131,11 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="BWBMxFKH88TfoQagAiQt-2" value="PYPI" style="shape=umlLifeline;perimeter=lifelinePerimeter;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="BWBMxFKH88TfoQagAiQt-2" value="PYPI" style="shape=umlLifeline;perimeter=lifelinePerimeter;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;whiteSpace=wrap;rounded=0;shadow=0;glass=0;sketch=0;" vertex="1" parent="1">
           <mxGeometry x="880" y="280" width="80" height="250" as="geometry" />
         </mxCell>
-        <mxCell id="BWBMxFKH88TfoQagAiQt-3" value="&lt;ul style=&quot;font-size: 13px&quot;&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;...&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.2&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.1&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.0&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=top;overflow=hidden;align=left;horizontal=1;fontSize=13;fontStyle=0;fontFamily=Garamond;connectable=0;labelBorderColor=none;" vertex="1" parent="1">
-          <mxGeometry x="880" y="310" width="80" height="220" as="geometry" />
+        <mxCell id="BWBMxFKH88TfoQagAiQt-3" value="&lt;ul style=&quot;font-size: 13px&quot;&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;...&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.2&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.1&lt;br&gt;&lt;/li&gt;&lt;li style=&quot;font-size: 13px&quot;&gt;v0.1.0&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=top;overflow=hidden;align=left;horizontal=1;fontSize=13;fontStyle=0;fontFamily=Garamond;connectable=0;labelBorderColor=none;shadow=0;glass=0;" vertex="1" parent="1">
+          <mxGeometry x="880" y="310" width="80" height="90" as="geometry" />
         </mxCell>
         <mxCell id="BWBMxFKH88TfoQagAiQt-4" value="Dépôt de package" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelBackgroundColor=none;fontFamily=Garamond;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="880" y="240" width="80" height="40" as="geometry" />
