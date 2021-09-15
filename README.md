@@ -22,16 +22,28 @@ Then you'll need to specify the directory link in the config file.
 You have two ways of executing two commands:
 
 1. CLI in the package directory: `python INPMT`
-    1. get_urban_profile `python INPMT --villages --export`
-    2. get_countries `python INPMT --countries --export`
-4. Package in a python file or console: `import INPMT`
-    1. get_urban_profile `INPMT.run(method='villages', export=True)`
-    2. get_countries `INPMT.run(method='countries', export=True)`
+    1. get_urban_profile `python INPMT --villages --loc`
+    2. get_countries `python INPMT --countries`
+2. Package in a python file or console: `import INPMT`
+    1. get_urban_profile `INPMT.run(method='villages', loc=True)`
+    2. get_countries `INPMT.run(method='countries', loc=False)`
+3. The corr file to compute correlation matrix from the result file
+   1. `from INPMT.__utils import corr`
 
 ### Data
-To download the data, you can either download it [here]() or produce it yourself.
+You can [mail me](mailto:pierre.manchon@pm.me) to get the download link or use data of your own which is trickier.
 Either way you'll need to modify the `<datasets_storage_path>` variable in the config file so the program can find it.
 If you choose to use your own data you'll need to provide:
 - a .qml (legend file) file along with your raster files,
 - data at the scale of the African continent,
 - data projected to WGS 84 / Pseudo-Mercator (EPSG:3857)
+
+### Code
+Github repo is organized as follow:
+
+    INPMT/
+    ├──dependencies/: specific gdal wheel and requirements file
+    ├──docs/: graphs and xml files from drawio
+    ├──INPMT/: Python script developped to process and analyse the data
+    │   └──__utils/: Python functions developped to ease the readability and processing
+    ├──test/: test files for gdal + gdal based packages and import
