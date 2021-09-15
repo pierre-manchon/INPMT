@@ -99,4 +99,4 @@ __environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
 __environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
 
 # Progress bar settings
-__config_handler.set_global(length=20, spinner="dots_reverse", unknown="long_message", force_tty=True)
+__config_handler.set_global(length=20, force_tty=True)
