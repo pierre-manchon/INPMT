@@ -82,7 +82,7 @@ def run(
     anopheles_kyalo_out_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
 
-    with TemporaryDirectory() as tmp_directory:
+    with TemporaryDirectory(prefix='INPMT_') as tmp_directory:
         # Read file as a geodataframe
         if method == 'countries':
             gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
