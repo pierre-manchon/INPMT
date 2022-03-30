@@ -132,10 +132,10 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, item_
     __data_dir = __get_cfg_val("datasets_storage_path")
     __qml_path = os.path.join(__data_dir, legend_filename)
     # Count every pixel from the raster and its value
+    # TODO here i retrieve the area by multiplying the width and height resolutions
+    #  => need to get the pixels area for each pixel here
     dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
     for c in ctr:
-        # TODO here i retrieve the area by multiplying the width and height resolutions
-        #  => need to get the pixels area for each pixel here
         # Multiply the number of pixels by the resolution of a pixel
         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
         # Cross product with the geodataframe_aoi's polygon's area to get the percentage of land use of
