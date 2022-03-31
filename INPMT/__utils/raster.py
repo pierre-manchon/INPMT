@@ -38,7 +38,6 @@ def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
     """
     Using a dataset filepath and a band number i read every pixel values
     one by one for each row then and for each columns.
-
     :param dataset: Link to a .tif raster file
     :type dataset: AnyStr
     :param band:  Band from a raster to be processed
@@ -47,10 +46,17 @@ def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
     :rtype: GeneratorType
     """
     # TODO CC
+    with rasterio.open(
+            '/dev/data/LC08_L1TP_197030_20210406_20210416_01_T1/LC08_L1TP_197030_20210406_20210416_01_T1_B1.TIF') as ds:
+        # TODO transform rasteiro dataset to numpy array
+        for shapes, values in rasterio.features.shapes(source=ds, transform=ds.transform):
+            print(shapes, values)
+    """
     for __row in range(band.shape[0]):
         for __col in range(band.shape[1]):
             if band[__row, __col] != dataset.nodata:
                 yield str(band[__row, __col])
+    """
 
 
 def read_pixels_from_array(dataset: np.ndarray) -> Generator:
