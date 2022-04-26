@@ -20,55 +20,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 from pathlib import Path
-from typing import Any, AnyStr, Counter, Generator, Optional, SupportsInt, Union
+from typing import Any, AnyStr, Optional, SupportsInt, Union
 
 import numpy as np
 import geopandas as gpd
 import rasterio
 import rasterio.mask
+import rasterio.windows
+from numpy import ndarray
 from rasterio.features import shapes
 
 from geopandas import GeoDataFrame
 
-from .utils import __count_values, __gather, format_dataset_output
+from .utils import format_dataset_output
 from .vector import __read_shapefile, intersect
 
 
-def read_pixels(dataset: AnyStr, band: np.ndarray) -> Generator:
-    """
-    Using a dataset filepath and a band number i read every pixel values
-    one by one for each row then and for each columns.
-
-    :param dataset: Link to a .tif raster file
-    :type dataset: AnyStr
-    :param band:  Band from a raster to be processed
-    :type band: ndarray
-    :return: Generator of one pixel at a time
-    :rtype: GeneratorType
-    """
-    # TODO CC
-    for __row in range(band.shape[0]):
-        for __col in range(band.shape[1]):
-            if band[__row, __col] != dataset.nodata:
-                yield str(band[__row, __col])
-
-
-def read_pixels_from_array(dataset: np.ndarray) -> Generator:
-    """
-    :param dataset:
-    :type dataset:
-    :return:
-    :rtype:
-    """
-    # TODO CC
-    for p in dataset:
-        for r in p:
-            for c in r:
-                if c != 255:
-                    yield c
-
-
-def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Counter]:
+def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[
+     Any, ndarray | tuple[ndarray, ndarray | None, ndarray | None, ndarray | None]]:
     """
     Takes a dataset path as an input, read every of its pixel then count them based on their values.
 
@@ -76,13 +45,10 @@ def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[Any, Count
     :param band:
     :return:
     """
-    __pixel_value = 0
     with rasterio.open(dataset_path) as __dataset:
         __band = __dataset.read()[band]
-        __pixel_value = read_pixels(dataset=__dataset, band=__band)
-        __pixel_array = __gather(pixel_values=__pixel_value)
-        __ctr = __count_values(pixel_array=__pixel_array)
-    return __dataset, __ctr
+        __uniques, __count = np.unique(np.where(__band != __dataset.nodata, __band, np.nan), return_counts=True)
+    return __dataset, dict(zip(__uniques, __count))
 
 
 def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:

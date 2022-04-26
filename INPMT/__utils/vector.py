@@ -18,8 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from collections import Iterable
-from typing import AnyStr
+from typing import AnyStr, Iterable
 
 # Functions for basic vector processing
 import fiona

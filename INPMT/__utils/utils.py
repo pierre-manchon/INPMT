@@ -22,11 +22,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import unicodedata
 import xml.dom.minidom
-from collections import Counter
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
-from typing import AnyStr, Generator, List, Union
+from typing import AnyStr, List, Union
 from warnings import warn
 
 cfgparser = ConfigParser()
@@ -86,35 +85,6 @@ def __strip(text: AnyStr) -> tuple[str, str]:
     """
     text = unicodedata.normalize("NFD", text).encode("ascii", "ignore").decode("utf-8")
     return str(text), str(text).replace(" ", "_")
-
-
-def __gather(pixel_values: Generator) -> List:
-    """
-    Using a generator as an input, i __gather every value encountered into a list.
-
-    :param pixel_values: Float value of a pixel in a raster band
-    :type pixel_values: Generator
-    :return: A list of all of the pixels found in a raster band
-    :rtype: List
-    """
-    __cat = []
-    for x in pixel_values:
-        __cat.append(x)
-    return __cat
-
-
-def __count_values(pixel_array: List) -> Counter:
-    """
-    Using a list as an input, i
-
-    :param pixel_array:  A list of all of the pixels found in a raster band
-    :type pixel_array: List
-    :return: Countered data
-    :rtype: Counter
-    """
-    __nb = Counter()
-    __nb.update(pixel_array)
-    return __nb
 
 
 def __get_cfg_val(value):

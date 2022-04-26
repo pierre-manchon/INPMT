@@ -21,10 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from configparser import ConfigParser as __ConfigParser
 
 # Built-ins
-from os import environ as __environ
-from sys import executable as __executable
-from sys import modules as __modules
-from sys import version_info as __version_info
+import os
+import sys
 from shapely import speedups
 
 from alive_progress import config_handler as __config_handler
@@ -46,20 +44,19 @@ def get_config():
 
 
 # If the python version is too old, the code will not execute
-__current_python_version = "{}.{}".format(__version_info[0], __version_info[1])
-if __current_python_version != "3.9":
-    raise Exception("Python 3.9 is required.")
+if f'{sys.version_info[0]}.{sys.version_info[1]}' != "3.10":
+    raise Exception("Python 3.10 is required.")
 
 # To avoid writing venv's python path everytime
 # Might be overridden by the setup.py entry points
-__environ["PATH"] = __executable
+os.environ["PATH"] = sys.executable
 
 __cfgparser = __ConfigParser()
 __cfgparser.read("setup.cfg")
 
 __package__ = __cfgparser.get("setup", "name")
-__file__ = __modules[__name__]
-__doc__ = __modules[__name__].__doc__
+__file__ = sys.modules[__name__]
+__doc__ = sys.modules[__name__].__doc__
 __version__ = __cfgparser.get("setup", "version")
 __license__ = __cfgparser.get("setup", "license")
 __author__ = __cfgparser.get("setup", "author")
@@ -93,10 +90,10 @@ else:
 # POSTGRES SQL install or either one it founds)
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?
-__environ["PROJ_LIB"] = r"C:\Program Files\GDAL\projlib"
-__environ["GDAL_DATA"] = r"C:\Program Files\GDAL\gdal-data"
-__environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
-__environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
+os.environ["PROJ_LIB"] = r"C:\Program Files\GDAL\projlib"
+os.environ["GDAL_DATA"] = r"C:\Program Files\GDAL\gdal-data"
+os.environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
+os.environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
 
 # Progress bar settings
 __config_handler.set_global(length=20, force_tty=True)
