@@ -10,7 +10,7 @@
         <mxCell id="49MzPBeOzlvqZ0RAgaE--1" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;strokeWidth=3;allowArrows=0;connectable=0;container=0;opacity=30;shadow=0;sketch=1;fillColor=#EAFFE9;strokeColor=#438F3D;" parent="1" vertex="1">
           <mxGeometry x="20" y="40" width="810" height="330" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--2" value="Préparation des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;fontColor=#97D077;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--2" value="Preparation des donnees" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;fontColor=#97D077;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;" parent="1" vertex="1">
           <mxGeometry x="290" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=0.5;" parent="1" source="49MzPBeOzlvqZ0RAgaE--24" target="wq_lvgGx_w2eAz3UQXKo-35" edge="1">
@@ -33,7 +33,7 @@
         <mxCell id="49MzPBeOzlvqZ0RAgaE--24" value="LANDUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="117.5" y="41.05" width="65" height="17.91" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--26" value="Découpage par pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--26" value="Decoupage par pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="45" y="65.84" width="70" height="34.16" as="geometry" />
         </mxCell>
         <mxCell id="49MzPBeOzlvqZ0RAgaE--27" value="Conversion en vecteur" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
@@ -122,16 +122,16 @@
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-15" value="PARASITE RATE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="410" y="40.01" width="100" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--14" value="Fusion spatiale des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--14" value="Fusion spatiale des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="190" y="128.34" width="80" height="61.66" as="geometry" />
         </mxCell>
-        <mxCell id="SCPs35aV1NnULm3B9HY3-12" value="Fusion temporelle des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="SCPs35aV1NnULm3B9HY3-12" value="Fusion temporelle des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="270" y="70" width="140" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--23" value="Dégradation de la résolution spatiale à 300m" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--23" value="Degradation de la resolution spatiale à 300m" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="140" y="320" width="270" height="38.34" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--15" value="Découpage de la donnée à l&#39;échelle de l&#39;Afrique" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--15" value="Decoupage de la donnee à l&#39;echelle de l&#39;Afrique" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="200" y="236.66" width="290" height="43.34" as="geometry" />
         </mxCell>
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-31" value="Regroupement par valeurs" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
@@ -228,7 +228,7 @@
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-53" value="GWS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="370" y="405.00000000000006" width="30" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="49MzPBeOzlvqZ0RAgaE--4" value="Traitement des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;strokeColor=#FFD966;fontColor=#FFD966;fillColor=#FFF2CC;sketch=1;" parent="1" vertex="1">
+        <mxCell id="49MzPBeOzlvqZ0RAgaE--4" value="Traitement des donnees" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;strokeColor=#FFD966;fontColor=#FFD966;fillColor=#FFF2CC;sketch=1;" parent="1" vertex="1">
           <mxGeometry x="300" y="480" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="FRuTKILGjcJd7eueGVJ2-2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeWidth=1;strokeColor=#FF8000;" parent="1" source="wq_lvgGx_w2eAz3UQXKo-54" target="K0ugWXwgX_FUpqQaoqOF-29" edge="1">
@@ -242,7 +242,7 @@
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-54" value="PREVALENCE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="420" y="405.00000000000006" width="80" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="wq_lvgGx_w2eAz3UQXKo-58" value="Intersection avec les données de KYALO" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
+        <mxCell id="wq_lvgGx_w2eAz3UQXKo-58" value="Intersection avec les donnees de KYALO" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
           <mxGeometry x="615" y="280" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="FRuTKILGjcJd7eueGVJ2-1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeWidth=1;strokeColor=#0000FF;" parent="1" source="wq_lvgGx_w2eAz3UQXKo-59" target="pdTfkMI7k9afYE7M75yk-28" edge="1">
@@ -288,19 +288,19 @@
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-61" value="PARKS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="622.5" y="405.00000000000006" width="115" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="wq_lvgGx_w2eAz3UQXKo-62" value="Intersection avec les données de NATIONAL PARKS" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
+        <mxCell id="wq_lvgGx_w2eAz3UQXKo-62" value="Intersection avec les donnees de NATIONAL PARKS" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
           <mxGeometry x="710" y="179.99999999999997" width="110" height="90" as="geometry" />
         </mxCell>
         <mxCell id="wq_lvgGx_w2eAz3UQXKo-63" value="Calcul d&#39;une zone tampon de 10km" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="640" y="100" width="80" height="71.66" as="geometry" />
         </mxCell>
-        <mxCell id="wq_lvgGx_w2eAz3UQXKo-65" value="Sélection et export de ces pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="wq_lvgGx_w2eAz3UQXKo-65" value="Selection et export de ces pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="515" y="220" width="95" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="wq_lvgGx_w2eAz3UQXKo-67" value="Listing des pays qui figurent dans les données de IRISH" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
+        <mxCell id="wq_lvgGx_w2eAz3UQXKo-67" value="Listing des pays qui figurent dans les donnees de IRISH" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" parent="1" vertex="1">
           <mxGeometry x="500" y="110" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="pdTfkMI7k9afYE7M75yk-12" value="Reprojection de la donnée" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
+        <mxCell id="pdTfkMI7k9afYE7M75yk-12" value="Reprojection de la donnee" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" parent="1" vertex="1">
           <mxGeometry x="310" y="140" width="103.75" height="50" as="geometry" />
         </mxCell>
         <mxCell id="pdTfkMI7k9afYE7M75yk-28" value="Par pays/habitats" style="text;align=left;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=15;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;fontColor=#4D4D4D;" parent="1" vertex="1">
@@ -340,25 +340,25 @@
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-32" value="countries_profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" parent="1" vertex="1">
           <mxGeometry x="40" y="1040" width="380" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-34" value="Lecture des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-34" value="Lecture des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="50" y="600" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-36" value="Etape 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="50" y="570" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-47" value="Re-découpage des données selon le pays sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-47" value="Re-decoupage des donnees selon le pays sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="50" y="740" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-48" value="Etape 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="50" y="640" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-49" value="Re-découpage des données selon l&#39;habitat sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-49" value="Re-decoupage des donnees selon l&#39;habitat sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="50" y="810" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-50" value="Etape 3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="50" y="710" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-51" value="Traitement des données et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-51" value="Traitement des donnees et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="53.75" y="880" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-52" value="Etape 4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
@@ -373,7 +373,7 @@
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-56" value="Etape 6" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="50" y="920" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-57" value="Lecture des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-57" value="Lecture des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="440" y="600" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-58" value="Etape 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
@@ -385,19 +385,19 @@
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-60" value="Etape 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="440" y="640" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-61" value="Re-découpage des données selon le buffer du village sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-61" value="Re-decoupage des donnees selon le buffer du village sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="440" y="740" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-62" value="Etape 3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="440" y="710" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-63" value="Traitement des données et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-63" value="Traitement des donnees et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="440" y="810" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-64" value="Etape 4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
           <mxGeometry x="440" y="780" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-69" value="Préparation" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-69" value="Preparation" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="50" y="670" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-74" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeColor=#4D4D4D;strokeWidth=0.5;" parent="1" source="K0ugWXwgX_FUpqQaoqOF-70" target="K0ugWXwgX_FUpqQaoqOF-76" edge="1">
@@ -424,7 +424,7 @@
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-79" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeColor=#4D4D4D;strokeWidth=0.5;" parent="1" source="K0ugWXwgX_FUpqQaoqOF-76" target="K0ugWXwgX_FUpqQaoqOF-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="K0ugWXwgX_FUpqQaoqOF-76" value="Fusion des deux tableaux de résultats en un (données côte à côte" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
+        <mxCell id="K0ugWXwgX_FUpqQaoqOF-76" value="Fusion des deux tableaux de resultats en un (donnees côte à côte" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" parent="1" vertex="1">
           <mxGeometry x="440" y="960" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="K0ugWXwgX_FUpqQaoqOF-77" value="Etape 5" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" parent="1" vertex="1">
@@ -441,7 +441,7 @@
         <mxCell id="iAGP-xg3i58UWG6sHJvT-3" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;strokeWidth=3;allowArrows=0;connectable=0;container=0;opacity=30;shadow=0;sketch=1;fillColor=#EAFFE9;strokeColor=#438F3D;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="20" y="40" width="810" height="330" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-4" value="Préparation des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;fontColor=#97D077;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-4" value="Preparation des donnees" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;fontColor=#97D077;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="290" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="iAGP-xg3i58UWG6sHJvT-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=0.5;" edge="1" parent="iAGP-xg3i58UWG6sHJvT-1" source="iAGP-xg3i58UWG6sHJvT-7" target="iAGP-xg3i58UWG6sHJvT-36">
@@ -464,7 +464,7 @@
         <mxCell id="iAGP-xg3i58UWG6sHJvT-7" value="LANDUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="117.5" y="41.05" width="65" height="17.91" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-8" value="Découpage par pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-8" value="Decoupage par pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="45" y="65.84" width="70" height="34.16" as="geometry" />
         </mxCell>
         <mxCell id="iAGP-xg3i58UWG6sHJvT-9" value="Conversion en vecteur" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
@@ -553,16 +553,16 @@
         <mxCell id="iAGP-xg3i58UWG6sHJvT-26" value="PARASITE RATE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=12;fontColor=#1A1A1A;fontStyle=2;rotation=0;direction=east;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="410" y="40.01" width="100" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-27" value="Fusion spatiale des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-27" value="Fusion spatiale des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="190" y="128.34" width="80" height="61.66" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-28" value="Fusion temporelle des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-28" value="Fusion temporelle des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="270" y="70" width="140" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-29" value="Dégradation de la résolution spatiale à 300m" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-29" value="Degradation de la resolution spatiale à 300m" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="140" y="320" width="270" height="38.34" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-30" value="Découpage de la donnée à l&#39;échelle de l&#39;Afrique" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-30" value="Decoupage de la donnee à l&#39;echelle de l&#39;Afrique" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="200" y="236.66" width="290" height="43.34" as="geometry" />
         </mxCell>
         <mxCell id="iAGP-xg3i58UWG6sHJvT-31" value="Regroupement par valeurs" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
@@ -595,7 +595,7 @@
         <mxCell id="iAGP-xg3i58UWG6sHJvT-50" value="PREVALENCE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="420" y="405.00000000000006" width="80" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-51" value="Intersection avec les données de KYALO" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-51" value="Intersection avec les donnees de KYALO" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="615" y="280" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="iAGP-xg3i58UWG6sHJvT-53" value="IRISH" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
@@ -607,19 +607,19 @@
         <mxCell id="iAGP-xg3i58UWG6sHJvT-58" value="PARKS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="622.5" y="405.00000000000006" width="115" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-59" value="Intersection avec les données de NATIONAL PARKS" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-59" value="Intersection avec les donnees de NATIONAL PARKS" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="710" y="179.99999999999997" width="110" height="90" as="geometry" />
         </mxCell>
         <mxCell id="iAGP-xg3i58UWG6sHJvT-60" value="Calcul d&#39;une zone tampon de 10km" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="640" y="100" width="80" height="71.66" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-61" value="Sélection et export de ces pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-61" value="Selection et export de ces pays" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="515" y="220" width="95" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-62" value="Listing des pays qui figurent dans les données de IRISH" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-62" value="Listing des pays qui figurent dans les donnees de IRISH" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;fillColor=#F5F5F5;glass=0;strokeColor=#1A1A1A;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="500" y="110" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="iAGP-xg3i58UWG6sHJvT-63" value="Reprojection de la donnée" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
+        <mxCell id="iAGP-xg3i58UWG6sHJvT-63" value="Reprojection de la donnee" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;fontColor=#333333;glass=0;strokeColor=#666666;fillColor=#f5f5f5;" vertex="1" parent="iAGP-xg3i58UWG6sHJvT-1">
           <mxGeometry x="310" y="140" width="103.75" height="50" as="geometry" />
         </mxCell>
       </root>
@@ -718,7 +718,7 @@
         <mxCell id="2N_QGelfFbamr1cD8kg8-47" value="GWS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="370" y="405.00000000000006" width="30" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-48" value="Traitement des données" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;strokeColor=#FFD966;fontColor=#FFD966;fillColor=#FFF2CC;sketch=1;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-48" value="Traitement des donnees" style="text;align=center;verticalAlign=middle;rounded=0;dashed=1;opacity=30;fontStyle=1;fontSize=20;labelBackgroundColor=none;labelBorderColor=none;html=1;labelPosition=center;verticalLabelPosition=middle;fontFamily=Georgia;strokeColor=#FFD966;fontColor=#FFD966;fillColor=#FFF2CC;sketch=1;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="300" y="480" width="280" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-49" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeWidth=1;strokeColor=#FF8000;" edge="1" parent="2N_QGelfFbamr1cD8kg8-1" source="2N_QGelfFbamr1cD8kg8-50" target="2N_QGelfFbamr1cD8kg8-71">
@@ -812,25 +812,25 @@
         <mxCell id="2N_QGelfFbamr1cD8kg8-72" value="countries_profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=10;fontColor=#1A1A1A;fontStyle=3;rotation=0;direction=east;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="40" y="1040" width="380" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-73" value="Lecture des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-73" value="Lecture des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="600" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-74" value="Etape 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="570" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-75" value="Re-découpage des données selon le pays sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-75" value="Re-decoupage des donnees selon le pays sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="740" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-76" value="Etape 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="640" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-77" value="Re-découpage des données selon l&#39;habitat sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-77" value="Re-decoupage des donnees selon l&#39;habitat sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="810" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-78" value="Etape 3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="710" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-79" value="Traitement des données et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-79" value="Traitement des donnees et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="53.75" y="880" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-80" value="Etape 4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
@@ -845,7 +845,7 @@
         <mxCell id="2N_QGelfFbamr1cD8kg8-83" value="Etape 6" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="920" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-84" value="Lecture des données" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-84" value="Lecture des donnees" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="600" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-85" value="Etape 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
@@ -857,19 +857,19 @@
         <mxCell id="2N_QGelfFbamr1cD8kg8-87" value="Etape 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="640" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-88" value="Re-découpage des données selon le buffer du village sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-88" value="Re-decoupage des donnees selon le buffer du village sur lequel on itère" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="740" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-89" value="Etape 3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="710" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-90" value="Traitement des données et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-90" value="Traitement des donnees et calcul de statistiques" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="810" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-91" value="Etape 4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="780" width="360" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-92" value="Préparation" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-92" value="Preparation" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="50" y="670" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-93" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeColor=#4D4D4D;strokeWidth=0.5;" edge="1" parent="2N_QGelfFbamr1cD8kg8-1" source="2N_QGelfFbamr1cD8kg8-94" target="2N_QGelfFbamr1cD8kg8-99">
@@ -896,7 +896,7 @@
         <mxCell id="2N_QGelfFbamr1cD8kg8-98" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFD966;strokeColor=#4D4D4D;strokeWidth=0.5;" edge="1" parent="2N_QGelfFbamr1cD8kg8-1" source="2N_QGelfFbamr1cD8kg8-99" target="2N_QGelfFbamr1cD8kg8-66">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="2N_QGelfFbamr1cD8kg8-99" value="Fusion des deux tableaux de résultats en un (données côte à côte" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
+        <mxCell id="2N_QGelfFbamr1cD8kg8-99" value="Fusion des deux tableaux de resultats en un (donnees côte à côte" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;sketch=0;fontFamily=Georgia;fontSize=13;strokeWidth=1;dashed=1;dashPattern=1 2;glass=0;" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
           <mxGeometry x="440" y="960" width="360" height="40" as="geometry" />
         </mxCell>
         <mxCell id="2N_QGelfFbamr1cD8kg8-100" value="Etape 5" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#4D4D4D;fontSize=15;fontStyle=3" vertex="1" parent="2N_QGelfFbamr1cD8kg8-1">
@@ -1036,13 +1036,13 @@
             <mxPoint x="-2" y="-7" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="MNxkb6-DvF_cQoqUnSHj-38" value="lecture des données dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
+        <mxCell id="MNxkb6-DvF_cQoqUnSHj-38" value="lecture des donnees dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="240" y="86.25" width="260" height="20" as="geometry" />
         </mxCell>
         <mxCell id="MNxkb6-DvF_cQoqUnSHj-39" value="calcul de la distance jusqu&#39;à la bordure du parc le plus proche" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="497" y="288.75" width="330" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="MNxkb6-DvF_cQoqUnSHj-40" value="recupération du nom du parc national le plus proche" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
+        <mxCell id="MNxkb6-DvF_cQoqUnSHj-40" value="recuperation du nom du parc national le plus proche" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="500" y="338.75" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="MNxkb6-DvF_cQoqUnSHj-41" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.992;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.936;entryDx=0;entryDy=0;entryPerimeter=0;" parent="hqocFmHOfBDxpCHPY2PE-1" source="MNxkb6-DvF_cQoqUnSHj-0" target="MNxkb6-DvF_cQoqUnSHj-9" edge="1">
@@ -1063,13 +1063,13 @@
         <mxCell id="MNxkb6-DvF_cQoqUnSHj-45" value="transformation de la GeoSeries en GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="290.04" y="438.75" width="279.96" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="MNxkb6-DvF_cQoqUnSHj-46" value="si à l&#39;intérieur du polygone : la rendre négatif" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
+        <mxCell id="MNxkb6-DvF_cQoqUnSHj-46" value="si à l&#39;interieur du polygone : la rendre negatif" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="500" y="312.5" width="240" height="15" as="geometry" />
         </mxCell>
         <mxCell id="MNxkb6-DvF_cQoqUnSHj-47" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="260.04" y="406.25" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="MNxkb6-DvF_cQoqUnSHj-48" value="décompte du nombre d&#39;espèces de moustiques" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
+        <mxCell id="MNxkb6-DvF_cQoqUnSHj-48" value="decompte du nombre d&#39;espèces de moustiques" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
           <mxGeometry x="290.04" y="408.75" width="259.96" height="20" as="geometry" />
         </mxCell>
         <mxCell id="MNxkb6-DvF_cQoqUnSHj-59" value="lecture des rasters NDVI et SWI" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="hqocFmHOfBDxpCHPY2PE-1" vertex="1">
@@ -1274,7 +1274,7 @@
         <mxCell id="ctQiGe4M9oWUFr8axYFc-0" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="260.04" y="500" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="ctQiGe4M9oWUFr8axYFc-1" value="découpage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="ctQiGe4M9oWUFr8axYFc-1" value="decoupage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="290.04" y="502.5" width="199.96" height="20" as="geometry" />
         </mxCell>
         <mxCell id="ALPIpOB687EMA76oWhX6-0" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
@@ -1294,7 +1294,7 @@
         <mxCell id="ALPIpOB687EMA76oWhX6-3" value="transformation des pixels en vecteur" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="435" y="690" width="195" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="ALPIpOB687EMA76oWhX6-4" value="découpage des pixels selon le buffer du village" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="ALPIpOB687EMA76oWhX6-4" value="decoupage des pixels selon le buffer du village" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="430" y="717.5" width="260" height="20" as="geometry" />
         </mxCell>
         <mxCell id="ALPIpOB687EMA76oWhX6-5" value="normalisation de la valeur de population par la surface obtenue selon la surface initiale" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
@@ -1323,13 +1323,13 @@
             <mxPoint x="400" y="940" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ALPIpOB687EMA76oWhX6-12" value="récupération des valeurs et labels des catégories d&#39;occupation du sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="ALPIpOB687EMA76oWhX6-12" value="recuperation des valeurs et labels des categories d&#39;occupation du sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="435" y="855" width="375" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="ALPIpOB687EMA76oWhX6-13" value="décompte du nombre de pixels selon leurs valeurs" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="ALPIpOB687EMA76oWhX6-13" value="decompte du nombre de pixels selon leurs valeurs" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="435" y="882.5" width="280" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="ALPIpOB687EMA76oWhX6-14" value="calcul des pourcentages de recouvrement de chaque catégorie selon la surface du village" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="ALPIpOB687EMA76oWhX6-14" value="calcul des pourcentages de recouvrement de chaque categorie selon la surface du village" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="435" y="910" width="375" height="20" as="geometry" />
         </mxCell>
         <mxCell id="ALPIpOB687EMA76oWhX6-15" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
@@ -1341,7 +1341,7 @@
         <mxCell id="ALPIpOB687EMA76oWhX6-17" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="400" y="905" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="zsP20GAxNqIhzaj92k5U-0" value="pivotement du résultat pour que chaque labels correspondent à une colonne" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
+        <mxCell id="zsP20GAxNqIhzaj92k5U-0" value="pivotement du resultat pour que chaque labels correspondent à une colonne" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
           <mxGeometry x="435" y="945" width="345" height="20" as="geometry" />
         </mxCell>
         <mxCell id="zsP20GAxNqIhzaj92k5U-1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="hqocFmHOfBDxpCHPY2PE-1">
@@ -1396,10 +1396,10 @@
         <mxCell id="bAt47FRoh4k6tToitiFb-22" value="Start" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="240" y="20" width="40" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="bAt47FRoh4k6tToitiFb-24" value="Données Vecteur" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;glass=0;shadow=1;strokeColor=#FFB570;fillColor=#FFFDF5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
+        <mxCell id="bAt47FRoh4k6tToitiFb-24" value="Donnees Vecteur" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;glass=0;shadow=1;strokeColor=#FFB570;fillColor=#FFFDF5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="10" y="10" width="150" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="bAt47FRoh4k6tToitiFb-25" value="Données Raster" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;glass=0;shadow=1;strokeColor=#FFB570;fillColor=#FFFDF5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
+        <mxCell id="bAt47FRoh4k6tToitiFb-25" value="Donnees Raster" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;glass=0;shadow=1;strokeColor=#FFB570;fillColor=#FFFDF5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="20" y="177.5" width="100" height="20" as="geometry" />
         </mxCell>
         <mxCell id="bAt47FRoh4k6tToitiFb-26" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=15;fontColor=#FFB570;strokeColor=#FF8000;strokeWidth=1;" parent="bAt47FRoh4k6tToitiFb-1" source="bAt47FRoh4k6tToitiFb-27" target="56QpGQYKummIBWFxpFbp-1" edge="1">
@@ -1414,7 +1414,7 @@
         <mxCell id="bAt47FRoh4k6tToitiFb-27" value="&lt;pre style=&quot;font-family: &amp;quot;fira code&amp;quot; , monospace&quot;&gt;&lt;span&gt;LANDUSE&lt;/span&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;sketch=0;shadow=0;labelBackgroundColor=none;strokeWidth=0.5;fontColor=#FFB570;fontStyle=3;fillColor=none;dashed=1;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="30" y="217.5" width="80" height="32.5" as="geometry" />
         </mxCell>
-        <mxCell id="bAt47FRoh4k6tToitiFb-32" value="lecture des données dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
+        <mxCell id="bAt47FRoh4k6tToitiFb-32" value="lecture des donnees dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="240" y="63.78" width="250" height="20" as="geometry" />
         </mxCell>
         <mxCell id="bAt47FRoh4k6tToitiFb-58" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
@@ -1552,7 +1552,7 @@
         <mxCell id="bAt47FRoh4k6tToitiFb-41" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" parent="bAt47FRoh4k6tToitiFb-1" vertex="1">
           <mxGeometry x="315" y="370" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="4LEx_vTF4DCoUYzIlV8y-0" value="préparation des données" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
+        <mxCell id="4LEx_vTF4DCoUYzIlV8y-0" value="preparation des donnees" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
           <mxGeometry x="240" y="97.52" width="140" height="20" as="geometry" />
         </mxCell>
         <mxCell id="4LEx_vTF4DCoUYzIlV8y-1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
@@ -1578,13 +1578,13 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="56QpGQYKummIBWFxpFbp-0" value="découpage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
+        <mxCell id="56QpGQYKummIBWFxpFbp-0" value="decoupage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
           <mxGeometry x="287.5" y="212.53" width="202.5" height="20" as="geometry" />
         </mxCell>
         <mxCell id="56QpGQYKummIBWFxpFbp-1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
           <mxGeometry x="260" y="210" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="6y8JfZrLbC9ucjPVKvw0-0" value="découpage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
+        <mxCell id="6y8JfZrLbC9ucjPVKvw0-0" value="decoupage de chaque fichiers raster" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
           <mxGeometry x="342.5" y="332.53" width="202.5" height="20" as="geometry" />
         </mxCell>
         <mxCell id="6y8JfZrLbC9ucjPVKvw0-1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="bAt47FRoh4k6tToitiFb-1">
@@ -1628,7 +1628,7 @@
         <mxCell id="vPSJ_YkBlQE-338K9ckB-13" value="&lt;pre style=&quot;font-family: &amp;quot;fira code&amp;quot; , monospace&quot;&gt;&lt;span&gt;LANDUSE&lt;/span&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;sketch=0;shadow=0;labelBackgroundColor=none;strokeWidth=0.5;fontColor=#FFB570;fontStyle=3;fillColor=none;dashed=1;" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="42.5" y="488.78" width="80" height="32.5" as="geometry" />
         </mxCell>
-        <mxCell id="vPSJ_YkBlQE-338K9ckB-14" value="lecture des données dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
+        <mxCell id="vPSJ_YkBlQE-338K9ckB-14" value="lecture des donnees dans des GeoDataFrame" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="240" y="63.78" width="250" height="20" as="geometry" />
         </mxCell>
         <mxCell id="vPSJ_YkBlQE-338K9ckB-15" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
@@ -1713,7 +1713,7 @@
         <mxCell id="vPSJ_YkBlQE-338K9ckB-38" value="&lt;div&gt;lecture des raster un à un&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="479.99" y="455.02" width="160.01" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="vPSJ_YkBlQE-338K9ckB-39" value="&lt;div&gt;découpage du raster selon le buffer&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
+        <mxCell id="vPSJ_YkBlQE-338K9ckB-39" value="&lt;div&gt;decoupage du raster selon le buffer&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="479.99" y="480.02" width="195.01" height="20" as="geometry" />
         </mxCell>
         <mxCell id="vPSJ_YkBlQE-338K9ckB-40" value="sauvegarde du raster dans un nouveau fichier" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
@@ -1768,7 +1768,7 @@
         <mxCell id="vPSJ_YkBlQE-338K9ckB-57" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="305" y="575.02" width="25" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="vPSJ_YkBlQE-338K9ckB-58" value="préparation des données" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
+        <mxCell id="vPSJ_YkBlQE-338K9ckB-58" value="preparation des donnees" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="240" y="97.52" width="140" height="20" as="geometry" />
         </mxCell>
         <mxCell id="vPSJ_YkBlQE-338K9ckB-59" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;rounded=1;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#333333;strokeColor=#666666;strokeWidth=1;fillColor=#f5f5f5;" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
@@ -1791,7 +1791,7 @@
         <mxCell id="vPSJ_YkBlQE-338K9ckB-63" value="&lt;div&gt;lecture des fichiers de type raster un à un&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="434.99" y="232.5" width="225.01" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="vPSJ_YkBlQE-338K9ckB-64" value="&lt;div&gt;découpage du raster selon le buffer&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
+        <mxCell id="vPSJ_YkBlQE-338K9ckB-64" value="&lt;div&gt;decoupage du raster selon le buffer&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
           <mxGeometry x="434.99" y="257.5" width="195.01" height="20" as="geometry" />
         </mxCell>
         <mxCell id="vPSJ_YkBlQE-338K9ckB-65" value="sauvegarde du raster dans un nouveau fichier" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;shadow=0;glass=0;labelBackgroundColor=none;sketch=0;fontColor=#4D4D4D;fontStyle=2" vertex="1" parent="vPSJ_YkBlQE-338K9ckB-1">
