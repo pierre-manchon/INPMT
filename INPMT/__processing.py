@@ -22,6 +22,7 @@ import os
 from typing import Any, AnyStr, SupportsInt, Optional
 
 import rasterio
+import rasterio.windows
 import geopandas as gpd
 import pandas as pd
 import numpy as np
@@ -108,7 +109,7 @@ def get_nearest_park(
     return res_dist, loc_np, np_name
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, item_type: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, processing, item_type: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
@@ -134,18 +135,8 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, item_
     # Count every pixel from the raster and its value
     # TODO here i retrieve the area by multiplying the width and height resolutions
     #  => need to get the pixels area for each pixel here
-    dataset, ctr = get_pixel_count(dataset_path=dataset, band=0)
-    for c in ctr:
-        # Multiply the number of pixels by the resolution of a pixel
-        category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
-        # Cross product with the geodataframe_aoi's polygon's area to get the percentage of land use of
-        # the current category
-        percentage = round(((category_area * 100) / __polygon.area[0]), 3)
-        __data.append([c, ctr[c], category_area, percentage])
-    # Creates a DataFrame from the list processed previously
-    df_hab_div = pd.DataFrame(
-        __data, columns=["Category", "Nbr of pixels", "Surface (m2)", "Proportion (%)"]
-    )
+    df_hab_div = get_pixel_count(dataset_path=dataset, processing=processing)
+    print(df_hab_div)
     # Format the .qml file path from the dataset path
     # TODO NBR habitats column != Habitats columns: two back columns not inserted?
     # TODO val 200 unknown but normally present = legend does not list it?
@@ -164,7 +155,7 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, item_
                 __val = "Unknown"
         df_hab_div.loc[m, "Label"] = __val
 
-    return df_hab_div, len(ctr)
+    return df_hab_div, len(df_hab_div)
 
 
 def get_urban_profile(
@@ -254,8 +245,8 @@ def get_urban_profile(
     result = pd.DataFrame(columns=cols)
 
     # Create the progress and the temporary directory used to save some temporary files
-    with alive_bar(total=len(gdf_villages)) as pbar:
-        for i in range(len(gdf_villages)):
+    with alive_bar(total=len(gdf_villages[:5])) as pbar:
+        for i in range(len(gdf_villages[:5])):
             try:
                 _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
                 result.loc[i, "ID"] = village_id
@@ -310,6 +301,7 @@ def get_urban_profile(
                 df_gwsd, _ = get_landuse(polygon=path_poly,
                                          dataset=path_gws_aoi,
                                          legend_filename=path_qml_gws,
+                                         processing=processing_directory,
                                          item_type='paletteEntry')
                 try:
                     df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
@@ -325,6 +317,7 @@ def get_urban_profile(
                 df_hd, len_ctr = get_landuse(polygon=path_poly,
                                              dataset=path_landuse_aoi,
                                              legend_filename=path_qml_landuse,
+                                             processing=processing_directory,
                                              item_type='item')
                 result.loc[i, "HAB_DIV"] = len_ctr
                 try:
