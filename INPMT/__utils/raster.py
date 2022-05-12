@@ -23,11 +23,11 @@ from pathlib import Path
 from typing import Any, AnyStr, Optional, SupportsInt, Union
 
 import numpy as np
+import pandas as pd
 import geopandas as gpd
 import rasterio
 import rasterio.mask
 import rasterio.windows
-from numpy import ndarray
 from rasterio.features import shapes
 
 from geopandas import GeoDataFrame
@@ -36,19 +36,25 @@ from .utils import format_dataset_output
 from .vector import __read_shapefile, intersect
 
 
-def get_pixel_count(dataset_path: AnyStr, band: SupportsInt) -> tuple[
-     Any, ndarray | tuple[ndarray, ndarray | None, ndarray | None, ndarray | None]]:
+def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
     """
     Takes a dataset path as an input, read every of its pixel then count them based on their values.
 
+    :param processing:
+    :type processing:
     :param dataset_path:
-    :param band:
     :return:
     """
-    with rasterio.open(dataset_path) as __dataset:
-        __band = __dataset.read()[band]
-        __uniques, __count = np.unique(np.where(__band != __dataset.nodata, __band, np.nan), return_counts=True)
-    return __dataset, dict(zip(__uniques, __count))
+    ds = polygonize(dataset=dataset_path, processing=processing)
+    px = gpd.read_file(ds)
+    labels = list(px.value_counts('val').keys().values)
+    values = list(px.value_counts().values)
+    area = px.area  # TODO aire totale ?
+    category_area = values * area
+    percentage = round(((category_area * 100) / area[0]), 3)
+    print(labels, values, area, percentage)
+    return pd.DataFrame(data=[labels, values, area, percentage],
+                        columns=["Category", "Nbr of pixels", "Surface (m2)", "Proportion (%)"])
 
 
 def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
