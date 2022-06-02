@@ -46,15 +46,16 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
     :return:
     """
     ds = polygonize(dataset=dataset_path, processing=processing)
-    px = gpd.read_file(ds)
-    labels = list(px.value_counts('val').keys().values)
-    values = list(px.value_counts().values)
-    area = px.area  # TODO aire totale ?
-    category_area = values * area
-    percentage = round(((category_area * 100) / area[0]), 3)
-    print(labels, values, area, percentage)
-    return pd.DataFrame(data=[labels, values, area, percentage],
-                        columns=["Category", "Nbr of pixels", "Surface (m2)", "Proportion (%)"])
+    ua = gpd.read_file(ds)
+    for i in range(len(ua)):
+        ua.loc[i, 'area'] = ua.loc[i, 'geometry'].area
+    ua = ua.groupby(by='val').agg(func='sum')
+    labels = ua.value_counts('val').keys().values.astype(np.str)
+    nbrs = ua.value_counts().values
+    area = ua.value_counts('area').keys().values
+    category_area = np.multiply(nbrs, area)
+    percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
+    return pd.DataFrame(data={"Category": labels, "Nbr of pixels": nbrs, "Surface (m2)": area, "Proportion (%)": percentage})
 
 
 def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
@@ -66,7 +67,7 @@ def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -
         window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
         # read rgb values of the window
         value = src.read(window=window)
-    return value[0][0]
+    return value[0][0][0]
 
 
 def raster_crop(
