@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+import warnings
 from typing import Any, AnyStr, SupportsInt, Optional
 
 import rasterio
@@ -60,6 +61,8 @@ except ImportError:
         iter_geoseries_as_geodataframe,
         merge_touching,
     )
+
+warnings.filterwarnings('ignore')
 
 
 def get_nearest_park(

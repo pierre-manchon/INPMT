@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import argparse
 import os
+import warnings
 import numpy as np
 from argparse import ArgumentTypeError
 from configparser import ConfigParser
@@ -35,6 +36,7 @@ except ImportError:
     from .__processing import get_countries_profile, get_urban_profile
     from .__utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 
+warnings.filterwarnings('ignore')
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
 config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])

@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import warnings
 from typing import AnyStr, Iterable
 
 # Functions for basic vector processing
@@ -31,6 +32,8 @@ from pandas import DataFrame
 from shapefile import Reader
 
 from .utils import format_dataset_output
+
+warnings.filterwarnings('ignore')
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:

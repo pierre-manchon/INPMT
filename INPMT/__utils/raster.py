@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+import warnings
 from pathlib import Path
 from typing import Any, AnyStr, Optional, SupportsInt, Union
 
@@ -34,6 +35,8 @@ from geopandas import GeoDataFrame
 
 from .utils import format_dataset_output
 from .vector import __read_shapefile, intersect
+
+warnings.filterwarnings('ignore')
 
 
 def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):

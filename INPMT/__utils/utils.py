@@ -26,7 +26,9 @@ from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
 from typing import AnyStr, List, Union
-from warnings import warn
+from warnings import warn, filterwarnings
+
+filterwarnings('ignore')
 
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
