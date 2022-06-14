@@ -88,18 +88,12 @@ def get_nearest_park(
     loc_np = None
     res_dist = None
     min_dist = int(__get_cfg_val("min_dist"))
-
     for y in range(len(parks)):
-        dist = parks.loc[y, "geometry"].boundary.distance(
-            villages.loc[index, "geometry"]
-        )
+        dist = parks.loc[y, "geometry"].boundary.distance(villages.loc[index, "geometry"])
         if dist < min_dist:
             min_dist = dist
             name = parks.loc[y, "NAME"]
-            if (
-                parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"])
-                == 0.0
-            ):
+            if parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"]) == 0.0:
                 res_dist = -min_dist
                 loc_np = "P"
             else:
@@ -112,13 +106,19 @@ def get_nearest_park(
     return res_dist, loc_np, np_name
 
 
-def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, processing, item_type: AnyStr) -> tuple[DataFrame, int]:
+def get_landuse(polygon: AnyStr,
+                dataset: AnyStr,
+                legend_filename: AnyStr,
+                processing: AnyStr,
+                item_type: AnyStr) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
     To do this, I first read the qml (legend file) to get the values and their corresponding labels.
     Then I retrieve a number of pixels by values using the Counter object.
     I process the category area and the landuse percentage using the pixel area and the polygon area
 
+    :param processing:
+    :type processing:
     :param legend_filename:
     :param polygon: Path to the shapefile
     :type polygon: AnyStr
@@ -129,7 +129,6 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, proce
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
-    __data = []
     __val = None
     __polygon = gpd.read_file(polygon, encoding='windows-1252')
     # Retrieve the legend file's path
@@ -139,14 +138,11 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, proce
     # TODO here i retrieve the area by multiplying the width and height resolutions
     #  => need to get the pixels area for each pixel here
     df_hab_div = get_pixel_count(dataset_path=dataset, processing=processing)
-    print(df_hab_div)
     # Format the .qml file path from the dataset path
     # TODO NBR habitats column != Habitats columns: two back columns not inserted?
     # TODO val 200 unknown but normally present = legend does not list it?
     # TODO Snow ice and no data are not inserted: merged with other columns?
     # TODO Might improve performance by associating the label when searching for the categories
-    # TODO Reads the corresponding legend style from the .qml file
-    # TODO Associates the category number the label name of the legend values (ridden from a .qml file)
     __style = __read_qml(path_qml=__qml_path, item_type=item_type)
     for m, r in df_hab_div.iterrows():
         for n in __style:
@@ -157,7 +153,6 @@ def get_landuse(polygon: AnyStr, dataset: AnyStr, legend_filename: AnyStr, proce
             else:
                 __val = "Unknown"
         df_hab_div.loc[m, "Label"] = __val
-
     return df_hab_div, len(df_hab_div)
 
 
@@ -246,95 +241,89 @@ def get_urban_profile(
         "HAB_DIV",
     ]
     result = pd.DataFrame(columns=cols)
-
     # Create the progress and the temporary directory used to save some temporary files
-    with alive_bar(total=len(gdf_villages[:5])) as pbar:
-        for i in range(len(gdf_villages[:5])):
+    with alive_bar(total=len(gdf_villages[:10])) as pbar:
+        for i in range(len(gdf_villages[:10])):
+            _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
+            result.loc[i, "ID"] = village_id
+            result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
+            # Get the minimum distance from the village the park edge border and return the said distance and the
+            # park's name
+            if loc:
+                print(i)
+                res_dist, loc_np, np_name = get_nearest_park(index=i, parks=gdf_parks, villages=gdf_villages)
+                print(gdf_villages.loc[i, 'Full_Name'], res_dist, loc_np, np_name)
+                result.loc[i, "NP"] = np_name
+                result.loc[i, "loc_NP"] = loc_np
+                result.loc[i, "dist_NP"] = round(res_dist, 3)
+            # Transform the GeoSeries as a GeoDataFrame
+            p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
+            p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
+            p.crs = 3857
+            
+            # Coordinates
+            result.loc[i, 'x'] = p.centroid.x.values[0]
+            result.loc[i, 'y'] = p.centroid.y.values[0]
+            
+            # Format the path for the temporary file
+            p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
+            path_poly = os.path.join(processing_directory, "".join([p1, pext]))
+
+            # Create a buffer of the village centroid
+            p.buffer(buffer_villages).to_file(path_poly)
+            
+            path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
+            with rasterio.open(path_pop_aoi) as src:
+                pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
+            result.loc[i, "POP"] = pop
+            
+            # Crop the NDVI data to the buffer extent and process it's min, mean and max value
+            path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
+            _, ndvi_min, ndvi_mean, ndvi_max = raster_stats(dataset=path_ndvi_aoi)
+            # I divide by 10 000 because Normalized Difference Vegetation Index is usually between -1 and 1.
+            result.loc[i, "NDVI_min"] = ndvi_min/10000
+            result.loc[i, "NDVI_mean"] = ndvi_mean/10000
+            result.loc[i, "NDVI_max"] = ndvi_max/10000
+            
+            val_swi = get_value_from_coord(index=i, dataset=swi, shapefile=gdf_villages)
+            # https://land.copernicus.eu/global/products/SWI I divide by a 2 because SWI data must be between 0
+            # and 100.
+            result.loc[i, "SWI"] = val_swi/2
+            val_prevalence = get_value_from_coord(index=i, dataset=prevalence, shapefile=gdf_villages)
+            # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
+            # and 100.
+            result.loc[i, "PREVALENCE"] = val_prevalence*100
+            
+            _, _, path_qml_gws = format_dataset_output(dataset=gws, ext='.qml')
+            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            df_gwsd, _ = get_landuse(polygon=path_poly,
+                                     dataset=path_gws_aoi,
+                                     legend_filename=path_qml_gws,
+                                     processing=processing_directory,
+                                     item_type='paletteEntry')
             try:
-                _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
-                result.loc[i, "ID"] = village_id
-                result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
-                # Get the minimum distance from the village the park edge border and return the said distance and the
-                # park's name
-                if loc:
-                    res_dist, loc_np, np_name = get_nearest_park(index=i, parks=gdf_parks, villages=gdf_villages)
-                    result.loc[i, "NP"] = np_name
-                    result.loc[i, "loc_NP"] = loc_np
-                    result.loc[i, "dist_NP"] = round(res_dist, 3)
-                # Transform the GeoSeries as a GeoDataFrame
-                p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
-                p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
-                p.crs = 3857
-                
-                # Coordinates
-                result.loc[i, 'x'] = p.centroid.x.values[0]
-                result.loc[i, 'y'] = p.centroid.y.values[0]
-                
-                # Format the path for the temporary file
-                p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
-                path_poly = os.path.join(processing_directory, "".join([p1, pext]))
-    
-                # Create a buffer of the village centroid
-                p.buffer(buffer_villages).to_file(path_poly)
-                
-                path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
-                with rasterio.open(path_pop_aoi) as src:
-                    pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
-                result.loc[i, "POP"] = pop
-                
-                # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-                path_ndvi_aoi = raster_crop(dataset=ndvi, shapefile=path_poly, processing=processing_directory)
-                _, ndvi_min, ndvi_mean, ndvi_max = raster_stats(dataset=path_ndvi_aoi)
-                # I divide by 10 000 because Normalized Difference Vegetation Index is usually between -1 and 1.
-                result.loc[i, "NDVI_min"] = ndvi_min/10000
-                result.loc[i, "NDVI_mean"] = ndvi_mean/10000
-                result.loc[i, "NDVI_max"] = ndvi_max/10000
-                
-                val_swi = get_value_from_coord(index=i, dataset=swi, shapefile=gdf_villages)
-                # https://land.copernicus.eu/global/products/SWI I divide by a 2 because SWI data must be between 0
-                # and 100.
-                result.loc[i, "SWI"] = val_swi/2
-                val_prevalence = get_value_from_coord(index=i, dataset=prevalence, shapefile=gdf_villages)
-                # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
-                # and 100.
-                result.loc[i, "PREVALENCE"] = val_prevalence*100
-                
-                _, _, path_qml_gws = format_dataset_output(dataset=gws, ext='.qml')
-                path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-                df_gwsd, _ = get_landuse(polygon=path_poly,
-                                         dataset=path_gws_aoi,
-                                         legend_filename=path_qml_gws,
+                df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
+                df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
+                result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
+            except KeyError:
+                result.loc[i, df_gwsd.columns] = np.nan
+                pass
+
+            # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
+            _, _, path_qml_landuse = format_dataset_output(dataset=landuse, ext='.qml')
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
+            df_hd, len_ctr = get_landuse(polygon=path_poly,
+                                         dataset=path_landuse_aoi,
+                                         legend_filename=path_qml_landuse,
                                          processing=processing_directory,
-                                         item_type='paletteEntry')
-                try:
-                    df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
-                    df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                    result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
-                except KeyError:
-                    result.loc[i, df_gwsd.columns] = np.nan
-                    pass
-    
-                # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
-                _, _, path_qml_landuse = format_dataset_output(dataset=landuse, ext='.qml')
-                path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
-                df_hd, len_ctr = get_landuse(polygon=path_poly,
-                                             dataset=path_landuse_aoi,
-                                             legend_filename=path_qml_landuse,
-                                             processing=processing_directory,
-                                             item_type='item')
-                result.loc[i, "HAB_DIV"] = len_ctr
-                try:
-                    df_hd = df_hd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")  # noqa
-                    df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                    result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
-                except KeyError:
-                    result.loc[i, df_hd.columns] = np.nan
-                    pass
-            except IndexError:
-                print('Found village with no geometry')
-                pass
-            except TypeError:
-                pass
+                                         item_type='item')
+            result.loc[i, "HAB_DIV"] = len_ctr
+            try:
+                df_hd = df_hd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")  # noqa
+                df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
+                result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
+            except KeyError:
+                result.loc[i, df_hd.columns] = np.nan
             pbar()
     return result
 
@@ -447,13 +436,14 @@ def get_countries_profile(
                     df_hd, _ = get_landuse(polygon=path_poly2,
                                            dataset=path_landuse_aoi_landuse,
                                            legend_filename="LANDUSE/ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml",
-                                           item_type='item')
+                                           item_type='item',
+                                           processing=anopheles)
                     aoi_extract.loc[i, "HAB"] = df_hd.loc[0, "Label"]
                     aoi_extract.loc[i, "HAB_PROP"] = df_hd.loc[0, "Proportion (%)"]
 
                     # Count every pixel from the raster and its value
                     __data = []
-                    dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, band=0)
+                    dataset, ctr = get_pixel_count(dataset_path=path_landuse_aoi_landuse, processing=anopheles)
                     for c in ctr:
                         # Multiply the number of pixels by the resolution of a pixel
                         category_area = round(ctr[c] * (dataset.res[0] * dataset.res[1]), 3)
@@ -491,10 +481,8 @@ def get_countries_profile(
 
             bar_main.text("Append")  # Pbar 1st level
             result = result.append(aoi_extract, ignore_index=True)
-
             bar_main.text("Done")  # Progress bar for the first level
             print("[{}/{}]".format(i + 1, len(geodataframe_aoi)))
             bar_main()  # Progress bar for the first level
-
         # End
         return result, aoi
