@@ -58,6 +58,8 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
     area = ua.value_counts('area').keys().values
     category_area = np.multiply(nbrs, area)
     percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
+    if len(labels) > len(nbrs):
+        labels = labels[1:]
     return pd.DataFrame(data={"Category": labels, "Nbr of pixels": nbrs, "Surface (m2)": area, "Proportion (%)": percentage})
 
 
