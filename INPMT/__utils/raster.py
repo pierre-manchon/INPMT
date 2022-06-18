@@ -53,9 +53,10 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
     for i in range(len(ua)):
         ua.loc[i, 'area'] = ua.loc[i, 'geometry'].area
     ua = ua.groupby(by='val').agg(func='sum')
-    labels = ua.value_counts('val').keys().values.astype(np.str)
-    nbrs = ua.value_counts().values
-    area = ua.value_counts('area').keys().values
+    ua = ua.reset_index()
+    labels = ua['val'].astype(str).to_list()
+    nbrs = ua.value_counts('val').values
+    area = ua['area'].to_list()
     category_area = np.multiply(nbrs, area)
     percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
     if len(labels) > len(nbrs):
