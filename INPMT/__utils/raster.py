@@ -182,15 +182,16 @@ def raster_stats(
     # If ValueError, idk
     try:
         with rasterio.open(dataset) as ro:
-            x = ro.read()
-            x = x[x != ro.nodata]
-        return (
-            round(x.sum(), 3),
-            round(x.min(), 3),
-            round(x.mean(), 3),
-            round(x.max(), 3),
-        )
-    except TypeError:
+            values = ro.read()
+            data = np.where(values == ro.nodata, np.nan, values)
+            return (
+                np.nansum(data),
+                np.nanmin(data),
+                np.nanmean(data),
+                np.nanmax(data),
+            )
+    except TypeError as e:
+        print(e)
         return 0, 0, 0, 0
     except ValueError as e:
         print(e)
