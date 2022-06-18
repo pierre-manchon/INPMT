@@ -192,7 +192,8 @@ def raster_stats(
         )
     except TypeError:
         return 0, 0, 0, 0
-    except ValueError:
+    except ValueError as e:
+        print(e)
         return 0, 0, 0, 0
 
 
