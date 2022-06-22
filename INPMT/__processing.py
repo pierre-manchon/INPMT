@@ -242,17 +242,15 @@ def get_urban_profile(
     ]
     result = pd.DataFrame(columns=cols)
     # Create the progress and the temporary directory used to save some temporary files
-    with alive_bar(total=len(gdf_villages[:10])) as pbar:
-        for i in range(len(gdf_villages[:10])):
+    with alive_bar(total=len(gdf_villages)) as pbar:
+        for i in range(len(gdf_villages)):
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
             if loc:
-                print(i)
                 res_dist, loc_np, np_name = get_nearest_park(index=i, parks=gdf_parks, villages=gdf_villages)
-                print(gdf_villages.loc[i, 'Full_Name'], res_dist, loc_np, np_name)
                 result.loc[i, "NP"] = np_name
                 result.loc[i, "loc_NP"] = loc_np
                 result.loc[i, "dist_NP"] = round(res_dist, 3)
@@ -271,7 +269,6 @@ def get_urban_profile(
 
             # Create a buffer of the village centroid
             p.buffer(buffer_villages).to_file(path_poly)
-            
             path_pop_aoi = raster_crop(dataset=population, shapefile=path_poly, processing=processing_directory)
             with rasterio.open(path_pop_aoi) as src:
                 pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
