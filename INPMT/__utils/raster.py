@@ -48,20 +48,22 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
     :param dataset_path:
     :return:
     """
-    ds = polygonize(dataset=dataset_path, processing=processing)
-    ua = gpd.read_file(ds)
-    for i in range(len(ua)):
-        ua.loc[i, 'area'] = ua.loc[i, 'geometry'].area
-    ua = ua.groupby(by='val').agg(func='sum')
-    ua = ua.reset_index()
-    labels = ua['val'].astype(str).to_list()
-    nbrs = ua.value_counts('val').values
-    area = ua['area'].to_list()
-    category_area = np.multiply(nbrs, area)
-    percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
-    if len(labels) > len(nbrs):
-        labels = labels[1:]
-    return pd.DataFrame(data={"Category": labels, "Nbr of pixels": nbrs, "Surface (m2)": area, "Proportion (%)": percentage})
+    try:
+        ds = polygonize(dataset=dataset_path, processing=processing)
+        ua = gpd.read_file(ds)
+        for i in range(len(ua)):
+            ua.loc[i, 'area'] = ua.loc[i, 'geometry'].area
+        ua = ua.groupby(by='val').agg(func='sum')
+        ua = ua.reset_index()
+        labels = ua['val'].astype(str).to_list()
+        nbrs = ua.value_counts('val').values
+        area = ua['area'].to_list()
+        category_area = np.multiply(nbrs, area)
+        percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
+        return pd.DataFrame(data={"Category": labels, "Nbr of pixels": nbrs, "Surface (m2)": area, "Proportion (%)": percentage})
+    except:
+        return pd.DataFrame(data={"Category": ['0.0'], "Nbr of pixels": [1], "Surface (m2)": [0.0], "Proportion (%)": 100})
+        pass
 
 
 def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
@@ -78,7 +80,7 @@ def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -
 
 def raster_crop(
     dataset: AnyStr, shapefile: AnyStr, processing: AnyStr, overwrite: bool = False
-) -> AnyStr:
+) -> str | None:
     """
     Cut a raster based on the GeoDataFrame boundary and saves it in a new temporary file.
 
@@ -115,10 +117,9 @@ def raster_crop(
             with rasterio.open(__output_path, "w", **output_meta) as output_file:
                 output_file.write(cropped_dataset)
         return __output_path
-
-    except ValueError:
-        print(UserWarning("Raster does not overlap with {}.".format(__sf.__hash__)))
-        pass
+    except ValueError as e:
+        print(UserWarning(f"Raster does not overlap with {__sf}:\n{e}"))
+        return None
 
 
 def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
@@ -131,6 +132,7 @@ def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
     :return:
     """
     mask = None
+    print(dataset, processing)
     with rasterio.Env():
         with rasterio.open(dataset) as src:
             image = src.read(1)
