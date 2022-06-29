@@ -32,30 +32,30 @@ from geopandas import GeoDataFrame
 from pandas import DataFrame
 
 try:
-    from __utils.raster import (
+    from utils.raster import (
         density,
         get_pixel_count,
         get_value_from_coord,
         raster_crop,
         raster_stats,
     )
-    from __utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
-    from __utils.vector import (
+    from utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
+    from utils.vector import (
         __read_shp_as_gdf,
         intersect,
         iter_geoseries_as_geodataframe,
         merge_touching,
     )
 except ImportError:
-    from .__utils.raster import (
+    from .utils.raster import (
         density,
         get_pixel_count,
         get_value_from_coord,
         raster_crop,
         raster_stats,
     )
-    from .__utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
-    from .__utils.vector import (
+    from .utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
+    from .utils.vector import (
         __read_shp_as_gdf,
         intersect,
         iter_geoseries_as_geodataframe,

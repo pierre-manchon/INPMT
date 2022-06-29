@@ -31,10 +31,10 @@ from typing import AnyStr
 
 try:
     from __processing import get_countries_profile, get_urban_profile
-    from __utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
+    from utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 except ImportError:
     from .__processing import get_countries_profile, get_urban_profile
-    from .__utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
+    from .utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 
 warnings.filterwarnings('ignore')
 cfgparser = ConfigParser()
@@ -79,7 +79,7 @@ def run(
     irish = os.path.join(datasets, "IRISH_countries.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
     anopheles_kyalo_out_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
 

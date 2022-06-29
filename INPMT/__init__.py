@@ -23,16 +23,17 @@ from configparser import ConfigParser as __ConfigParser
 # Built-ins
 import os
 import sys
+import configparser
+# 3rd party
+import alive_progress
 from shapely import speedups
-
-from alive_progress import config_handler as __config_handler
-
+# 1st party
 try:
     from __main__ import run
-    from __utils.utils import __set_cfg_val as set_config_value
+    from utils.utils import __set_cfg_val as set_config_value
 except ImportError:
     from .__main__ import run
-    from .__utils.utils import __set_cfg_val as set_config_value
+    from .utils.utils import __set_cfg_val as set_config_value
 
 
 def get_config():
@@ -51,16 +52,16 @@ if f'{sys.version_info[0]}.{sys.version_info[1]}' != "3.10":
 # Might be overridden by the setup.py entry points
 os.environ["PATH"] = sys.executable
 
-__cfgparser = __ConfigParser()
-__cfgparser.read("setup.cfg")
+cfgparser = configparser.ConfigParser()
+cfgparser.read("setup.cfg")
 
-__package__ = __cfgparser.get("setup", "name")
+__package__ = cfgparser.get("metadata", "name")
 __file__ = sys.modules[__name__]
 __doc__ = sys.modules[__name__].__doc__
-__version__ = __cfgparser.get("setup", "version")
-__license__ = __cfgparser.get("setup", "license")
-__author__ = __cfgparser.get("setup", "author")
-__email__ = __cfgparser.get("setup", "author_email")
+__version__ = cfgparser.get("metadata", "version")
+__license__ = cfgparser.get("metadata", "license")
+__author__ = cfgparser.get("metadata", "author")
+__email__ = cfgparser.get("metadata", "author_email")
 
 __all__ = (
     "__package__",
@@ -91,9 +92,10 @@ else:
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?
 os.environ["PROJ_LIB"] = r"C:\Program Files\GDAL\projlib"
+os.environ["GDAL_CONFIG"] = '3.2.2'
 os.environ["GDAL_DATA"] = r"C:\Program Files\GDAL\gdal-data"
 os.environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
 os.environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
 
 # Progress bar settings
-__config_handler.set_global(length=20, force_tty=True)
+alive_progress.config_handler.set_global(length=20, force_tty=True)
