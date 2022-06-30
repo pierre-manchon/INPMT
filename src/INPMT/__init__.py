@@ -56,7 +56,7 @@ cfgparser.read("setup.cfg")
 __package__ = cfgparser.get("metadata", "name")
 __file__ = sys.modules[__name__]
 __doc__ = sys.modules[__name__].__doc__
-__version__ = cfgparser.get("metadata", "version")
+__version__ = '0.2.0'
 __license__ = cfgparser.get("metadata", "license")
 __author__ = cfgparser.get("metadata", "author")
 __email__ = cfgparser.get("metadata", "author_email")
@@ -90,7 +90,6 @@ else:
 # https://gis.stackexchange.com/questions/326968/ogr2ogr-error-1-proj-pj-obj-create-cannot-find-proj-db/334346
 # TODO adapt GDAL path based on the os?
 os.environ["PROJ_LIB"] = r"C:\Program Files\GDAL\projlib"
-os.environ["GDAL_CONFIG"] = '3.2.2'
 os.environ["GDAL_DATA"] = r"C:\Program Files\GDAL\gdal-data"
 os.environ["GDAL_DRIVER_PATH"] = r"C:\Program Files\GDAL\gdalplugins"
 os.environ["PYTHONPATH"] = r"C:\Program Files\GDAL"
