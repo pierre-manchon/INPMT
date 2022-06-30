@@ -1,5 +1,6 @@
 import subprocess
 import setuptools
-
-subprocess.call(['sh', './dependencies/install.sh'], shell=True)
+print('Installing dependencies...')
+subprocess.run(['powershell.exe', 'dependencies/install.ps1'])
+print('Done')
 setuptools.setup()
