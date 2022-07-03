@@ -18,13 +18,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import configparser
+
 # Built-ins
 import os
 import sys
-import configparser
+
 # 3rd party
 import alive_progress
 from shapely import speedups
+
 # 1st party
 try:
     from __main__ import run
@@ -40,12 +43,12 @@ def get_config():
     """
     Open and view the config file
     """
-    with open('INPMT/config.cfg', "r") as cfg:
+    with open("INPMT/config.cfg", "r") as cfg:
         print(cfg.read())
 
 
 # If the python version is too old, the code will not execute
-if f'{sys.version_info[0]}.{sys.version_info[1]}' != "3.10":
+if f"{sys.version_info[0]}.{sys.version_info[1]}" != "3.10":
     raise Exception("Python 3.10 is required.")
 
 # To avoid writing venv's python path everytime

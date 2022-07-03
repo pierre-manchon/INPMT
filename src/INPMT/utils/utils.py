@@ -26,9 +26,9 @@ from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
 from typing import AnyStr, List, Union
-from warnings import warn, filterwarnings
+from warnings import filterwarnings, warn
 
-filterwarnings('ignore')
+filterwarnings("ignore")
 
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
@@ -56,7 +56,9 @@ def format_dataset_output(
     if not Path(dataset).is_dir():
         __dataset_name = Path(dataset).name.replace(__ext, "")
     else:
-        __dataset_name = os.path.join(dataset, "".join(["output_", datetime.now().strftime("%Y%m%d%H%M%S")]))
+        __dataset_name = os.path.join(
+            dataset, "".join(["output_", datetime.now().strftime("%Y%m%d%H%M%S")])
+        )
         if ext == "":
             raise UserWarning("Custom dataset path must have attribute 'ext' set")
         pass

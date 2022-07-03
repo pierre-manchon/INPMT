@@ -1,14 +1,22 @@
 # -*-coding: utf8 -*
 import pandas as pd
 
-oney = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/' \
-       r'NP_Africa_1y_2016-2017_MOD13A1-006-Statistics.csv'
-fivey = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/' \
-        r'NP_Africa_5y_2012-2017_MOD13A1-006-Statistics.csv'
-teny = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/' \
-       r'NP_Africa_10y_2007-2017_MOD13A1-006-Statistics.csv'
-NDVI_stats = r'H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/' \
-             r'NDVI_NP_statistics.xlsx'
+oney = (
+    r"H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/"
+    r"NP_Africa_1y_2016-2017_MOD13A1-006-Statistics.csv"
+)
+fivey = (
+    r"H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/"
+    r"NP_Africa_5y_2012-2017_MOD13A1-006-Statistics.csv"
+)
+teny = (
+    r"H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/"
+    r"NP_Africa_10y_2007-2017_MOD13A1-006-Statistics.csv"
+)
+NDVI_stats = (
+    r"H:/Cours/M2/Cours/HGADU03 - Mémoire/Projet Impact PN Anophèles/datasets/NDVI/NPs/"
+    r"NDVI_NP_statistics.xlsx"
+)
 
 df_oney = pd.read_csv(oney)
 df_fivey = pd.read_csv(fivey)

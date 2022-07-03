@@ -33,7 +33,7 @@ from shapefile import Reader
 
 from .utils import format_dataset_output
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 def __read_shapefile(shapefile: AnyStr) -> list:
@@ -45,7 +45,9 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     :return: List of dicts of geometries and their types
     :rtype: list
     """
-    with fiona.open(shapefile, 'r', encoding='utf-8') as shape:  # , encoding='windows-1252'
+    with fiona.open(
+        shapefile, "r", encoding="utf-8"
+    ) as shape:  # , encoding='windows-1252'
         shapes = [feature["geometry"] for feature in shape]
     return shapes
 
@@ -59,7 +61,7 @@ def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
     :return: DataFrame with a coords column
     :rtype: [DataFrame, Reader]
     """
-    sf = shp.Reader(shapefile, 'r', encoding='utf-8')
+    sf = shp.Reader(shapefile, "r", encoding="utf-8")
     fields = [x[0] for x in sf.fields][1:]
     records = sf.records()
     shapes = [s.points for s in sf.shapes()]
@@ -77,7 +79,7 @@ def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     :return:
     :rtype:
     """
-    gdf = gpd.read_file(shapefile, 'r', encoding='utf-8')
+    gdf = gpd.read_file(shapefile, "r", encoding="utf-8")
     gdf.crs = 3857
     return gdf
 
@@ -134,8 +136,8 @@ def intersect(
     :return:
     :rtype: [GeoDataFrame, AnyStr]
     """
-    gdf_base = gpd.read_file(base, 'r', encoding='utf-8')
-    gdf_ol = gpd.read_file(overlay, 'r', encoding='utf-8')
+    gdf_base = gpd.read_file(base, "r", encoding="utf-8")
+    gdf_ol = gpd.read_file(overlay, "r", encoding="utf-8")
     gdf_base.crs = crs
     gdf_ol.crs = crs
     inter_df = gpd.overlay(gdf_base, gdf_ol)

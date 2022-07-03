@@ -21,13 +21,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import argparse
 import os
 import warnings
-import numpy as np
 from argparse import ArgumentTypeError
 from configparser import ConfigParser
 from shlex import quote as shlex_quote
 from sys import argv, exit, stderr
 from tempfile import TemporaryDirectory
 from typing import AnyStr
+
+import numpy as np
 
 try:
     from __processing import get_countries_profile, get_urban_profile
@@ -36,23 +37,23 @@ except ImportError:
     from .__processing import get_countries_profile, get_urban_profile
     from .utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
 config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
 
 
 def run(
-    method: AnyStr = ('villages', 'countries'),
+    method: AnyStr = ("villages", "countries"),
     export_dir: AnyStr = "results",
-    loc: bool = True
+    loc: bool = True,
 ) -> None:
     """
     Retrieves the datasets path and executes the functions.
     For the countries, i only execute it like that.
     For the villages, i execute first after setting the buffer parameter to 500, then i execute it after setting the
     parameter to 2000. Then i merge the two results.
-    
+
     :param loc:
     :param method: Execute whether by villages or countries
     :type method: AnyStr
@@ -61,31 +62,49 @@ def run(
     :return: Nothing
     :rtype: None
     """
-    valid_method = ['countries', 'villages']
+    valid_method = ["countries", "villages"]
     if method not in valid_method:
-        raise ValueError("Invalid method parameter. Expected one of {}".format(valid_method))
+        raise ValueError(
+            "Invalid method parameter. Expected one of {}".format(valid_method)
+        )
     datasets = __get_cfg_val("datasets_storage_path")
     export = os.path.join(datasets, export_dir)
-    
+
     # Raster data
     population = os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif")
-    landuse = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif")
-    ndvi = os.path.join(datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif")
-    swi = os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif")
+    landuse = os.path.join(
+        datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"
+    )
+    ndvi = os.path.join(
+        datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif"
+    )
+    swi = os.path.join(
+        datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif"
+    )
     gws = os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif")
-    prevalence = os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif")
+    prevalence = os.path.join(
+        datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"
+    )
 
     # Vector data
     irish = os.path.join(datasets, "IRISH_countries.shp")
-    landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
+    landuse_polygonized = os.path.join(
+        datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp"
+    )
     anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
-    anopheles_kyalo_out_national_parks_buffered = os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
-    national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
+    anopheles_kyalo_in_national_parks_buffered = os.path.join(
+        datasets, "KYALO_anopheles_in_PAs_buffers.shp"
+    )  # noqa F841
+    anopheles_kyalo_out_national_parks_buffered = os.path.join(
+        datasets, "KYALO_anopheles_out_PAs_buffers.shp"
+    )
+    national_parks_with_anopheles_kyalo = os.path.join(
+        datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp"
+    )
 
-    with TemporaryDirectory(prefix='INPMT_') as tmp_directory:
+    with TemporaryDirectory(prefix="INPMT_") as tmp_directory:
         # Read file as a geodataframe
-        if method == 'countries':
+        if method == "countries":
             gdf_profiles_aoi, path_profiles_aoi = get_countries_profile(
                 aoi=irish,
                 landuse=landuse,
@@ -94,9 +113,11 @@ def run(
                 processing_directory=tmp_directory,
             )
             # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_profiles = format_dataset_output(dataset=export_dir, name="countries_profiles")
+            _, _, output_profiles = format_dataset_output(
+                dataset=export_dir, name="countries_profiles"
+            )
             gdf_profiles_aoi.to_file(output_profiles)
-        if method == 'villages':
+        if method == "villages":
             __set_cfg_val("buffer_villages", "500")
             profile_villages_500 = get_urban_profile(
                 villages=anopheles_kyalo_out_national_parks_buffered,
@@ -108,7 +129,7 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
-                loc=loc
+                loc=loc,
             )
             __set_cfg_val("buffer_villages", "2000")
             profile_villages_2000 = get_urban_profile(
@@ -121,7 +142,7 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 processing_directory=tmp_directory,
-                loc=loc
+                loc=loc,
             )
 
             # https://stackoverflow.com/a/50865526
@@ -133,25 +154,37 @@ def run(
                 suffixes=("_500", "_2000"),
             )
             # Rename and delete the duplicated columns
-            profile_villages.rename(columns={'ID_500': 'ID',
-                                             'x_500': 'x',
-                                             'y_500': 'y',
-                                             'NP_500': 'NP',
-                                             'loc_NP_500': 'loc_NP',
-                                             'dist_NP_500': 'dist_NP'}, inplace=True)
-            profile_villages = profile_villages.drop(['ID_2000',
-                                                      'x_2000',
-                                                      'y_2000',
-                                                      'NP_2000',
-                                                      'loc_NP_2000',
-                                                      'dist_NP_2000'], axis=1)
+            profile_villages.rename(
+                columns={
+                    "ID_500": "ID",
+                    "x_500": "x",
+                    "y_500": "y",
+                    "NP_500": "NP",
+                    "loc_NP_500": "loc_NP",
+                    "dist_NP_500": "dist_NP",
+                },
+                inplace=True,
+            )
+            profile_villages = profile_villages.drop(
+                [
+                    "ID_2000",
+                    "x_2000",
+                    "y_2000",
+                    "NP_2000",
+                    "loc_NP_2000",
+                    "dist_NP_2000",
+                ],
+                axis=1,
+            )
             # Change nan values to NULL string
             # https://stackoverflow.com/a/26838140/12258568
-            profile_villages = profile_villages.replace(np.nan, 'NULL', regex=True)
+            profile_villages = profile_villages.replace(np.nan, "NULL", regex=True)
             # Retrieves the directory the dataset is in and joins it the output filename
-            _, _, output_urban_profiles = format_dataset_output(dataset=export, name="urban_profiles", ext='.xlsx')
+            _, _, output_urban_profiles = format_dataset_output(
+                dataset=export, name="urban_profiles", ext=".xlsx"
+            )
             profile_villages.to_excel(output_urban_profiles)
-            print('Jesus was black.')
+            print("Jesus was black.")
 
 
 def main():
@@ -218,31 +251,40 @@ def main():
     )
 
     # Create the arguments
-    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit.")
-    parser.add_argument("-d",
-                        "--description",
-                        dest="description",
-                        action="store_true",
-                        help="Show the program's description and exit.")
-    parser.add_argument("-l",
-                        "--license",
-                        dest="license",
-                        action="store_true",
-                        help="Show the program's license and exit.",)
-    parser.add_argument("-c",
-                        "--config",
-                        nargs="*",
-                        help="Read or overwrite local config file.")
-    parser.add_argument("-m",
-                        "--method",
-                        nargs="?",
-                        type=file_path,
-                        help="How do you want to process the data ['countries', 'villages'].",)
-    parser.add_argument("-e",
-                        "--export",
-                        nargs="?",
-                        type=file_path,
-                        help="Where do you the result to be saved.",)
+    parser.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit."
+    )
+    parser.add_argument(
+        "-d",
+        "--description",
+        dest="description",
+        action="store_true",
+        help="Show the program's description and exit.",
+    )
+    parser.add_argument(
+        "-l",
+        "--license",
+        dest="license",
+        action="store_true",
+        help="Show the program's license and exit.",
+    )
+    parser.add_argument(
+        "-c", "--config", nargs="*", help="Read or overwrite local config file."
+    )
+    parser.add_argument(
+        "-m",
+        "--method",
+        nargs="?",
+        type=file_path,
+        help="How do you want to process the data ['countries', 'villages'].",
+    )
+    parser.add_argument(
+        "-e",
+        "--export",
+        nargs="?",
+        type=file_path,
+        help="Where do you the result to be saved.",
+    )
     # If no arguments are given, print the help
     if len(argv) == 1:
         parser.print_help(stderr)

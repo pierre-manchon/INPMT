@@ -23,20 +23,19 @@ import warnings
 from pathlib import Path
 from typing import Any, AnyStr, Optional, SupportsInt, Union
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
 import rasterio
 import rasterio.mask
 import rasterio.windows
-from rasterio.features import shapes
-
 from geopandas import GeoDataFrame
+from rasterio.features import shapes
 
 from .utils import format_dataset_output
 from .vector import __read_shapefile, intersect
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
@@ -52,27 +51,41 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
         ds = polygonize(dataset=dataset_path, processing=processing)
         ua = gpd.read_file(ds)
         for i in range(len(ua)):
-            ua.loc[i, 'area'] = ua.loc[i, 'geometry'].area
-        ua = ua.groupby(by='val').agg(func='sum')
+            ua.loc[i, "area"] = ua.loc[i, "geometry"].area
+        ua = ua.groupby(by="val").agg(func="sum")
         ua = ua.reset_index()
-        labels = ua['val'].astype(str).to_list()
-        nbrs = ua.value_counts('val').values
-        area = ua['area'].to_list()
+        labels = ua["val"].astype(str).to_list()
+        nbrs = ua.value_counts("val").values
+        area = ua["area"].to_list()
         category_area = np.multiply(nbrs, area)
-        percentage = np.divide(np.multiply(category_area, 100), ua['area'].sum())
-        return pd.DataFrame(data={"Category": labels, "Nbr of pixels": nbrs, "Surface (m2)": area, "Proportion (%)": percentage})
+        percentage = np.divide(np.multiply(category_area, 100), ua["area"].sum())
+        return pd.DataFrame(
+            data={
+                "Category": labels,
+                "Nbr of pixels": nbrs,
+                "Surface (m2)": area,
+                "Proportion (%)": percentage,
+            }
+        )
     except:
-        return pd.DataFrame(data={"Category": ['0.0'], "Nbr of pixels": [1], "Surface (m2)": [0.0], "Proportion (%)": 100})
+        return pd.DataFrame(
+            data={
+                "Category": ["0.0"],
+                "Nbr of pixels": [1],
+                "Surface (m2)": [0.0],
+                "Proportion (%)": 100,
+            }
+        )
         pass
 
 
 def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
     with rasterio.open(dataset) as src:
-        x, y = list(shapefile.loc[index, 'geometry'].coords)[0]
+        x, y = list(shapefile.loc[index, "geometry"].coords)[0]
         # get pixel x+y of the coordinate
         py, px = src.index(x, y)
         # create 1x1px window of the pixel
-        window = rasterio.windows.Window(px - 1//2, py - 1//2, 1, 1)
+        window = rasterio.windows.Window(px - 1 // 2, py - 1 // 2, 1, 1)
         # read rgb values of the window
         value = src.read(window=window)
     return value[0][0][0]
@@ -101,10 +114,13 @@ def raster_crop(
             cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
             output_meta = src.meta
             output_meta.update(
-                {"driver": "GTiff",
-                 "height": cropped_dataset.shape[1],
-                 "width": cropped_dataset.shape[2],
-                 "transform": output_transform})
+                {
+                    "driver": "GTiff",
+                    "height": cropped_dataset.shape[1],
+                    "width": cropped_dataset.shape[2],
+                    "transform": output_transform,
+                }
+            )
             r, r_ext, _ = format_dataset_output(dataset=dataset, name="cropped_tmp")
             __output_path = os.path.join(processing, "".join([r, r_ext]))
 
@@ -145,7 +161,9 @@ def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
     geoms = list(results)
     gpd_polygonized_raster = gpd.GeoDataFrame.from_features(geoms)
     gpd_polygonized_raster.crs = 3857
-    p, p_ext, _ = format_dataset_output(dataset=dataset, name='polygonized_tmp', ext='.shp')
+    p, p_ext, _ = format_dataset_output(
+        dataset=dataset, name="polygonized_tmp", ext=".shp"
+    )
     __output_path = os.path.join(processing, "".join([p, p_ext]))
     gpd_polygonized_raster.to_file(__output_path)
     return __output_path
@@ -211,8 +229,8 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
     polygonized = polygonize(dataset, processing=processing)
     polygon = intersect(base=polygonized, overlay=area, crs=3857)
     polygon.insert(0, "valpop", np.nan)
-    print('on est la')
-    zda = gpd.read_file(polygonized, encoding='windows-1252')
+    print("on est la")
+    zda = gpd.read_file(polygonized, encoding="windows-1252")
     zda.plot()
     polygon.plot()
     i = None
@@ -222,14 +240,18 @@ def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
         # area_pop*10 because the population values are minified by 10
         # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
         # expressed in square kilometers
-        val = polygon.loc[i, 'val']*10
-        percentage = round(polygon.loc[i, 'geometry'].area/(res_x*res_y), 2)
-        polygon.loc[i, 'valpop'] = val*percentage
-    print('{}, {}, {}, {}, {}, {}, {}'.format(len(polygon),
-                                              polygon.loc[i, 'geometry'].area,
-                                              res_x*res_y,
-                                              val,
-                                              percentage,
-                                              polygon['val'].sum(),
-                                              polygon['valpop'].sum()))
-    return polygon['valpop'].sum()
+        val = polygon.loc[i, "val"] * 10
+        percentage = round(polygon.loc[i, "geometry"].area / (res_x * res_y), 2)
+        polygon.loc[i, "valpop"] = val * percentage
+    print(
+        "{}, {}, {}, {}, {}, {}, {}".format(
+            len(polygon),
+            polygon.loc[i, "geometry"].area,
+            res_x * res_y,
+            val,
+            percentage,
+            polygon["val"].sum(),
+            polygon["valpop"].sum(),
+        )
+    )
+    return polygon["valpop"].sum()
