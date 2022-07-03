@@ -28,9 +28,11 @@ from shapely import speedups
 # 1st party
 try:
     from __main__ import run
+    from _version import __version__
     from utils.utils import __set_cfg_val as set_config_value
 except ImportError:
     from .__main__ import run
+    from ._version import __version__
     from .utils.utils import __set_cfg_val as set_config_value
 
 
@@ -56,7 +58,6 @@ cfgparser.read("setup.cfg")
 __package__ = cfgparser.get("metadata", "name")
 __file__ = sys.modules[__name__]
 __doc__ = sys.modules[__name__].__doc__
-__version__ = '0.2.0'
 __license__ = cfgparser.get("metadata", "license")
 __author__ = cfgparser.get("metadata", "author")
 __email__ = cfgparser.get("metadata", "author_email")
