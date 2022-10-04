@@ -40,7 +40,7 @@ except ImportError:
 warnings.filterwarnings("ignore")
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
-config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
+config_file_path = "".join([cfgparser.get("metadata", "name"), "/config.cfg"])
 
 
 def run(
@@ -244,7 +244,7 @@ def main():
             raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, "\n"))
 
     parser = ArgumentParser(
-        prog="$ python {}".format(cfgparser.get("setup", "name")),
+        prog="$ python {}".format(cfgparser.get("metadata", "name")),
         description="",
         add_help=False,
         epilog="\n",
@@ -298,7 +298,7 @@ def main():
         if args.license is True:
             print(cfgparser.get("metadata", "short_license"))
         elif args.description is True:
-            print(cfgparser.get("setup", "description"))
+            print(cfgparser.get("metadata", "description"))
         elif args.config is not None:
             if len(args.config) == 2:
                 var, value = args.config

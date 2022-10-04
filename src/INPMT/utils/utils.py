@@ -32,7 +32,7 @@ filterwarnings("ignore")
 
 cfgparser = ConfigParser()
 cfgparser.read("setup.cfg")
-config_file_path = "".join([cfgparser.get("setup", "name"), "/config.cfg"])
+config_file_path = "src/INPMT/config.cfg"
 
 
 def format_dataset_output(
