@@ -111,7 +111,7 @@ def raster_crop(
     __sf = __read_shapefile(shapefile=shapefile)
     try:
         with rasterio.open(dataset) as src:
-            cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, crop=True)
+            cropped_dataset, output_transform = rasterio.mask.mask(src, __sf, all_touched=True, crop=True)
             output_meta = src.meta
             output_meta.update(
                 {
