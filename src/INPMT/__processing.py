@@ -250,7 +250,7 @@ def get_urban_profile(
     result = pd.DataFrame(columns=cols)
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
-        for i in range(len(gdf_villages)):
+        for i in range(len(gdf_villages[:50])):
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
@@ -282,7 +282,7 @@ def get_urban_profile(
                 dataset=population, shapefile=path_poly, processing=processing_directory
             )
             with rasterio.open(path_pop_aoi) as src:
-                pop = src.read()[np.logical_not(np.isnan(src.read()))].sum()
+                pop = np.nansum(src.read())
             result.loc[i, "POP"] = pop
 
             # Crop the NDVI data to the buffer extent and process it's min, mean and max value
@@ -317,6 +317,7 @@ def get_urban_profile(
                 processing=processing_directory,
                 item_type="paletteEntry",
             )
+
             try:
                 df_gwsd = df_gwsd.pivot_table(
                     columns="Label", values="Proportion (%)", aggfunc="sum"
