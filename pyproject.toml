@@ -1,11 +1,119 @@
+# BUILD ======================================================================
 [build-system]
 requires=[
-    "setuptools>=42",
+    "setuptools>=61.0.0",
     "wheel",
     "setuptools >= 35.0.2",
-    "setuptools_scm >= 2.0.0, <3"
 ]
 build-backend="setuptools.build_meta"
 
-[tool.setuptools_scm]
-fallback_version="999"
+# METADATA ===================================================================
+[project]
+name = 'INPMT'
+license = {file = "LICENSE"}
+description = "Impact of National Parks on Malaria Transmission"
+keywords = ['gis', 'gis-utils', 'tools']
+classifiers = [
+    # How mature is this project? Common values are
+    #   1 - Planning
+    #   2 - Pre-Alpha
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    #   6 - Mature
+    #   7 - Inactive
+    'Development Status :: 1 - Planning',
+    # Indicate who your project is intended for
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'Environment :: Console',
+    'Operating System :: OS Independent',
+    # Pick your license as you wish (should match "license" above)
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    # Specify the Python versions you support here. In particular, ensure
+    # that you indicate whether you support Python 2, Python 3 or both.
+    'Programming Language :: Python :: >3.6<3.10',
+]
+authors = [ { name = "P. MANCHON", email = "pierre.manchon@pm.me" } ]
+urls = { code = "https://github.com/pierre-manchon/INPMT", doc = "" }
+dynamic = ['version', 'readme']
+requires-python = ">=3.4"
+dependencies = [
+    'toml',
+]
+
+[project.optional-dependencies]
+dev = ['pre-commit', 'pytest', 'tox']
+docs = ['docutils>=0.3', 'sphinx']
+
+[tool.setuptools.dynamic]
+version = {attr = 'INPMT._version:__version__'}
+readme = {file = 'README.md'}
+
+# MYPY =======================================================================
+[mypy]
+# Start off with these
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+# Getting these passing should be easy
+strict_equality = true
+strict_concatenate = true
+
+# Strongly recommend enabling this one as soon as you can
+check_untyped_defs = true
+
+# These shouldn't be too much additional work, but may be tricky to
+# get passing if you use a lot of untyped libraries
+disallow_subclassing_any = true
+disallow_untyped_decoratorst = true
+disallow_any_generics = true
+
+# These next few are various gradations of forcing use of type annotations
+disallow_untyped_calls = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+
+# This one isn't too hard to get passing, but return on investment is lower
+no_implicit_reexport = true
+
+# This one can be tricky to get passing if you use a lot of untyped libraries
+warn_return_any = true
+
+# RUFF =======================================================================
+[tool.ruff]
+target-version = "py310"
+line-length = 80
+builtins = ["ellipsis"]
+exclude = ['.eggs', 'docs']
+ignore = [
+    'E402', # module-import-not-at-top-of-file
+    'E501', # line-too-long
+    'E731', # lambda-assignment
+]
+select = [
+    "F", # Pyflakes
+    "E", # Pycodestyle
+    "W",
+    "I", # isort
+    "UP", # Pyupgrade
+]
+
+[tool.ruff.isort]
+known-first-party = ["INPMT"]
+
+# TOX ========================================================================
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+    minversion=4
+    envlist=py{34,35,36,37,38,39,310,311}
+    isolated_build = True
+
+    [testenv]
+    description = Run unit tests
+    deps = pytest
+    commands = pytest {posargs:tests}
+"""
