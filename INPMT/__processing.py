@@ -1,4 +1,3 @@
-# -*-coding: utf8 -*
 """
 INPMT
 A tool to process data to learn more about Impact of National Parks on Malaria Transmission
@@ -20,46 +19,45 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import warnings
-from typing import Any, AnyStr, Optional, SupportsInt
+from typing import Any, AnyStr, SupportsInt
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
-import rasterio
-import rasterio.windows
 from alive_progress import alive_bar
 from geopandas import GeoDataFrame
 from pandas import DataFrame
 
 try:
     from utils.raster import (
-        density,
         get_pixel_count,
-        get_value_from_coord,
         raster_crop,
-        raster_stats,
     )
-    from utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
+    from utils.utils import (
+        __read_qml,
+        __strip,
+        format_dataset_output,
+        get_cfg_val,
+    )
     from utils.vector import (
         __read_shp_as_gdf,
         intersect,
         iter_geoseries_as_geodataframe,
-        merge_touching,
     )
 except ImportError:
-    from .utils.raster import (
-        density,
+    from INPMT.utils.raster import (
         get_pixel_count,
-        get_value_from_coord,
         raster_crop,
-        raster_stats,
     )
-    from .utils.utils import __get_cfg_val, __read_qml, __strip, format_dataset_output
-    from .utils.vector import (
+    from INPMT.utils.utils import (
+        __read_qml,
+        __strip,
+        format_dataset_output,
+        get_cfg_val,
+    )
+    from INPMT.utils.vector import (
         __read_shp_as_gdf,
         intersect,
         iter_geoseries_as_geodataframe,
-        merge_touching,
     )
 
 warnings.filterwarnings("ignore")
@@ -67,7 +65,7 @@ warnings.filterwarnings("ignore")
 
 def get_nearest_park(
     index: SupportsInt, villages: GeoDataFrame, parks: GeoDataFrame
-) -> tuple[Optional[Any], Optional[str], str]:
+) -> tuple[Any | None, str | None, str]:
     """
     For each polygon, I check the distance from the point to the boundary of the polygon and compare it to the minimum
     distance found yet (at the start it's 100000 but it is modified in the first occurrence).
@@ -87,7 +85,7 @@ def get_nearest_park(
     name = None
     loc_np = None
     res_dist = None
-    min_dist = int(__get_cfg_val("min_dist"))
+    min_dist = int(get_cfg_val("min_dist"))
     for y in range(len(parks)):
         dist = parks.loc[y, "geometry"].boundary.distance(
             villages.loc[index, "geometry"]
@@ -95,6 +93,7 @@ def get_nearest_park(
         if dist < min_dist:
             min_dist = dist
             name = parks.loc[y, "NAME"]
+            print(parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"]))
             if (
                 parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"])
                 == 0.0
@@ -139,7 +138,7 @@ def get_landuse(
     __val = None
     __polygon = gpd.read_file(polygon, encoding="windows-1252")
     # Retrieve the legend file's path
-    __data_dir = __get_cfg_val("datasets_storage_path")
+    __data_dir = get_cfg_val("datasets_storage_path")
     __qml_path = os.path.join(__data_dir, legend_filename)
     # Count every pixel from the raster and its value
     # TODO here i retrieve the area by multiplying the width and height resolutions
@@ -229,7 +228,7 @@ def get_urban_profile(
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
     # Retrieves buffer size for the villages patches
-    buffer_villages = int(__get_cfg_val("buffer_villages"))
+    int(get_cfg_val("buffer_villages"))
     # Create a blank DataFrame to receive the result when iterating below
     cols = [
         "ID",
@@ -271,7 +270,7 @@ def get_urban_profile(
             # Coordinates
             result.loc[i, "x"] = p.centroid.x.values[0]
             result.loc[i, "y"] = p.centroid.y.values[0]
-
+            """
             # Format the path for the temporary file
             p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
             path_poly = os.path.join(processing_directory, "".join([p1, pext]))
@@ -349,6 +348,7 @@ def get_urban_profile(
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
                 result.loc[i, df_hd.columns] = np.nan
+            """
             pbar()
     return result
 
@@ -540,7 +540,7 @@ def get_countries_profile(
             bar_main.text("Append")  # Pbar 1st level
             result = result.append(aoi_extract, ignore_index=True)
             bar_main.text("Done")  # Progress bar for the first level
-            print("[{}/{}]".format(i + 1, len(geodataframe_aoi)))
+            print(f"[{i + 1}/{len(geodataframe_aoi)}]")
             bar_main()  # Progress bar for the first level
         # End
         return result, aoi

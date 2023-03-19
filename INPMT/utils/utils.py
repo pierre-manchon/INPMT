@@ -1,4 +1,3 @@
-# -*-coding: utf8 -*
 """
 INPMT
 A tool to process data to learn more about Impact of National Parks on Malaria Transmission
@@ -22,22 +21,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import unicodedata
 import xml.dom.minidom
-from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
-from typing import AnyStr, List, Union
-from warnings import filterwarnings, warn
+from typing import AnyStr
+from warnings import filterwarnings
 
 filterwarnings("ignore")
-
-cfgparser = ConfigParser()
-cfgparser.read("setup.cfg")
-config_file_path = "src/INPMT/config.cfg"
 
 
 def format_dataset_output(
     dataset: AnyStr = "", name: AnyStr = "", ext: AnyStr = "", prevent_duplicate=True
-) -> tuple[str, Union[AnyStr, str], str]:
+) -> tuple[str, AnyStr | str, str]:
     """
     :param dataset: Path to a file
     :type dataset: AnyStr
@@ -91,26 +85,7 @@ def __strip(text: AnyStr) -> tuple[str, str]:
     return str(text), str(text).replace(" ", "_")
 
 
-def __get_cfg_val(value):
-    getcfgparser = ConfigParser()
-    getcfgparser.read(config_file_path, encoding="utf-8")
-    return getcfgparser.get("config", value)
-
-
-def __set_cfg_val(var, value):
-    setcfgparser = ConfigParser(comment_prefixes="///", allow_no_value=True)
-    setcfgparser.read_file(open(config_file_path))
-    try:
-        _ = setcfgparser["config"][var]
-        setcfgparser["config"][var] = value
-        with open(config_file_path, "w") as configfile:
-            setcfgparser.write(configfile)
-    except KeyError:
-        warn("Can't modify non present value", category=SyntaxWarning)
-        print("\n")
-
-
-def __read_qml(path_qml: AnyStr, item_type: AnyStr) -> List:
+def __read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
     for item in xml_data.getElementsByTagName(item_type):

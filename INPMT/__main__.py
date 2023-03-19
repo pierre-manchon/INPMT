@@ -1,4 +1,3 @@
-# -*-coding: utf8 -*
 """
 INPMT
 A tool to process data to learn more about Impact of National Parks on Malaria Transmission
@@ -22,7 +21,6 @@ import argparse
 import os
 import warnings
 from argparse import ArgumentTypeError
-from configparser import ConfigParser
 from shlex import quote as shlex_quote
 from sys import argv, exit, stderr
 from tempfile import TemporaryDirectory
@@ -32,15 +30,16 @@ import numpy as np
 
 try:
     from __processing import get_countries_profile, get_urban_profile
-    from utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
+    from utils.utils import format_dataset_output, get_cfg_val, set_cfg_val
 except ImportError:
-    from .__processing import get_countries_profile, get_urban_profile
-    from .utils.utils import __get_cfg_val, __set_cfg_val, format_dataset_output
+    from INPMT.__processing import get_countries_profile, get_urban_profile
+    from INPMT.utils.utils import (
+        format_dataset_output,
+        get_cfg_val,
+        set_cfg_val,
+    )
 
 warnings.filterwarnings("ignore")
-cfgparser = ConfigParser()
-cfgparser.read("setup.cfg")
-config_file_path = "".join([cfgparser.get("metadata", "name"), "/config.cfg"])
 
 
 def run(
@@ -51,7 +50,8 @@ def run(
     """
     Retrieves the datasets path and executes the functions.
     For the countries, i only execute it like that.
-    For the villages, i execute first after setting the buffer parameter to 500, then i execute it after setting the
+    For the villages, i execute first after setting the buffer parameter to
+        500, then i execute it after setting the
     parameter to 2000. Then i merge the two results.
 
     :param loc:
@@ -65,9 +65,9 @@ def run(
     valid_method = ["countries", "villages"]
     if method not in valid_method:
         raise ValueError(
-            "Invalid method parameter. Expected one of {}".format(valid_method)
+            f"Invalid method parameter. Expected one of {valid_method}"
         )
-    datasets = __get_cfg_val("datasets_storage_path")
+    datasets = get_cfg_val("datasets_storage_path")
     export = os.path.join(datasets, export_dir)
 
     # Raster data
@@ -92,15 +92,17 @@ def run(
         datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp"
     )
     anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
-    anopheles_kyalo_in_national_parks_buffered = os.path.join(
+    os.path.join(
         datasets, "KYALO_anopheles_in_PAs_buffers.shp"
     )  # noqa F841
-    anopheles_kyalo_out_national_parks_buffered = os.path.join(
+    os.path.join(
         datasets, "KYALO_anopheles_out_PAs_buffers.shp"
     )
     national_parks_with_anopheles_kyalo = os.path.join(
         datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp"
     )
+
+    anopheles_kyalo_all_buffered = os.path.join(datasets, "KYALO_anopheles_all_PAs_buffers.shp")
 
     with TemporaryDirectory(prefix="INPMT_") as tmp_directory:
         # Read file as a geodataframe
@@ -112,15 +114,16 @@ def run(
                 anopheles=anopheles_kyalo,
                 processing_directory=tmp_directory,
             )
-            # Retrieves the directory the dataset is in and joins it the output filename
+            # Retrieves the directory the dataset is in and joins it the output
+            # filename
             _, _, output_profiles = format_dataset_output(
                 dataset=export_dir, name="countries_profiles"
             )
             gdf_profiles_aoi.to_file(output_profiles)
         if method == "villages":
-            __set_cfg_val("buffer_villages", "500")
+            set_cfg_val("buffer_villages", "500")
             profile_villages_500 = get_urban_profile(
-                villages=anopheles_kyalo_out_national_parks_buffered,
+                villages=anopheles_kyalo_all_buffered,
                 parks=national_parks_with_anopheles_kyalo,
                 landuse=landuse,
                 population=population,
@@ -131,9 +134,9 @@ def run(
                 processing_directory=tmp_directory,
                 loc=loc,
             )
-            __set_cfg_val("buffer_villages", "2000")
+            set_cfg_val("buffer_villages", "2000")
             profile_villages_2000 = get_urban_profile(
-                villages=anopheles_kyalo_out_national_parks_buffered,
+                villages=anopheles_kyalo_all_buffered,
                 parks=national_parks_with_anopheles_kyalo,
                 landuse=landuse,
                 population=population,
@@ -146,8 +149,10 @@ def run(
             )
 
             # https://stackoverflow.com/a/50865526
-            # Merge the two dataframes in one (side by side) with the column suffix
-            profile_villages = profile_villages_500.reset_index(drop=True).merge(
+            # Merge the two dataframes in one (side by side) with the column
+            # suffix
+            profile_villages = profile_villages_500.reset_index(drop=True
+                                                                ).merge(
                 profile_villages_2000.reset_index(drop=True),
                 left_index=True,
                 right_index=True,
@@ -178,8 +183,11 @@ def run(
             )
             # Change nan values to NULL string
             # https://stackoverflow.com/a/26838140/12258568
-            profile_villages = profile_villages.replace(np.nan, "NULL", regex=True)
-            # Retrieves the directory the dataset is in and joins it the output filename
+            profile_villages = profile_villages.replace(np.nan,
+                                                        "NULL",
+                                                        regex=True)
+            # Retrieves the directory the dataset is in and joins it the output
+            # filename
             _, _, output_urban_profiles = format_dataset_output(
                 dataset=export, name="urban_profiles", ext=".xlsx"
             )
@@ -199,7 +207,8 @@ def main():
 
     class ArgumentParser(argparse.ArgumentParser):
         """Object for parsing command line strings into Python objects.
-        Overridden to print the help whenever an error occurred (For example, no arguments error)
+        Overridden to print the help whenever an error occurred (For example,
+        no arguments error)
 
         Keyword Arguments:
             - prog -- The name of the program (default: sys.argv[0])
@@ -214,9 +223,10 @@ def main():
             - argument_default -- The default value for all arguments
             - conflict_handler -- String indicating how to handle conflicts
             - add_help -- Add a -h/-help option
-            - allow_abbrev -- Allow long options to be abbreviated unambiguously
-            - exit_on_error -- Determines whether or not ArgumentParser exits with
-                error info when an error occurs
+            - allow_abbrev -- Allow long options to be abbreviated
+                unambiguously
+            - exit_on_error -- Determines whether or not ArgumentParser exits
+                with error info when an error occurs
         """
 
         def error(self, message):
@@ -241,10 +251,10 @@ def main():
         if os.path.isfile(normalized_filepath):
             return normalized_filepath
         else:
-            raise ArgumentTypeError('"{}" is not a valid path {}'.format(dirpath, "\n"))
+            raise ArgumentTypeError(f'"{dirpath}" is not a valid path \n')
 
     parser = ArgumentParser(
-        prog="$ python {}".format(cfgparser.get("metadata", "name")),
+        prog="$ python INPMT",
         description="",
         add_help=False,
         epilog="\n",
@@ -269,7 +279,7 @@ def main():
         help="Show the program's license and exit.",
     )
     parser.add_argument(
-        "-c", "--config", nargs="*", help="Read or overwrite local config file."
+        "-c", "--config", nargs="*", help="Read or overwrite local config file"
     )
     parser.add_argument(
         "-m",
@@ -296,17 +306,17 @@ def main():
     # Based on the dest vars execute methods with the arguments
     try:
         if args.license is True:
-            print(cfgparser.get("metadata", "short_license"))
+            print('GPL-3.0')
         elif args.description is True:
-            print(cfgparser.get("metadata", "description"))
+            print('Impact of National Parks on Malaria Transmission')
         elif args.config is not None:
             if len(args.config) == 2:
                 var, value = args.config
-                __set_cfg_val(var, value)
-                with open(config_file_path, "r") as cfg:
+                set_cfg_val(var, value)
+                with open('INPMT/config.cfg') as cfg:
                     print(cfg.read())
             elif len(args.config) == 0:
-                with open(config_file_path, "r") as cfg:
+                with open('INPMT/config.cfg') as cfg:
                     print(cfg.read())
         elif args.method:
             run(method=args.method, export_dir=args.export)
@@ -315,7 +325,8 @@ def main():
         exit(1)
 
 
-# Execute outside the if __name__ == '__main__' because I the main function to be accessible from the entry point in
+# Execute outside the if __name__ == '__main__' because I the main function to
+# be accessible from the entry point in
 # setup.py
 if __name__ == "__main__":
     main()
