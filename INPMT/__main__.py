@@ -30,14 +30,16 @@ import numpy as np
 
 try:
     from __processing import get_countries_profile, get_urban_profile
-    from utils.utils import format_dataset_output, get_cfg_val, set_cfg_val
+    from utils.utils import (format_dataset_output,
+                             get_cfg_val,
+                             set_cfg_val,
+                             config_file_path)
 except ImportError:
     from INPMT.__processing import get_countries_profile, get_urban_profile
-    from INPMT.utils.utils import (
-        format_dataset_output,
-        get_cfg_val,
-        set_cfg_val,
-    )
+    from INPMT.utils.utils import (format_dataset_output,
+                                   get_cfg_val,
+                                   set_cfg_val,
+                                   config_file_path)
 
 warnings.filterwarnings("ignore")
 
@@ -313,10 +315,10 @@ def main():
             if len(args.config) == 2:
                 var, value = args.config
                 set_cfg_val(var, value)
-                with open('INPMT/config.cfg') as cfg:
+                with open(config_file_path) as cfg:
                     print(cfg.read())
             elif len(args.config) == 0:
-                with open('INPMT/config.cfg') as cfg:
+                with open(config_file_path) as cfg:
                     print(cfg.read())
         elif args.method:
             run(method=args.method, export_dir=args.export)

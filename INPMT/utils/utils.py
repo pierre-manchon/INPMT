@@ -19,15 +19,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellaneous cases
 import os
+import configparser
 import unicodedata
 import xml.dom.minidom
 from datetime import datetime
 from pathlib import Path
 from typing import AnyStr
-from warnings import filterwarnings
+from warnings import filterwarnings, warn
 
 filterwarnings("ignore")
-
+config_file_path = 'INPMT/config.cfg'
 
 def format_dataset_output(
     dataset: AnyStr = "", name: AnyStr = "", ext: AnyStr = "", prevent_duplicate=True
@@ -91,3 +92,22 @@ def __read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     for item in xml_data.getElementsByTagName(item_type):
         legend.append([item.getAttribute("value"), item.getAttribute("label")])
     return legend
+
+
+def get_cfg_val(value):
+    getcfgparser = configparser.ConfigParser()
+    getcfgparser.read(config_file_path, encoding="utf-8")
+    return getcfgparser.get("config", value)
+
+
+def set_cfg_val(var, value):
+    setcfgparser = configparser.ConfigParser(comment_prefixes="///", allow_no_value=True)
+    setcfgparser.read_file(open(config_file_path))
+    try:
+        _ = setcfgparser["config"][var]
+        setcfgparser["config"][var] = value
+        with open(config_file_path, "w") as configfile:
+            setcfgparser.write(configfile)
+    except KeyError:
+        warn("Can't modify non present value", category=SyntaxWarning)
+        print("\n")
