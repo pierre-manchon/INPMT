@@ -42,10 +42,7 @@ about:
   license_file: LICENSE
   summary: 'Impact of National Parks on Malaria Transmission'
   description: |
-    SISPPEO is an open source project and Python package (with a CLI)
-    allowing one to extract synthetic information useful for Earth observation
-    (Water and Land) from satellite optical imagery (e.g, Sentinel-2/MSI,
-    Sentinel-3/OLCI, Landsat 8/OLI…).
+    Impact of National Parks on Malaria Transmission
 
 extra:
   recipe-maintainers:
