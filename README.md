@@ -9,6 +9,13 @@ Impact of National Parks on Malaria Transmission
 You need to have every type of data specified [here](#data) downloaded and stored in whatever directory you choose.
 Then you'll need to specify the directory link in the config file.
 
+### Installation
+
+With conda:
+```shell
+conda env create -f environment.yml
+```
+
 ### Configure
 1. CLI in the package directory: `python INPMT`:
 
