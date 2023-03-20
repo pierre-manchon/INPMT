@@ -17,5 +17,5 @@ license: "GPL-3.0"
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/pierre-manchon/INPMT/"
 title: INPMT
-version: "v0.2.0"
+version: "v0.2.2"
 ...

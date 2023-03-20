@@ -145,10 +145,6 @@ def get_landuse(
     #  => need to get the pixels area for each pixel here
     df_hab_div = get_pixel_count(dataset_path=dataset, processing=processing)
     # Format the .qml file path from the dataset path
-    # TODO NBR habitats column != Habitats columns: two back columns not inserted?
-    # TODO val 200 unknown but normally present = legend does not list it?
-    # TODO Snow ice and no data are not inserted: merged with other columns?
-    # TODO Might improve performance by associating the label when searching for the categories
     __style = __read_qml(path_qml=__qml_path, item_type=item_type)
     for m, r in df_hab_div.iterrows():
         for n in __style:
