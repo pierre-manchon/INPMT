@@ -49,8 +49,7 @@ If you choose to use your own data you'll need to provide:
 Github repo is organized as follow:
 
     INPMT/
-    ├──dependencies/: specific gdal wheel and requirements file
+    ├──conda/: specific conda installation files
     ├──docs/: graphs and xml files from drawio
     ├──INPMT/: Python script developped to process and analyse the data
     │   └──__utils/: Python functions developped to ease the readability and processing
-    ├──test/: test files for gdal + gdal based packages and import
