@@ -23,19 +23,23 @@ from tempfile import TemporaryDirectory
 from typing import AnyStr
 
 import numpy as np
+import rioxarray as rxr
+import xarray as xr
 
 try:
     from __processing import get_countries_profile, get_urban_profile
-    from utils.utils import (format_dataset_output,
-                             get_cfg_val,
-                             set_cfg_val,
-                             config_file_path)
+    from utils.utils import (
+        format_dataset_output,
+        get_cfg_val,
+        set_cfg_val,
+    )
 except ImportError:
     from INPMT.__processing import get_countries_profile, get_urban_profile
-    from INPMT.utils.utils import (format_dataset_output,
-                                   get_cfg_val,
-                                   set_cfg_val,
-                                   config_file_path)
+    from INPMT.utils.utils import (
+        format_dataset_output,
+        get_cfg_val,
+        set_cfg_val,
+    )
 
 warnings.filterwarnings("ignore")
 
@@ -68,38 +72,23 @@ def run(
     datasets = get_cfg_val("datasets_storage_path")
     export = os.path.join(datasets, export_dir)
 
-    # Raster data
-    population = os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif")
-    landuse = os.path.join(
-        datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"
-    )
-    ndvi = os.path.join(
-        datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif"
-    )
-    swi = os.path.join(
-        datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif"
-    )
-    gws = os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif")
-    prevalence = os.path.join(
-        datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"
-    )
+    # Convert all raster data as an xarray Dataset
+    population = rxr.open_rasterio(os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif"))
+    landuse = rxr.open_rasterio(os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"))
+    ndvi = rxr.open_rasterio(os.path.join(datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif"))
+    swi = rxr.open_rasterio(os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif"))
+    gws = rxr.open_rasterio(os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif"))
+    prevalence = rxr.open_rasterio(os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"))
+    xr.combine_by_coords([population, landuse, ndvi, swi, gws])
+    del population, landuse, ndvi, swi, gws, prevalence
 
-    # Vector data
+    # Convert all vector data as a WKT geometry
     irish = os.path.join(datasets, "IRISH_countries.shp")
-    landuse_polygonized = os.path.join(
-        datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp"
-    )
+    landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
     anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
-    os.path.join(
-        datasets, "KYALO_anopheles_in_PAs_buffers.shp"
-    )  # noqa F841
-    os.path.join(
-        datasets, "KYALO_anopheles_out_PAs_buffers.shp"
-    )
-    national_parks_with_anopheles_kyalo = os.path.join(
-        datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp"
-    )
-
+    os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
+    os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
+    national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
     anopheles_kyalo_all_buffered = os.path.join(datasets, "KYALO_anopheles_all_PAs_buffers.shp")
 
     with TemporaryDirectory(prefix="INPMT_") as tmp_directory:
