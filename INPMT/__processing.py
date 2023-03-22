@@ -162,7 +162,12 @@ def get_landuse(
 def get_urban_profile(
     villages: AnyStr,
     parks: AnyStr,
-    dataset: xr.Dataset,
+    population: xr.Dataset,
+    landuse: xr.Dataset,
+    ndvi: xr.Dataset,
+    swi: xr.Dataset,
+    gws: xr.Dataset,
+    prevalence: xr.Dataset,
     loc: bool = True,
 ) -> DataFrame:
     """
@@ -195,8 +200,20 @@ def get_urban_profile(
     :type villages: AnyStr
     :param parks: Path to the shapefile
     :type parks: AnyStr
-    :param dataset: A Dataset with every type of data in it
-    :type dataset: xr.Dataset
+    :param population: A Dataset with every type of data in it
+    :type population: xr.Dataset
+    :param population: A Dataset with every type of data in it
+    :type population: xr.Dataset
+    :param landuse: A Dataset with every type of data in it
+    :type landuse: xr.Dataset
+    :param ndvi: A Dataset with every type of data in it
+    :type ndvi: xr.Dataset
+    :param swi: A Dataset with every type of data in it
+    :type swi: xr.Dataset
+    :param gws: A Dataset with every type of data in it
+    :type gws: xr.Dataset
+    :param prevalence: A Dataset with every type of data in it
+    :type prevalence: xr.Dataset
     :return: A DataFrame of the processed values
     :rtype: DataFrame
     """
@@ -250,9 +267,13 @@ def get_urban_profile(
             result.loc[i, "y"] = geom.centroid.y
 
             # RESOLUTION IS 100 METERS SO A BUFFER
-            dataset.sel(x=slice(xmin, ymin),
-                        y=slice(xmax, ymax),
-                        method='nearest')
+            datasets = [population.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
+                        landuse.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
+                        ndvi.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
+                        swi.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
+                        gws.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
+                        prevalence.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))]
+            dataset = xr.merge(datasets, compat='minimal', combine_attrs='drop')
 
             result.loc[i, "POP"] = dataset['population'].sum(skipna=True)
 
