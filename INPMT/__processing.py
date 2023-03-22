@@ -163,7 +163,6 @@ def get_urban_profile(
     villages: AnyStr,
     parks: AnyStr,
     dataset: xr.Dataset,
-    processing_directory: AnyStr,
     loc: bool = True,
 ) -> DataFrame:
     """
@@ -198,8 +197,6 @@ def get_urban_profile(
     :type parks: AnyStr
     :param dataset: A Dataset with every type of data in it
     :type dataset: xr.Dataset
-    :param processing_directory: Path to the temporary directory used to store temporary files (then deleted)
-    :type processing_directory: AnyStr
     :return: A DataFrame of the processed values
     :rtype: DataFrame
     """
@@ -210,7 +207,6 @@ def get_urban_profile(
     gdf_villages.crs = 3857
     gdf_parks.crs = 3857
     # Retrieves buffer size for the villages patches
-    int(get_cfg_val("buffer_villages"))
     # Create a blank DataFrame to receive the result when iterating below
     cols = [
         "ID",
@@ -235,28 +231,27 @@ def get_urban_profile(
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
+
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
             if loc:
-                res_dist, loc_np, np_name = get_nearest_park(
-                    index=i, parks=gdf_parks, villages=gdf_villages
-                )
+                res_dist, loc_np, np_name = get_nearest_park(index=i, parks=gdf_parks, villages=gdf_villages)
                 result.loc[i, "NP"] = np_name
                 result.loc[i, "loc_NP"] = loc_np
                 result.loc[i, "dist_NP"] = round(res_dist, 3)
-            # Transform the GeoSeries as a GeoDataFrame
-            p = gpd.GeoDataFrame(gpd.GeoSeries(gdf_villages.iloc[i]["geometry"]))
-            p = p.rename(columns={0: "geometry"}).set_geometry("geometry")
-            p.crs = 3857
+
+            # Geometry
+            geom = gdf_villages.iloc[i]["geometry"]
+            geom = geom.buffer(int(get_cfg_val("buffer_villages")))
+            xmin, ymin, xmax, ymax = geom.bounds
 
             # Coordinates
-            result.loc[i, "x"] = p.centroid.x.values[0]
-            result.loc[i, "y"] = p.centroid.y.values[0]
+            result.loc[i, "x"] = geom.centroid.x
+            result.loc[i, "y"] = geom.centroid.y
 
-            # NEW
             # RESOLUTION IS 100 METERS SO A BUFFER
-            dataset.sel(x=slice(-3.481e+06, 4.824e+06),
-                        y=slice(-3.48e+06, 4.824e+06),
+            dataset.sel(x=slice(xmin, ymin),
+                        y=slice(xmax, ymax),
                         method='nearest')
 
             result.loc[i, "POP"] = dataset['population'].sum(skipna=True)
@@ -275,39 +270,9 @@ def get_urban_profile(
             # and 100.
             result.loc[i, "PREVALENCE"] = dataset['prevalence'].sum(skipna=True) * 100
 
-            _, _, path_qml_gws = format_dataset_output(dataset=gws, ext=".qml")
-            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
-            df_gwsd, _ = get_landuse(polygon=path_poly,
-                                     dataset=path_gws_aoi,
-                                     legend_filename=path_qml_gws,
-                                     processing=processing_directory,
-                                     item_type="paletteEntry")
-
-            try:
-                df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
-                df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
-            except KeyError:
-                result.loc[i, df_gwsd.columns] = np.nan
-                pass
-
-            # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
-            _, _, path_qml_landuse = format_dataset_output(dataset=landuse, ext=".qml")
-            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
-            df_hd, len_ctr = get_landuse(polygon=path_poly,
-                                         dataset=path_landuse_aoi,
-                                         legend_filename=path_qml_landuse,
-                                         processing=processing_directory,
-                                         item_type="item")
+            result.loc[i, gws.columns] = gws.loc[i, :].values
             result.loc[i, "HAB_DIV"] = len_ctr
-            try:
-                df_hd = df_hd.pivot_table(
-                    columns="Label", values="Proportion (%)", aggfunc="sum"
-                )  # noqa
-                df_hd.rename(index={"Proportion (%)": int(i)}, inplace=True)
-                result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
-            except KeyError:
-                result.loc[i, df_hd.columns] = np.nan
+            result.loc[i, hd.columns] = hd.loc[i, :].values
             pbar()
     return result
 
