@@ -23,6 +23,7 @@ from typing import Any, AnyStr, SupportsInt
 
 import geopandas as gpd
 import pandas as pd
+import xarray as xr
 from alive_progress import alive_bar
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -161,12 +162,7 @@ def get_landuse(
 def get_urban_profile(
     villages: AnyStr,
     parks: AnyStr,
-    landuse: AnyStr,
-    population: AnyStr,
-    ndvi: AnyStr,
-    swi: AnyStr,
-    gws: AnyStr,
-    prevalence: AnyStr,
+    dataset: xr.Dataset,
     processing_directory: AnyStr,
     loc: bool = True,
 ) -> DataFrame:
@@ -200,18 +196,8 @@ def get_urban_profile(
     :type villages: AnyStr
     :param parks: Path to the shapefile
     :type parks: AnyStr
-    :param landuse: Path to the dataset file
-    :type landuse: AnyStr
-    :param population: Path to the dataset file
-    :type population: AnyStr
-    :param ndvi: Path to the dataset file
-    :type ndvi: AnyStr
-    :param swi: Path to the dataset file
-    :type swi: AnyStr
-    :param gws: Path to the dataset file
-    :type gws: AnyStr
-    :param prevalence: Path to the dataset file
-    :type prevalence: AnyStr
+    :param dataset: A Dataset with every type of data in it
+    :type dataset: xr.Dataset
     :param processing_directory: Path to the temporary directory used to store temporary files (then deleted)
     :type processing_directory: AnyStr
     :return: A DataFrame of the processed values
@@ -266,57 +252,39 @@ def get_urban_profile(
             # Coordinates
             result.loc[i, "x"] = p.centroid.x.values[0]
             result.loc[i, "y"] = p.centroid.y.values[0]
-            """
-            # Format the path for the temporary file
-            p1, pext, _ = format_dataset_output(dataset=villages, name="tmp")
-            path_poly = os.path.join(processing_directory, "".join([p1, pext]))
 
-            # Create a buffer of the village centroid
-            p.buffer(buffer_villages).to_file(path_poly)
-            path_pop_aoi = raster_crop(
-                dataset=population, shapefile=path_poly, processing=processing_directory
-            )
-            with rasterio.open(path_pop_aoi) as src:
-                pop = np.nansum(src.read())
-            result.loc[i, "POP"] = pop
+            # NEW
+            # RESOLUTION IS 100 METERS SO A BUFFER
+            dataset.sel(x=slice(-3.481e+06, 4.824e+06),
+                        y=slice(-3.48e+06, 4.824e+06),
+                        method='nearest')
 
-            # Crop the NDVI data to the buffer extent and process it's min, mean and max value
-            path_ndvi_aoi = raster_crop(
-                dataset=ndvi, shapefile=path_poly, processing=processing_directory
-            )
-            _, ndvi_min, ndvi_mean, ndvi_max = raster_stats(dataset=path_ndvi_aoi)
-            # I divide by 10 000 because Normalized Difference Vegetation Index is usually between -1 and 1.
-            result.loc[i, "NDVI_min"] = ndvi_min / 10000
-            result.loc[i, "NDVI_mean"] = ndvi_mean / 10000
-            result.loc[i, "NDVI_max"] = ndvi_max / 10000
+            result.loc[i, "POP"] = dataset['population'].sum(skipna=True)
 
-            val_swi = get_value_from_coord(index=i, dataset=swi, shapefile=gdf_villages)
-            # https://land.copernicus.eu/global/products/SWI I divide by a 2 because SWI data must be between 0
-            # and 100.
-            result.loc[i, "SWI"] = val_swi / 2
-            val_prevalence = get_value_from_coord(
-                index=i, dataset=prevalence, shapefile=gdf_villages
-            )
+            # I divide by 10 000 because Normalized Difference Vegetation
+            # Index is usually between -1 and 1.
+            result.loc[i, "NDVI_min"] = dataset['ndvi'].min(skipna=True) / 10000
+            result.loc[i, "NDVI_mean"] = dataset['ndvi'].mean(skipna=True) / 10000
+            result.loc[i, "NDVI_max"] = dataset['ndvi'].max(skipna=True) / 10000
+
+            # https://land.copernicus.eu/global/products/SWI I divide by a 2
+            # because SWI data must be between 0 and 100.
+            result.loc[i, "SWI"] = dataset['swi'].sum(skipna=True) / 2
+
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
-            result.loc[i, "PREVALENCE"] = val_prevalence * 100
+            result.loc[i, "PREVALENCE"] = dataset['prevalence'].sum(skipna=True) * 100
 
             _, _, path_qml_gws = format_dataset_output(dataset=gws, ext=".qml")
-            path_gws_aoi = raster_crop(
-                dataset=gws, shapefile=path_poly, processing=processing_directory
-            )
-            df_gwsd, _ = get_landuse(
-                polygon=path_poly,
-                dataset=path_gws_aoi,
-                legend_filename=path_qml_gws,
-                processing=processing_directory,
-                item_type="paletteEntry",
-            )
+            path_gws_aoi = raster_crop(dataset=gws, shapefile=path_poly, processing=processing_directory)
+            df_gwsd, _ = get_landuse(polygon=path_poly,
+                                     dataset=path_gws_aoi,
+                                     legend_filename=path_qml_gws,
+                                     processing=processing_directory,
+                                     item_type="paletteEntry")
 
             try:
-                df_gwsd = df_gwsd.pivot_table(
-                    columns="Label", values="Proportion (%)", aggfunc="sum"
-                )
+                df_gwsd = df_gwsd.pivot_table(columns="Label", values="Proportion (%)", aggfunc="sum")
                 df_gwsd.rename(index={"Proportion (%)": int(i)}, inplace=True)
                 result.loc[i, df_gwsd.columns] = df_gwsd.loc[i, :].values
             except KeyError:
@@ -325,16 +293,12 @@ def get_urban_profile(
 
             # Crop the landuse data and make stats out of it, add those stats as new columns for each lines
             _, _, path_qml_landuse = format_dataset_output(dataset=landuse, ext=".qml")
-            path_landuse_aoi = raster_crop(
-                dataset=landuse, shapefile=path_poly, processing=processing_directory
-            )
-            df_hd, len_ctr = get_landuse(
-                polygon=path_poly,
-                dataset=path_landuse_aoi,
-                legend_filename=path_qml_landuse,
-                processing=processing_directory,
-                item_type="item",
-            )
+            path_landuse_aoi = raster_crop(dataset=landuse, shapefile=path_poly, processing=processing_directory)
+            df_hd, len_ctr = get_landuse(polygon=path_poly,
+                                         dataset=path_landuse_aoi,
+                                         legend_filename=path_qml_landuse,
+                                         processing=processing_directory,
+                                         item_type="item")
             result.loc[i, "HAB_DIV"] = len_ctr
             try:
                 df_hd = df_hd.pivot_table(
@@ -344,7 +308,6 @@ def get_urban_profile(
                 result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
             except KeyError:
                 result.loc[i, df_hd.columns] = np.nan
-            """
             pbar()
     return result
 
