@@ -79,7 +79,14 @@ def run(
     swi = rxr.open_rasterio(os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif"))
     gws = rxr.open_rasterio(os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif"))
     prevalence = rxr.open_rasterio(os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"))
-    xr.combine_by_coords([population, landuse, ndvi, swi, gws])
+    lst = [population.rename({"band": 'population'}).chunk(),
+           landuse.rename({"band": 'landuse'}).chunk(),
+           ndvi.rename({"band": 'ndvi'}).chunk(),
+           swi.rename({"band": 'swi'}).chunk(),
+           gws.rename({"band": 'gws'}).chunk(),
+           prevalence.rename({"band": 'prevalence'}).chunk()]
+    lazy_concat = xr.concat(objs=lst, dim='band', coords='minimal')
+
     del population, landuse, ndvi, swi, gws, prevalence
 
     # Convert all vector data as a WKT geometry
@@ -112,28 +119,14 @@ def run(
             profile_villages_500 = get_urban_profile(
                 villages=anopheles_kyalo_all_buffered,
                 parks=national_parks_with_anopheles_kyalo,
-                landuse=landuse,
-                population=population,
-                ndvi=ndvi,
-                swi=swi,
-                gws=gws,
-                prevalence=prevalence,
-                processing_directory=tmp_directory,
-                loc=loc,
-            )
+                dataset=ds,
+                loc=loc)
             set_cfg_val("buffer_villages", "2000")
             profile_villages_2000 = get_urban_profile(
                 villages=anopheles_kyalo_all_buffered,
                 parks=national_parks_with_anopheles_kyalo,
-                landuse=landuse,
-                population=population,
-                ndvi=ndvi,
-                swi=swi,
-                gws=gws,
-                prevalence=prevalence,
-                processing_directory=tmp_directory,
-                loc=loc,
-            )
+                dataset=ds,
+                loc=loc)
 
             # https://stackoverflow.com/a/50865526
             # Merge the two dataframes in one (side by side) with the column
