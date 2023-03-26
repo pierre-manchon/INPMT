@@ -94,7 +94,6 @@ def get_nearest_park(
         if dist < min_dist:
             min_dist = dist
             name = parks.loc[y, "NAME"]
-            print(parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"]))
             if (
                 parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"])
                 == 0.0
@@ -217,6 +216,8 @@ def get_urban_profile(
     :return: A DataFrame of the processed values
     :rtype: DataFrame
     """
+    BUFFER_500 = 500
+    BUFFER_2000 = 2000
     # Read the shapefiles as GeoDataFrames
     gdf_villages = gpd.read_file(villages, encoding="windows-1252")
     gdf_parks = gpd.read_file(parks, encoding="windows-1252")
@@ -259,41 +260,64 @@ def get_urban_profile(
 
             # Geometry
             geom = gdf_villages.iloc[i]["geometry"]
-            geom = geom.buffer(int(get_cfg_val("buffer_villages")))
-            xmin, ymin, xmax, ymax = geom.bounds
+            geom_500 = geom.buffer(BUFFER_500)
+            geom_2000 = geom.buffer(BUFFER_2000)
+            xmin500, ymin500, xmax500, ymax500 = geom_500.bounds
+            xmin2000, ymin2000, xmax2000, ymax2000 = geom_2000.bounds
 
             # Coordinates
-            result.loc[i, "x"] = geom.centroid.x
-            result.loc[i, "y"] = geom.centroid.y
+            result.loc[i, "x"] = geom_500.centroid.x
+            result.loc[i, "y"] = geom_500.centroid.y
 
+            print(village_id, np_name, loc_np, res_dist,
+            [xmin500, ymin500, xmax500, ymax500],
+            [xmin2000, ymin2000, xmax2000, ymax2000])
             # RESOLUTION IS 100 METERS SO A BUFFER
-            datasets = [population.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
-                        landuse.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
-                        ndvi.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
-                        swi.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
-                        gws.sel(x=slice(xmin, xmax), y=slice(ymin, ymax)),
-                        prevalence.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))]
-            dataset = xr.merge(datasets, compat='minimal', combine_attrs='drop')
+            # For 500 meters
+            datasets_sliced_500 = [population.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
+                                   landuse.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
+                                   ndvi.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
+                                   swi.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
+                                   gws.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
+                                   prevalence.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk()]
+            dataset_500 = xr.merge(datasets_sliced_500)
+            # For 2000 meters
+            datasets_sliced_2000 = [population.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
+                                   landuse.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
+                                   ndvi.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
+                                   swi.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
+                                   gws.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
+                                   prevalence.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk()]
+            dataset_2000 = xr.merge(datasets_sliced_2000)
 
-            result.loc[i, "POP"] = dataset['population'].sum(skipna=True)
+            result.loc[i, "POP_500"] = dataset_500['population'].sum(skipna=True).values
+            result.loc[i, "POP_2000"] = dataset_2000['population'].sum(skipna=True).values
 
             # I divide by 10 000 because Normalized Difference Vegetation
             # Index is usually between -1 and 1.
-            result.loc[i, "NDVI_min"] = dataset['ndvi'].min(skipna=True) / 10000
-            result.loc[i, "NDVI_mean"] = dataset['ndvi'].mean(skipna=True) / 10000
-            result.loc[i, "NDVI_max"] = dataset['ndvi'].max(skipna=True) / 10000
+            # For 500 meters
+            result.loc[i, "NDVI_min_500"] = dataset_500['ndvi'].min(skipna=True) / 10000
+            result.loc[i, "NDVI_mean_500"] = dataset_500['ndvi'].mean(skipna=True) / 10000
+            result.loc[i, "NDVI_max_500"] = dataset_500['ndvi'].max(skipna=True) / 10000
+            # For 2000 meters
+            result.loc[i, "NDVI_min_2000"] = dataset_2000['ndvi'].min(skipna=True) / 10000
+            result.loc[i, "NDVI_mean_2000"] = dataset_2000['ndvi'].mean(skipna=True) / 10000
+            result.loc[i, "NDVI_max_2000"] = dataset_2000['ndvi'].max(skipna=True) / 10000
 
             # https://land.copernicus.eu/global/products/SWI I divide by a 2
             # because SWI data must be between 0 and 100.
-            result.loc[i, "SWI"] = dataset['swi'].sum(skipna=True) / 2
+            result.loc[i, "SWI_500"] = dataset_500['swi'].sum(skipna=True) / 2
+            result.loc[i, "SWI_2000"] = dataset_2000['swi'].sum(skipna=True) / 2
 
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
-            result.loc[i, "PREVALENCE"] = dataset['prevalence'].sum(skipna=True) * 100
-
+            result.loc[i, "PREVALENCE_500"] = dataset_500['prevalence'].sum(skipna=True) * 100
+            result.loc[i, "PREVALENCE_2000"] = dataset_2000['prevalence'].sum(skipna=True) * 100
+            """
             result.loc[i, gws.columns] = gws.loc[i, :].values
             result.loc[i, "HAB_DIV"] = len_ctr
             result.loc[i, hd.columns] = hd.loc[i, :].values
+            """
             pbar()
     return result
 

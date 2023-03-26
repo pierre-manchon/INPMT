@@ -22,23 +22,19 @@ import warnings
 from tempfile import TemporaryDirectory
 from typing import AnyStr
 
-import numpy as np
 import rioxarray as rxr
-import xarray as xr
 
 try:
     from __processing import get_countries_profile, get_urban_profile
     from utils.utils import (
         format_dataset_output,
         get_cfg_val,
-        set_cfg_val,
     )
 except ImportError:
     from INPMT.__processing import get_countries_profile, get_urban_profile
     from INPMT.utils.utils import (
         format_dataset_output,
         get_cfg_val,
-        set_cfg_val,
     )
 
 warnings.filterwarnings("ignore")
@@ -72,7 +68,7 @@ def run(
     datasets = get_cfg_val("datasets_storage_path")
     export = os.path.join(datasets, export_dir)
 
-    # Convert all raster data as an xarray Dataset
+    # Convert all raster data as xarray DataArrays
     population = rxr.open_rasterio(os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif"))
     landuse = rxr.open_rasterio(os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"))
     ndvi = rxr.open_rasterio(os.path.join(datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif"))
@@ -120,8 +116,7 @@ def run(
             )
             gdf_profiles_aoi.to_file(output_profiles)
         if method == "villages":
-            set_cfg_val("buffer_villages", "500")
-            profile_villages_500 = get_urban_profile(
+            profile_villages = get_urban_profile(
                 villages=anopheles_kyalo_all_buffered,
                 parks=national_parks_with_anopheles_kyalo,
                 population=population,
@@ -131,60 +126,10 @@ def run(
                 gws=gws,
                 prevalence=prevalence,
                 loc=loc)
-            set_cfg_val("buffer_villages", "2000")
-            profile_villages_2000 = get_urban_profile(
-                villages=anopheles_kyalo_all_buffered,
-                parks=national_parks_with_anopheles_kyalo,
-                population=population,
-                landuse=landuse,
-                ndvi=ndvi,
-                swi=swi,
-                gws=gws,
-                prevalence=prevalence,
-                loc=loc)
-
-            # https://stackoverflow.com/a/50865526
-            # Merge the two dataframes in one (side by side) with the column
-            # suffix
-            profile_villages = profile_villages_500.reset_index(drop=True
-                                                                ).merge(
-                profile_villages_2000.reset_index(drop=True),
-                left_index=True,
-                right_index=True,
-                suffixes=("_500", "_2000"),
-            )
-            # Rename and delete the duplicated columns
-            profile_villages.rename(
-                columns={
-                    "ID_500": "ID",
-                    "x_500": "x",
-                    "y_500": "y",
-                    "NP_500": "NP",
-                    "loc_NP_500": "loc_NP",
-                    "dist_NP_500": "dist_NP",
-                },
-                inplace=True,
-            )
-            profile_villages = profile_villages.drop(
-                [
-                    "ID_2000",
-                    "x_2000",
-                    "y_2000",
-                    "NP_2000",
-                    "loc_NP_2000",
-                    "dist_NP_2000",
-                ],
-                axis=1,
-            )
-            # Change nan values to NULL string
-            # https://stackoverflow.com/a/26838140/12258568
-            profile_villages = profile_villages.replace(np.nan,
-                                                        "NULL",
-                                                        regex=True)
             # Retrieves the directory the dataset is in and joins it the output
             # filename
-            _, _, output_urban_profiles = format_dataset_output(
-                dataset=export, name="urban_profiles", ext=".xlsx"
+            _, _, output_vilages_profiles = format_dataset_output(
+                dataset=export, name="village_profiles", ext=".xlsx"
             )
-            profile_villages.to_excel(output_urban_profiles)
+            profile_villages.to_excel(output_vilages_profiles)
             print("Jesus was black.")
