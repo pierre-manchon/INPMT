@@ -76,13 +76,7 @@ def run(
     gws = rxr.open_rasterio(os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif"))
     prevalence = rxr.open_rasterio(os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"))
 
-    population = population.rename({"band": 'population'}).chunk()
-    landuse = landuse.rename({"band": 'landuse'}).chunk()
-    ndvi = ndvi.rename({"band": 'ndvi'}).chunk()
-    swi = swi.rename({"band": 'swi'}).chunk()
-    gws = gws.rename({"band": 'gws'}).chunk()
-    prevalence = prevalence.rename({"band": 'prevalence'}).chunk()
-
+    # Add name attribute
     population.name = 'population'
     landuse.name = 'landuse'
     ndvi.name = 'ndvi'
