@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import warnings
-from typing import Any, AnyStr, SupportsInt
+from typing import Any, AnyStr
 
 import geopandas as gpd
 import pandas as pd
@@ -65,7 +65,8 @@ warnings.filterwarnings("ignore")
 
 
 def get_nearest_park(
-    index: SupportsInt, villages: GeoDataFrame, parks: GeoDataFrame
+        parks: GeoDataFrame,
+        geom_villages: GeoDataFrame
 ) -> tuple[Any | None, str | None, str]:
     """
     For each polygon, I check the distance from the point to the boundary of the polygon and compare it to the minimum
@@ -73,11 +74,8 @@ def get_nearest_park(
     Every time a distance is smaller, the minimum distance it's reset.
     Every time the distance from point to the centroid of the polygon equals 0, it means the polygon of villages is
     inside the polygon of parks. In these cases I set it as a negative value.
-
-    :param index: Row index
-    :type: index: SupportsInt
-    :param villages: A GeoDataFrame of the locations of mosquito counts of Africa
-    :type: villages: GeoDataFrame
+    :param geom_villages: A GeoDataFrame of the locations of mosquito counts of Africa
+    :type: geom_villages: GeoDataFrame
     :param parks: A GeoDataFrame of the national parks of Africa
     :type: parks: GeoDataFrame
     :return: A DataFrame of the result
@@ -86,28 +84,19 @@ def get_nearest_park(
     name = None
     loc_np = None
     res_dist = None
-    min_dist = int(get_cfg_val("min_dist"))
-    for y in range(len(parks)):
-        dist = parks.loc[y, "geometry"].boundary.distance(
-            villages.loc[index, "geometry"]
-        )
+    min_dist = 1000000000000000
+    for i in range(len(parks)):
+        dist = parks.loc[i, "geometry"].boundary.distance(geom_villages.centroid)
         if dist < min_dist:
             min_dist = dist
-            name = parks.loc[y, "NAME"]
-            if (
-                parks.loc[y, "geometry"].distance(villages.loc[index, "geometry"])
-                == 0.0
-            ):
+            name = parks.loc[i, "NAME"]
+            if parks.loc[i, "geometry"].contains(geom_villages):
                 res_dist = -min_dist
                 loc_np = "P"
             else:
                 res_dist = min_dist
                 loc_np = "B"
-    try:
-        _, np_name = __strip(name)
-    except TypeError:
-        np_name = "Not defined"
-    return res_dist, loc_np, np_name
+    return res_dist, loc_np, name
 
 
 def get_landuse(
@@ -216,14 +205,12 @@ def get_urban_profile(
     :return: A DataFrame of the processed values
     :rtype: DataFrame
     """
-    BUFFER_500 = 500
-    BUFFER_2000 = 2000
+    buffer_500 = 500
+    buffer_2000 = 2000
     # Read the shapefiles as GeoDataFrames
-    gdf_villages = gpd.read_file(villages, encoding="windows-1252")
-    gdf_parks = gpd.read_file(parks, encoding="windows-1252")
+    gdf_villages = gpd.read_file(villages)
+    gdf_parks = gpd.read_file(parks)
     # Set the projection to 3857 to have distance, etc as meters
-    gdf_villages.crs = 3857
-    gdf_parks.crs = 3857
     # Retrieves buffer size for the villages patches
     # Create a blank DataFrame to receive the result when iterating below
     cols = [
@@ -258,28 +245,27 @@ def get_urban_profile(
             result.loc[i, "ID"] = village_id
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
 
+            # Geometry
+            geom = gdf_villages.loc[i, "geometry"]
+            geom_500 = geom.buffer(buffer_500)
+            geom_2000 = geom.buffer(buffer_2000)
+            xmin500, ymin500, xmax500, ymax500 = geom_500.bounds
+            xmin2000, ymin2000, xmax2000, ymax2000 = geom_2000.bounds
+
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
             if loc:
-                res_dist, loc_np, np_name = get_nearest_park(index=i, parks=gdf_parks, villages=gdf_villages)
+                res_dist, loc_np, np_name = get_nearest_park(parks=gdf_parks, geom_villages=geom_2000)
                 result.loc[i, "NP"] = np_name
                 result.loc[i, "loc_NP"] = loc_np
                 result.loc[i, "dist_NP"] = round(res_dist, 3)
-
-            # Geometry
-            geom = gdf_villages.iloc[i]["geometry"]
-            geom_500 = geom.buffer(BUFFER_500)
-            geom_2000 = geom.buffer(BUFFER_2000)
-            xmin500, ymin500, xmax500, ymax500 = geom_500.bounds
-            xmin2000, ymin2000, xmax2000, ymax2000 = geom_2000.bounds
 
             # Coordinates
             result.loc[i, "x"] = geom_500.centroid.x
             result.loc[i, "y"] = geom_500.centroid.y
 
-            print(village_id, np_name, loc_np, res_dist,
-            [xmin500, ymin500, xmax500, ymax500],
-            [xmin2000, ymin2000, xmax2000, ymax2000])
+            #print(village_id, np_name, loc_np, res_dist, [xmin500, ymin500, xmax500, ymax500], [xmin2000, ymin2000, xmax2000, ymax2000])
+            """
             # RESOLUTION IS 100 METERS SO A BUFFER
             # For 500 meters
             datasets_sliced_500 = [population.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
@@ -321,7 +307,7 @@ def get_urban_profile(
             # and 100.
             result.loc[i, "PREVALENCE_500"] = dataset_500['prevalence'].sum(skipna=True) * 100
             result.loc[i, "PREVALENCE_2000"] = dataset_2000['prevalence'].sum(skipna=True) * 100
-            """
+
             result.loc[i, gws.columns] = gws.loc[i, :].values
             result.loc[i, "HAB_DIV"] = len_ctr
             result.loc[i, hd.columns] = hd.loc[i, :].values

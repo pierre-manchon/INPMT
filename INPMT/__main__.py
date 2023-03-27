@@ -91,7 +91,8 @@ def run(
     os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
     os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
-    anopheles_kyalo_all_buffered = os.path.join(datasets, "KYALO_anopheles_all_PAs_buffers.shp")
+    os.path.join(datasets, "KYALO_anopheles_all_PAs_buffers.shp")
+    anopheles_kyalo = os.path.join(datasets, "KYALO_anopheles.shp")
 
     with TemporaryDirectory(prefix="INPMT_") as tmp_directory:
         # Read file as a geodataframe
@@ -111,7 +112,7 @@ def run(
             gdf_profiles_aoi.to_file(output_profiles)
         if method == "villages":
             profile_villages = get_urban_profile(
-                villages=anopheles_kyalo_all_buffered,
+                villages=anopheles_kyalo,
                 parks=national_parks_with_anopheles_kyalo,
                 population=population,
                 landuse=landuse,
