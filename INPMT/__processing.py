@@ -264,7 +264,7 @@ def get_urban_profile(
             result.loc[i, "x"] = geom_500.centroid.x
             result.loc[i, "y"] = geom_500.centroid.y
 
-            #print(village_id, np_name, loc_np, res_dist, [xmin500, ymin500, xmax500, ymax500], [xmin2000, ymin2000, xmax2000, ymax2000])
+            print(village_id, np_name, loc_np, res_dist, [xmin500, ymin500, xmax500, ymax500], [xmin2000, ymin2000, xmax2000, ymax2000])
             """
             # RESOLUTION IS 100 METERS SO A BUFFER
             # For 500 meters
@@ -307,7 +307,6 @@ def get_urban_profile(
             # and 100.
             result.loc[i, "PREVALENCE_500"] = dataset_500['prevalence'].sum(skipna=True) * 100
             result.loc[i, "PREVALENCE_2000"] = dataset_2000['prevalence'].sum(skipna=True) * 100
-
             result.loc[i, gws.columns] = gws.loc[i, :].values
             result.loc[i, "HAB_DIV"] = len_ctr
             result.loc[i, hd.columns] = hd.loc[i, :].values
