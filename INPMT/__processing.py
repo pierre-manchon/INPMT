@@ -38,7 +38,6 @@ try:
         __strip,
         format_dataset_output,
         get_cfg_val,
-        get_bbox,
         merge_ds,
     )
     from utils.vector import (
@@ -56,7 +55,6 @@ except ImportError:
         __strip,
         format_dataset_output,
         get_cfg_val,
-        get_bbox,
         merge_ds,
     )
     from INPMT.utils.vector import (
@@ -185,8 +183,6 @@ def get_urban_profile(
     - I read the raster that I cut out then I calculate the percentages of land use and I associate them to the nature
         of these land uses with the ***get_landuse*** function
 
-    :param loc: In or out of the national parks buffers
-    :type loc: bool
     :param villages: Path to the shapefile
     :type villages: AnyStr
     :param parks: Path to the shapefile
@@ -243,7 +239,7 @@ def get_urban_profile(
     result = pd.DataFrame(columns=cols)
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
-        for i in range(len(gdf_villages[:50])):
+        for i in range(len(gdf_villages)):
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
@@ -252,8 +248,6 @@ def get_urban_profile(
             geom = gdf_villages.loc[i, "geometry"]
             geom_500 = geom.buffer(buffer_500)
             geom_2000 = geom.buffer(buffer_2000)
-            xmin500, ymin500, xmax500, ymax500 = geom_500.bounds
-            xmin2000, ymin2000, xmax2000, ymax2000 = geom_2000.bounds
 
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
@@ -292,6 +286,7 @@ def get_urban_profile(
 
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
+            """
             result.loc[i, "PREVALENCE_500"] = dataset_500['prevalence'].sum(skipna=True) * 100
             result.loc[i, "PREVALENCE_2000"] = dataset_2000['prevalence'].sum(skipna=True) * 100
             result.loc[i, gws.columns] = gws.loc[i, :].values
