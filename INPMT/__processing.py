@@ -160,7 +160,6 @@ def get_urban_profile(
     swi: xr.Dataset,
     gws: xr.Dataset,
     prevalence: xr.Dataset,
-    loc: bool = True,
 ) -> DataFrame:
     """
     I use 4 different data, 2 vectors that I read in a GeoDataFrame at the beginning of the script and 2 raster.
@@ -258,11 +257,10 @@ def get_urban_profile(
 
             # Get the minimum distance from the village the park edge border and return the said distance and the
             # park's name
-            if loc:
-                res_dist, loc_np, np_name = get_nearest_park(parks=gdf_parks, geom_villages=geom_2000)
-                result.loc[i, "NP"] = np_name
-                result.loc[i, "loc_NP"] = loc_np
-                result.loc[i, "dist_NP"] = round(res_dist, 3)
+            res_dist, loc_np, np_name = get_nearest_park(parks=gdf_parks, geom_villages=geom_2000)
+            result.loc[i, "NP"] = np_name
+            result.loc[i, "loc_NP"] = loc_np
+            result.loc[i, "dist_NP"] = round(res_dist, 3)
 
             # Coordinates
             result.loc[i, "x"] = geom_500.centroid.x

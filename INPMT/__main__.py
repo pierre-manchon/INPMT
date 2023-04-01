@@ -119,8 +119,7 @@ def run(
                 ndvi=ndvi,
                 swi=swi,
                 gws=gws,
-                prevalence=prevalence,
-                loc=loc)
+                prevalence=prevalence)
             # Retrieves the directory the dataset is in and joins it the output
             # filename
             _, _, output_vilages_profiles = format_dataset_output(
