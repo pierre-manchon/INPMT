@@ -38,6 +38,8 @@ try:
         __strip,
         format_dataset_output,
         get_cfg_val,
+        get_bbox,
+        merge_ds,
     )
     from utils.vector import (
         __read_shp_as_gdf,
@@ -54,6 +56,8 @@ except ImportError:
         __strip,
         format_dataset_output,
         get_cfg_val,
+        get_bbox,
+        merge_ds,
     )
     from INPMT.utils.vector import (
         __read_shp_as_gdf,
@@ -264,25 +268,10 @@ def get_urban_profile(
             result.loc[i, "x"] = geom_500.centroid.x
             result.loc[i, "y"] = geom_500.centroid.y
 
-            print(village_id, np_name, loc_np, res_dist, [xmin500, ymin500, xmax500, ymax500], [xmin2000, ymin2000, xmax2000, ymax2000])
-            """
+            dataset_500 = merge_ds([population, landuse, ndvi, swi, gws, prevalence], geom_500)
+            dataset_2000 = merge_ds([population, landuse, ndvi, swi, gws, prevalence],geom_2000)
+            print(village_id, np_name, loc_np, res_dist, dataset_500['population'].sum(skipna=True).values, dataset_2000['population'].sum(skipna=True).values)
             # RESOLUTION IS 100 METERS SO A BUFFER
-            # For 500 meters
-            datasets_sliced_500 = [population.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
-                                   landuse.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
-                                   ndvi.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
-                                   swi.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
-                                   gws.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk(),
-                                   prevalence.sel(x=slice(xmin500, xmax500), y=slice(ymin500, ymax500)).chunk()]
-            dataset_500 = xr.merge(datasets_sliced_500)
-            # For 2000 meters
-            datasets_sliced_2000 = [population.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
-                                   landuse.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
-                                   ndvi.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
-                                   swi.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
-                                   gws.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk(),
-                                   prevalence.sel(x=slice(xmin2000, xmax2000), y=slice(ymin2000, ymax2000)).chunk()]
-            dataset_2000 = xr.merge(datasets_sliced_2000)
 
             result.loc[i, "POP_500"] = dataset_500['population'].sum(skipna=True).values
             result.loc[i, "POP_2000"] = dataset_2000['population'].sum(skipna=True).values

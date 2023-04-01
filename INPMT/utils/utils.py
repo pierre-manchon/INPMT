@@ -18,14 +18,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellaneous cases
-import os
 import configparser
+import os
 import unicodedata
 import xml.dom.minidom
 from datetime import datetime
 from pathlib import Path
 from typing import AnyStr
 from warnings import filterwarnings, warn
+
+import xarray as xr
 
 filterwarnings("ignore")
 config_file_path = 'INPMT/config.cfg'
@@ -111,3 +113,25 @@ def set_cfg_val(var, value):
     except KeyError:
         warn("Can't modify non present value", category=SyntaxWarning)
         print("\n")
+
+def get_bbox(ds, geom):
+    """Clips the subdataset with the geometry.
+    Args:
+        subdataset: A xarray dataset.
+        geom: A shapley geometry object.
+    Returns:
+        The corresponding bbox."""
+    x_min, y_min, x_max, y_max = geom.bounds
+    row_start = float(ds.sel(x=x_min, method='nearest').x.values)
+    col_start = float(ds.sel(y=y_max, method='nearest').y.values)
+    row_stop = float(ds.sel(x=x_max, method='nearest').x.values)
+    col_stop = float(ds.sel(y=y_min, method='nearest').y.values)
+    return [row_start, row_stop, col_start, col_stop]
+
+def merge_ds(dss, geom):
+    tomerge = []
+    for ds in dss:
+        row_start, row_stop, col_start, col_stop = get_bbox(ds, geom)
+        tomerge.append(ds.sel(x=slice(row_start, row_stop),
+                              y=slice(col_start, col_stop)).chunk())
+    return xr.merge(tomerge)
