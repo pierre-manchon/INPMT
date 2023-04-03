@@ -241,7 +241,11 @@ def get_urban_profile(
         for i in range(len(gdf_villages)):
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
-            result.loc[i, "ANO_DIV"] = gdf_villages.iloc[i].str.count("Y").sum()
+            if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
+                ano_div = int(gdf_villages.iloc[i].str.count("Y").sum()) + len(other_ano.split(','))
+            else:
+                ano_div = int(gdf_villages.iloc[i].str.count("Y").sum())
+            result.loc[i, "ANO_DIV"] = ano_div
 
             # Geometry
             geom = gdf_villages.loc[i, "geometry"]
@@ -261,9 +265,8 @@ def get_urban_profile(
 
             dataset_500 = merge_ds([population, landuse, ndvi, swi, gws, prevalence], geom_500)
             dataset_2000 = merge_ds([population, landuse, ndvi, swi, gws, prevalence],geom_2000)
-            print(village_id, np_name, loc_np, res_dist, dataset_500['population'].sum(skipna=True).values, dataset_2000['population'].sum(skipna=True).values)
-            # RESOLUTION IS 100 METERS SO A BUFFER
 
+            # RESOLUTION IS 100 METERS SO A BUFFER
             result.loc[i, "POP_500"] = dataset_500['population'].sum(skipna=True).values
             result.loc[i, "POP_2000"] = dataset_2000['population'].sum(skipna=True).values
 
@@ -283,6 +286,7 @@ def get_urban_profile(
             result.loc[i, "SWI_500"] = dataset_500['swi'].sum(skipna=True) / 2
             result.loc[i, "SWI_2000"] = dataset_2000['swi'].sum(skipna=True) / 2
 
+            # print(result.iloc[i])
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
             """
