@@ -35,45 +35,17 @@ from INPMT.utils.vector import __read_shapefile
 warnings.filterwarnings("ignore")
 
 
-def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
-    """
-    Takes a dataset path as an input, read every of its pixel then count them based on their values.
-
-    :param processing:
-    :type processing:
-    :param dataset_path:
-    :return:
-    """
-    try:
-        ds = polygonize(dataset=dataset_path, processing=processing)
-        ua = gpd.read_file(ds)
-        for i in range(len(ua)):
-            ua.loc[i, "area"] = ua.loc[i, "geometry"].area
-        ua = ua.groupby(by="val").agg(func="sum")
-        ua = ua.reset_index()
-        labels = ua["val"].astype(str).to_list()
-        nbrs = ua.value_counts("val").values
-        area = ua["area"].to_list()
-        category_area = np.multiply(nbrs, area)
-        percentage = np.divide(np.multiply(category_area, 100), ua["area"].sum())
-        return pd.DataFrame(
-            data={
-                "Category": labels,
-                "Nbr of pixels": nbrs,
-                "Surface (m2)": area,
-                "Proportion (%)": percentage,
-            }
-        )
-    except:
-        return pd.DataFrame(
-            data={
-                "Category": ["0.0"],
-                "Nbr of pixels": [1],
-                "Surface (m2)": [0.0],
-                "Proportion (%)": 100,
-            }
-        )
-        pass
+def get_pixel_count(dataset):
+    values, count = np.unique(dataset.values, return_counts=True)
+    res = dataset.x.values[1] - dataset.x.values[0]
+    pxl_area = res * res
+    area = count * pxl_area
+    area_total = area.sum()
+    percentage = area * 100 / area_total
+    return pd.DataFrame(data={"Category": values,
+                              "Nbr of pixels": count,
+                              "Surface (m2)": area,
+                              "Proportion (%)": percentage})
 
 
 def raster_crop(
