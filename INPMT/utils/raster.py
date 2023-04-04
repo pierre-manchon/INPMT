@@ -42,10 +42,7 @@ def get_pixel_count(dataset):
     area = count * pxl_area
     area_total = area.sum()
     percentage = area * 100 / area_total
-    return pd.DataFrame(data={"Category": values,
-                              "Nbr of pixels": count,
-                              "Surface (m2)": area,
-                              "Proportion (%)": percentage})
+    return pd.DataFrame(data={"cat": values, "Proportion (%)": percentage})
 
 
 def raster_crop(

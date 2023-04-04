@@ -120,20 +120,20 @@ def get_landuse(
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
-    val = None
+    label = None
     # Retrieve the legend file's path
     _qml = os.path.join(get_cfg_val("datasets_storage_path"), legend_filename)
     qml = read_qml(path_qml=_qml, item_type=item_type)
     df = get_pixel_count(dataset=dataset)
-    for m, r in df.iterrows():
-        for n in qml:
+    for i, r in df.iterrows():
+        for category in qml:
             # https://stackoverflow.com/a/8948303/12258568
-            if int(float(r["Category"])) == int(n[0]):
-                val = n[1]
+            if int(float(r["cat"])) == int(category[0]):
+                label = category[1]
                 break
             else:
-                val = "Unknown"
-        df.loc[m, "Label"] = val
+                label = "Unknown"
+        df.loc[i, "Label"] = label
     df = df.pivot_table(columns="Label",
                         values="Proportion (%)",
                         aggfunc="sum")

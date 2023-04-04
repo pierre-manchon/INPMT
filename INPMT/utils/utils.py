@@ -75,7 +75,7 @@ def format_dataset_output(
     return __dataset_name, __ext, __output_path
 
 
-def __strip(text: AnyStr) -> tuple[str, str]:
+def strip(text: AnyStr) -> tuple[str, str]:
     """
     https://stackoverflow.com/a/44433664/12258568
 
@@ -88,7 +88,7 @@ def __strip(text: AnyStr) -> tuple[str, str]:
     return str(text), str(text).replace(" ", "_")
 
 
-def __read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
+def read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
     for item in xml_data.getElementsByTagName(item_type):
