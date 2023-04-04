@@ -3,7 +3,6 @@
 requires=[
     "setuptools>=61.0.0",
     "wheel",
-    "setuptools >= 35.0.2",
 ]
 build-backend="setuptools.build_meta"
 
@@ -37,7 +36,7 @@ classifiers = [
 authors = [ { name = "P. MANCHON", email = "pierre.manchon@pm.me" } ]
 urls = { code = "https://github.com/pierre-manchon/INPMT", doc = "" }
 dynamic = ['version', 'readme']
-requires-python = ">=3.104"
+requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
