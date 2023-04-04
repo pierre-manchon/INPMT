@@ -34,11 +34,11 @@ try:
         raster_crop,
     )
     from utils.utils import (
-        __strip,
         format_dataset_output,
         get_cfg_val,
         merge_ds,
         read_qml,
+        strip,
     )
     from utils.vector import (
         __read_shp_as_gdf,
@@ -51,11 +51,11 @@ except ImportError:
         raster_crop,
     )
     from INPMT.utils.utils import (
-        __strip,
         format_dataset_output,
         get_cfg_val,
         merge_ds,
         read_qml,
+        strip,
     )
     from INPMT.utils.vector import (
         __read_shp_as_gdf,
@@ -102,7 +102,7 @@ def get_nearest_park(
 
 
 def get_landuse(
-    dataset: AnyStr,
+    dataset: xr.Dataset,
     legend_filename: AnyStr,
     item_type: AnyStr,
 ) -> tuple[DataFrame, int]:
@@ -120,20 +120,24 @@ def get_landuse(
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
+    val = None
     # Retrieve the legend file's path
     _qml = os.path.join(get_cfg_val("datasets_storage_path"), legend_filename)
     qml = read_qml(path_qml=_qml, item_type=item_type)
-    df_hab_div = get_pixel_count(dataset_path=dataset)
-    for m, r in df_hab_div.iterrows():
+    df = get_pixel_count(dataset=dataset)
+    for m, r in df.iterrows():
         for n in qml:
             # https://stackoverflow.com/a/8948303/12258568
             if int(float(r["Category"])) == int(n[0]):
-                __val = n[1]
+                val = n[1]
                 break
             else:
-                __val = "Unknown"
-        df_hab_div.loc[m, "Label"] = __val
-    return df_hab_div, len(df_hab_div)
+                val = "Unknown"
+        df.loc[m, "Label"] = val
+    df = df.pivot_table(columns="Label",
+                        values="Proportion (%)",
+                        aggfunc="sum")
+    return df, len(df)
 
 
 def get_urban_profile(
@@ -226,7 +230,7 @@ def get_urban_profile(
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
         for i in range(len(gdf_villages[:25])):
-            _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
+            _, village_id = strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
                 ano_div = int(gdf_villages.iloc[i].str.count("Y").sum()) + len(other_ano.split(','))
@@ -273,19 +277,20 @@ def get_urban_profile(
             result.loc[i, "SWI_500"] = (dataset_500['swi'].sum(skipna=True) / 2).values
             result.loc[i, "SWI_2000"] = (dataset_2000['swi'].sum(skipna=True) / 2).values
 
-            print(result.iloc[i])
-            # HAB DIV
             # PREVALENCE
-            # GWI
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
             result.loc[i, "PREVALENCE_500"] = (dataset_500['prevalence'].sum(skipna=True) * 100).values
             result.loc[i, "PREVALENCE_2000"] = (dataset_2000['prevalence'].sum(skipna=True) * 100).values
-            """
-            result.loc[i, gws.columns] = gws.loc[i, :].values
+
+            hd_qml = 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml'
+            df_hd, len_ctr = get_landuse(landuse, hd_qml, 'item')
             result.loc[i, "HAB_DIV"] = len_ctr
-            result.loc[i, hd.columns] = hd.loc[i, :].values
-            """
+            result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
+            gws_qml = 'GWS_seasonality_AFRICA_reprj3857.qml'
+            df_gws, _ = get_landuse(gws, gws_qml, 'paletteEntry')
+            result.loc[i, df_gws.columns] = df_gws.loc[i, :].values
+            print(result.iloc[i])
             pbar()
     return result
 
