@@ -1,4 +1,3 @@
-# -*-coding: utf8 -*
 """
 INPMT
 A tool to process data to learn more about Impact of National Parks on Malaria Transmission
@@ -19,19 +18,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import warnings
-from typing import AnyStr, Iterable
+from collections.abc import Iterable
+from typing import AnyStr
 
 # Functions for basic vector processing
 import fiona
 import geopandas as gpd
-import libpysal
-import pandas as pd
-import shapefile as shp
 from geopandas import GeoDataFrame
-from pandas import DataFrame
-from shapefile import Reader
 
-from .utils import format_dataset_output
+from INPMT.utils.utils import format_dataset_output
 
 warnings.filterwarnings("ignore")
 
@@ -52,24 +47,6 @@ def __read_shapefile(shapefile: AnyStr) -> list:
     return shapes
 
 
-def __read_shapefile_as_dataframe(shapefile: AnyStr) -> [DataFrame, Reader]:
-    """
-    Read a geodataframe into a Pandas dataframe with a 'coords' column holding the geometry information.
-
-    :param shapefile: Vector file path
-    :type shapefile: AnyStr
-    :return: DataFrame with a coords column
-    :rtype: [DataFrame, Reader]
-    """
-    sf = shp.Reader(shapefile, "r", encoding="utf-8")
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-    shapes = [s.points for s in sf.shapes()]
-    df = pd.DataFrame(columns=fields, data=records)
-    df = df.assign(coords=shapes)
-    return df, sf
-
-
 def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     """
 
@@ -82,41 +59,6 @@ def __read_shp_as_gdf(shapefile: AnyStr) -> GeoDataFrame:
     gdf = gpd.read_file(shapefile, "r", encoding="utf-8")
     gdf.crs = 3857
     return gdf
-
-
-def merge_touching(geodataframe: GeoDataFrame, by: AnyStr) -> GeoDataFrame:
-    """
-    Takes a GeoDataFrame as input and dissolve every touching polygons by doing the sum of their values.
-
-    Heavily inspired from this stackoverflow post:
-    # https://stackoverflow.com/questions/67280722/how-to-merge-touching-polygons-with-geopandas
-
-    :param by: Aggregate function, either sum or first
-    :type by: AnyStr
-    :param geodataframe: A generic GeoDataFrame
-    :type geodataframe: GeoDataFrame
-    :return: A new GeoDataFrame of polygons merged when touching
-    :rtype: GeoDataFrame
-    """
-    w = libpysal.weights.Queen.from_dataframe(geodataframe)
-    components = w.component_labels
-    combined_polygons = geodataframe.dissolve(by=components, aggfunc=by)
-    return combined_polygons
-
-
-def to_wkt(df: DataFrame, column: AnyStr) -> DataFrame:
-    """
-    Transform a column of text geometry into a column of wkt (Well Known Text)
-
-    :param df: Input DataFrame with the faulty geometry column
-    :type df: DataFrame
-    :param column: Column where the geometry is
-    :type column: AnyStr
-    :return: New DataFrame
-    :rtype: DataFrame
-    """
-    df[column] = gpd.GeoSeries.from_wkt(df[column])
-    return df
 
 
 def intersect(
@@ -149,36 +91,10 @@ def intersect(
             inter_df.to_file(output_path, index=False)
             return inter_df, output_path
         except ValueError:
-            print(UserWarning("Empty dataframe from {} was not saved.".format(base)))
+            print(UserWarning(f"Empty dataframe from {base} was not saved."))
             pass
     else:
         return inter_df
-
-
-def is_of_interest(base: GeoDataFrame, interest: GeoDataFrame) -> GeoDataFrame:
-    """
-    Takes two GeoDataFrames as input files and returns the first one minus every polygons that doesn't intersect with
-    the polygons of the second GeoDataFrame.
-    This function doesn't actually intersect but keep the polygons that does.
-
-    :param base: Geodataframe
-    :type base: GeoDataFrame
-    :param interest: GeoDataFrame
-    :type interest: GeoDataFrame
-    :return: GeoDataFrame
-    :rtype: GeoDataFrame
-    """
-    # TODO CC
-    base["intersects"] = False
-    for w, x in iter_geoseries_as_geodataframe(shapefile=base):
-        for y, z in iter_geoseries_as_geodataframe(shapefile=interest):
-            if x.intersects(z)[0]:
-                base.loc[w, "intersects"] = True
-    to_drop = base.loc[base.loc[:, "intersects"] != True].index  # noqa
-    base.drop(to_drop, inplace=True)
-    base.drop(["intersects"], axis=1, inplace=True)
-    base = base.reset_index()
-    return base
 
 
 def iter_geoseries_as_geodataframe(shapefile: GeoDataFrame) -> Iterable:

@@ -25,7 +25,7 @@ import xml.dom.minidom
 from datetime import datetime
 from pathlib import Path
 from typing import AnyStr
-from warnings import filterwarnings, warn
+from warnings import filterwarnings
 
 import xarray as xr
 
@@ -101,18 +101,6 @@ def get_cfg_val(value):
     getcfgparser.read(config_file_path, encoding="utf-8")
     return getcfgparser.get("config", value)
 
-
-def set_cfg_val(var, value):
-    setcfgparser = configparser.ConfigParser(comment_prefixes="///", allow_no_value=True)
-    setcfgparser.read_file(open(config_file_path))
-    try:
-        _ = setcfgparser["config"][var]
-        setcfgparser["config"][var] = value
-        with open(config_file_path, "w") as configfile:
-            setcfgparser.write(configfile)
-    except KeyError:
-        warn("Can't modify non present value", category=SyntaxWarning)
-        print("\n")
 
 def get_bbox(ds, geom):
     """Clips the subdataset with the geometry.

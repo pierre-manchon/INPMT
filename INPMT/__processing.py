@@ -34,11 +34,11 @@ try:
         raster_crop,
     )
     from utils.utils import (
-        __read_qml,
         __strip,
         format_dataset_output,
         get_cfg_val,
         merge_ds,
+        read_qml,
     )
     from utils.vector import (
         __read_shp_as_gdf,
@@ -51,11 +51,11 @@ except ImportError:
         raster_crop,
     )
     from INPMT.utils.utils import (
-        __read_qml,
         __strip,
         format_dataset_output,
         get_cfg_val,
         merge_ds,
+        read_qml,
     )
     from INPMT.utils.vector import (
         __read_shp_as_gdf,
@@ -102,10 +102,8 @@ def get_nearest_park(
 
 
 def get_landuse(
-    polygon: AnyStr,
     dataset: AnyStr,
     legend_filename: AnyStr,
-    processing: AnyStr,
     item_type: AnyStr,
 ) -> tuple[DataFrame, int]:
     """
@@ -114,11 +112,7 @@ def get_landuse(
     Then I retrieve a number of pixels by values using the Counter object.
     I process the category area and the landuse percentage using the pixel area and the polygon area
 
-    :param processing:
-    :type processing:
     :param legend_filename:
-    :param polygon: Path to the shapefile
-    :type polygon: AnyStr
     :param dataset: Path to the dataset file
     :type dataset: AnyStr
     :param item_type: Type of the item containing labels, values and colors for the legend.
@@ -126,19 +120,12 @@ def get_landuse(
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
-    __val = None
-    __polygon = gpd.read_file(polygon, encoding="windows-1252")
     # Retrieve the legend file's path
-    __data_dir = get_cfg_val("datasets_storage_path")
-    __qml_path = os.path.join(__data_dir, legend_filename)
-    # Count every pixel from the raster and its value
-    # TODO here i retrieve the area by multiplying the width and height resolutions
-    #  => need to get the pixels area for each pixel here
-    df_hab_div = get_pixel_count(dataset_path=dataset, processing=processing)
-    # Format the .qml file path from the dataset path
-    __style = __read_qml(path_qml=__qml_path, item_type=item_type)
+    _qml = os.path.join(get_cfg_val("datasets_storage_path"), legend_filename)
+    qml = read_qml(path_qml=_qml, item_type=item_type)
+    df_hab_div = get_pixel_count(dataset_path=dataset)
     for m, r in df_hab_div.iterrows():
-        for n in __style:
+        for n in qml:
             # https://stackoverflow.com/a/8948303/12258568
             if int(float(r["Category"])) == int(n[0]):
                 __val = n[1]
@@ -238,7 +225,7 @@ def get_urban_profile(
     result = pd.DataFrame(columns=cols)
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
-        for i in range(len(gdf_villages)):
+        for i in range(len(gdf_villages[:25])):
             _, village_id = __strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
@@ -457,7 +444,7 @@ def get_countries_profile(
                         dataset=path_landuse_aoi, ext=".qml"
                     )
                     # Reads the corresponding legend style from the .qml file
-                    __style = __read_qml(path_qml=__qml_path, item_type="item")
+                    __style = read_qml(path_qml=__qml_path, item_type="item")
                     # Associates the category number the label name of the legend values (ridden from a .qml file)
                     for m, r in df_hab_div.iterrows():
                         for n in __style:

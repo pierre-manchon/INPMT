@@ -87,11 +87,8 @@ def run(
     # Convert all vector data as a WKT geometry
     irish = os.path.join(datasets, "IRISH_countries.shp")
     landuse_polygonized = os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
-    # anopheles_kyalo = os.path.join(datasets, "KYALO_VectorDB_1898-2016.shp")
     anopheles_kyalo_in_PAs_buffers = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
-    os.path.join(datasets, "KYALO_anopheles_out_PAs_buffers.shp")
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
-    os.path.join(datasets, "KYALO_anopheles_all_PAs_buffers.shp")
     anopheles_kyalo = os.path.join(datasets, "KYALO_anopheles.shp")
 
     with TemporaryDirectory(prefix="INPMT_") as tmp_directory:

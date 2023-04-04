@@ -1,4 +1,3 @@
-# -*-coding: utf8 -*
 """
 INPMT
 A tool to process data to learn more about Impact of National Parks on Malaria Transmission
@@ -20,8 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import warnings
-from pathlib import Path
-from typing import Any, AnyStr, Optional, SupportsInt, Union
+from typing import AnyStr
 
 import geopandas as gpd
 import numpy as np
@@ -29,11 +27,10 @@ import pandas as pd
 import rasterio
 import rasterio.mask
 import rasterio.windows
-from geopandas import GeoDataFrame
 from rasterio.features import shapes
 
-from .utils import format_dataset_output
-from .vector import __read_shapefile, intersect
+from INPMT.utils.utils import format_dataset_output
+from INPMT.utils.vector import __read_shapefile
 
 warnings.filterwarnings("ignore")
 
@@ -77,18 +74,6 @@ def get_pixel_count(dataset_path: AnyStr, processing: AnyStr):
             }
         )
         pass
-
-
-def get_value_from_coord(index: int, dataset: AnyStr, shapefile: GeoDataFrame) -> int:
-    with rasterio.open(dataset) as src:
-        x, y = list(shapefile.loc[index, "geometry"].coords)[0]
-        # get pixel x+y of the coordinate
-        py, px = src.index(x, y)
-        # create 1x1px window of the pixel
-        window = rasterio.windows.Window(px - 1 // 2, py - 1 // 2, 1, 1)
-        # read rgb values of the window
-        value = src.read(window=window)
-    return value[0][0][0]
 
 
 def raster_crop(
@@ -167,91 +152,3 @@ def polygonize(dataset: AnyStr, processing: AnyStr) -> AnyStr:
     __output_path = os.path.join(processing, "".join([p, p_ext]))
     gpd_polygonized_raster.to_file(__output_path)
     return __output_path
-
-
-def export_raster(output_image, *args: Optional[Path]) -> None:
-    """
-    :param output_image:
-    :type output_image:
-    :param args:
-    :type args:
-    :return:
-    :rtype:
-    """
-    if args:
-        os.path.join(*args, "mask.tif")
-    else:
-        "mask.tif"
-    with rasterio.open("mask.tif", "w") as output_file:
-        output_file.write(output_image)
-
-
-def raster_stats(
-    dataset: AnyStr,
-) -> Union[tuple[Any, Any, Any, Any], tuple[int, int, int, int]]:
-    """
-    Read any raster file then delete the no data values and returns some basic statistics about the said raster (min,
-    mean and max)
-
-    :param dataset: Path to the dataset file
-    :type: dataset: AnyStr
-    :return: Min, Mean, Max values
-    :rtype: typle(SupportsInt, SupportsInt, SupportsInt)
-    """
-    # If TypeError, you couldn't read the file because it had no data.
-    # If ValueError, idk
-    try:
-        with rasterio.open(dataset) as ro:
-            values = ro.read()
-            data = np.where(values == ro.nodata, np.nan, values)
-            return (
-                np.nansum(data),
-                np.nanmin(data),
-                np.nanmean(data),
-                np.nanmax(data),
-            )
-    except TypeError as e:
-        print(e)
-        return 0, 0, 0, 0
-    except ValueError as e:
-        print(e)
-        return 0, 0, 0, 0
-
-
-def density(dataset: AnyStr, area: AnyStr, processing: AnyStr) -> SupportsInt:
-    """
-    AA
-    """
-    # TODO Convert the pixels to vector => Divide the value by the percentage of air in the pixel
-    # (1/3 of the pixel of 300m) => Use the remaining values to average in the buffer
-    with rasterio.open(dataset) as src:
-        res_x, res_y = src.res
-    polygonized = polygonize(dataset, processing=processing)
-    polygon = intersect(base=polygonized, overlay=area, crs=3857)
-    polygon.insert(0, "valpop", np.nan)
-    print("on est la")
-    zda = gpd.read_file(polygonized, encoding="windows-1252")
-    zda.plot()
-    polygon.plot()
-    i = None
-    val = None
-    percentage = None
-    for i in range(len(polygon)):
-        # area_pop*10 because the population values are minified by 10
-        # area_surf * 1 000 000 because they were in square meters (3857 cartesian) and population density is usually
-        # expressed in square kilometers
-        val = polygon.loc[i, "val"] * 10
-        percentage = round(polygon.loc[i, "geometry"].area / (res_x * res_y), 2)
-        polygon.loc[i, "valpop"] = val * percentage
-    print(
-        "{}, {}, {}, {}, {}, {}, {}".format(
-            len(polygon),
-            polygon.loc[i, "geometry"].area,
-            res_x * res_y,
-            val,
-            percentage,
-            polygon["val"].sum(),
-            polygon["valpop"].sum(),
-        )
-    )
-    return polygon["valpop"].sum()

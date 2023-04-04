@@ -25,10 +25,7 @@ from tempfile import TemporaryDirectory
 import geopandas as gpd
 import requests
 
-try:
-    from utils import format_dataset_output
-except ImportError:
-    from .utils import format_dataset_output
+from INPMT.utils.utils import format_dataset_output
 
 
 class APPEEARSapi:
@@ -59,7 +56,7 @@ class APPEEARSapi:
         # Logout
         self.response = requests.post(
             "https://lpdaacsvc.cr.usgs.gov/appeears/api/logout",
-            headers={"Authorization": "Bearer {0}".format(self.token)},
+            headers={"Authorization": f"Bearer {self.token}"},
         )
 
     @staticmethod
@@ -78,20 +75,20 @@ class APPEEARSapi:
         # create the task request
         task = {
             "task_type": "area",
-            "task_name": "{}".format(area),
+            "task_name": f"{area}",
             "params": {
                 "dates": [
                     {
-                        "startDate": "{}".format(startdate),
-                        "endDate": "{}".format(enddate),
+                        "startDate": f"{startdate}",
+                        "endDate": f"{enddate}",
                     }
                 ],
                 "layers": [
-                    {"layer": "{}".format(layer), "product": "{}".format(product)}
+                    {"layer": f"{layer}", "product": f"{product}"}
                 ],
                 "output": {
                     "format": {"type": "geotiff"},
-                    "projection": "{}".format(projection),
+                    "projection": f"{projection}",
                 },
                 "geo": {
                     "type": "FeatureCollection",
@@ -105,24 +102,24 @@ class APPEEARSapi:
         response = requests.post(
             "https://lpdaacsvc.cr.usgs.gov/appeears/api/task",
             json=task,
-            headers={"Authorization": "Bearer {0}".format(self.token)},
+            headers={"Authorization": f"Bearer {self.token}"},
         )
         self.task_id = response.json()
         return self.task_id
 
     def get_request_state(self):
         response = requests.get(
-            "https://lpdaacsvc.cr.usgs.gov/appeears/api/status/{0}".format(
+            "https://lpdaacsvc.cr.usgs.gov/appeears/api/status/{}".format(
                 self.task_id
             ),
-            headers={"Authorization": "Bearer {0}".format(self.token)},
+            headers={"Authorization": f"Bearer {self.token}"},
         )
         status_response = response.json()
         print(status_response)
 
     def get_file_credentials(self):
         response = requests.get(
-            "https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{0}".format(self.task_id)
+            f"https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{self.task_id}"
         )
         bundle_response = response.json()
         print(bundle_response)
@@ -134,7 +131,7 @@ class APPEEARSapi:
 
     def download_product(self):
         response = requests.get(
-            "https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{0}/{1}".format(
+            "https://lpdaacsvc.cr.usgs.gov/appeears/api/bundle/{}/{}".format(
                 self.task_id, self.file_id
             ),
             stream=True,
