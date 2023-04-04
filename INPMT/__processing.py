@@ -125,6 +125,7 @@ def get_landuse(
     _qml = os.path.join(get_cfg_val("datasets_storage_path"), legend_filename)
     qml = read_qml(path_qml=_qml, item_type=item_type)
     df = get_pixel_count(dataset=dataset)
+    len_df = len(df)
     for i, r in df.iterrows():
         for category in qml:
             # https://stackoverflow.com/a/8948303/12258568
@@ -137,7 +138,7 @@ def get_landuse(
     df = df.pivot_table(columns="Label",
                         values="Proportion (%)",
                         aggfunc="sum")
-    return df, len(df)
+    return df, len_df
 
 
 def get_urban_profile(
