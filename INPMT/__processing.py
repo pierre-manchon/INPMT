@@ -31,36 +31,22 @@ from pandas import DataFrame
 try:
     from utils.raster import (
         get_pixel_count,
-        raster_crop,
     )
     from utils.utils import (
-        format_dataset_output,
         get_cfg_val,
         merge_ds,
         read_qml,
         strip,
-    )
-    from utils.vector import (
-        __read_shp_as_gdf,
-        intersect,
-        iter_geoseries_as_geodataframe,
     )
 except ImportError:
     from INPMT.utils.raster import (
         get_pixel_count,
-        raster_crop,
     )
     from INPMT.utils.utils import (
-        format_dataset_output,
         get_cfg_val,
         merge_ds,
         read_qml,
         strip,
-    )
-    from INPMT.utils.vector import (
-        __read_shp_as_gdf,
-        intersect,
-        iter_geoseries_as_geodataframe,
     )
 
 warnings.filterwarnings("ignore")
@@ -103,8 +89,7 @@ def get_nearest_park(
 
 def get_landuse(
     dataset: xr.Dataset,
-    legend_filename: AnyStr,
-    item_type: AnyStr,
+    qml
 ) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
@@ -120,20 +105,15 @@ def get_landuse(
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
-    label = None
-    # Retrieve the legend file's path
-    _qml = os.path.join(get_cfg_val("datasets_storage_path"), legend_filename)
-    qml = read_qml(path_qml=_qml, item_type=item_type)
     df = get_pixel_count(dataset=dataset)
     len_df = len(df)
     for i, r in df.iterrows():
+        label = "Unknown"
         for category in qml:
             # https://stackoverflow.com/a/8948303/12258568
             if int(float(r["cat"])) == int(category[0]):
                 label = category[1]
                 break
-            else:
-                label = "Unknown"
         df.loc[i, "Label"] = label
     df = df.pivot_table(columns="Label",
                         values="Proportion (%)",
@@ -228,6 +208,9 @@ def get_urban_profile(
         "HAB_DIV_2000",
     ]
     result = pd.DataFrame(columns=cols)
+        # Retrieve the legend file's path
+    hd_qml = read_qml(path_qml=os.path.join(get_cfg_val("datasets_storage_path"), 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0-2.qml'), item_type='item')
+    gws_qml = read_qml(path_qml=os.path.join(get_cfg_val("datasets_storage_path"), 'GWS_seasonality_AFRICA_reprj3857.qml'), item_type='paletteEntry')
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
         for i in range(len(gdf_villages[:25])):
@@ -258,10 +241,11 @@ def get_urban_profile(
             dataset_500 = merge_ds([population, landuse, ndvi, swi, gws, prevalence], geom_500)
             dataset_2000 = merge_ds([population, landuse, ndvi, swi, gws, prevalence],geom_2000)
 
-            # RESOLUTION IS 100 METERS SO A BUFFER
+            # POPULATION
             result.loc[i, "POP_500"] = dataset_500['population'].sum(skipna=True).values
             result.loc[i, "POP_2000"] = dataset_2000['population'].sum(skipna=True).values
 
+            # NDVI
             # I divide by 10 000 because Normalized Difference Vegetation
             # Index is usually between -1 and 1.
             # For 500 meters
@@ -273,6 +257,7 @@ def get_urban_profile(
             result.loc[i, "NDVI_mean_2000"] = (dataset_2000['ndvi'].mean(skipna=True) / 10000).values
             result.loc[i, "NDVI_max_2000"] = (dataset_2000['ndvi'].max(skipna=True) / 10000).values
 
+            # SWI
             # https://land.copernicus.eu/global/products/SWI I divide by a 2
             # because SWI data must be between 0 and 100.
             result.loc[i, "SWI_500"] = (dataset_500['swi'].sum(skipna=True) / 2).values
@@ -284,13 +269,20 @@ def get_urban_profile(
             result.loc[i, "PREVALENCE_500"] = (dataset_500['prevalence'].sum(skipna=True) * 100).values
             result.loc[i, "PREVALENCE_2000"] = (dataset_2000['prevalence'].sum(skipna=True) * 100).values
 
-            hd_qml = 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.qml'
-            df_hd, len_ctr = get_landuse(landuse, hd_qml, 'item')
-            result.loc[i, "HAB_DIV"] = len_ctr
-            result.loc[i, df_hd.columns] = df_hd.loc[i, :].values
-            gws_qml = 'GWS_seasonality_AFRICA_reprj3857.qml'
-            df_gws, _ = get_landuse(gws, gws_qml, 'paletteEntry')
-            result.loc[i, df_gws.columns] = df_gws.loc[i, :].values
+            # LANDUSE
+            df_hd_500, len_ctr_500 = get_landuse(dataset_500['landuse'], hd_qml)
+            result.loc[i, "HAB_DIV_500"] = len_ctr_500
+            # TODO Assign values dynamically
+            result.loc[i, df_hd_500.columns] = df_hd_500.values
+            df_hd_2000, len_ctr_2000 = get_landuse(dataset_2000['landuse'], hd_qml)
+            result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
+            result.loc[i, df_hd_2000.columns] = df_hd_2000.values
+            df_gws_500, _ = get_landuse(dataset_500['gws'], gws_qml)
+
+            # GWS
+            result.loc[i, df_gws_500.columns] = df_gws_500.values
+            df_gws_2000, _ = get_landuse(dataset_2000['gws'], gws_qml)
+            result.loc[i, df_gws_2000.columns] = df_gws_2000.values
             print(result.iloc[i])
             pbar()
     return result
