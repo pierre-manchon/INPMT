@@ -22,6 +22,7 @@ import warnings
 from typing import Any, AnyStr
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import xarray as xr
 from alive_progress import alive_bar
@@ -33,7 +34,6 @@ try:
         get_pixel_count,
     )
     from utils.utils import (
-        get_cfg_val,
         merge_ds,
         read_qml,
         strip,
@@ -43,7 +43,6 @@ except ImportError:
         get_pixel_count,
     )
     from INPMT.utils.utils import (
-        get_cfg_val,
         merge_ds,
         read_qml,
         strip,
@@ -122,6 +121,7 @@ def get_landuse(
 
 
 def get_urban_profile(
+    datasets: str,
     villages: AnyStr,
     parks: AnyStr,
     population: xr.Dataset,
@@ -209,8 +209,8 @@ def get_urban_profile(
     ]
     result = pd.DataFrame(columns=cols)
         # Retrieve the legend file's path
-    hd_qml = read_qml(path_qml=os.path.join(get_cfg_val("datasets_storage_path"), 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0-2.qml'), item_type='item')
-    gws_qml = read_qml(path_qml=os.path.join(get_cfg_val("datasets_storage_path"), 'GWS_seasonality_AFRICA_reprj3857.qml'), item_type='paletteEntry')
+    hd_qml = read_qml(path_qml=os.path.join(datasets, 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0-2.qml'), item_type='item')
+    gws_qml = read_qml(path_qml=os.path.join(datasets, 'GWS_seasonality_AFRICA_reprj3857.qml'), item_type='paletteEntry')
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
         for i in range(len(gdf_villages[:25])):
@@ -272,17 +272,20 @@ def get_urban_profile(
             # LANDUSE
             df_hd_500, len_ctr_500 = get_landuse(dataset_500['landuse'], hd_qml)
             result.loc[i, "HAB_DIV_500"] = len_ctr_500
-            # TODO Assign values dynamically
-            result.loc[i, df_hd_500.columns] = df_hd_500.values
+            # result.loc[i, df_hd_500.columns] = df_hd_500.values
+            result.loc[i, df_hd_500.columns] = np.nan
             df_hd_2000, len_ctr_2000 = get_landuse(dataset_2000['landuse'], hd_qml)
             result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
-            result.loc[i, df_hd_2000.columns] = df_hd_2000.values
+            # result.loc[i, df_hd_2000.columns] = df_hd_2000.values
+            result.loc[i, df_hd_2000.columns] = np.nan
             df_gws_500, _ = get_landuse(dataset_500['gws'], gws_qml)
 
             # GWS
-            result.loc[i, df_gws_500.columns] = df_gws_500.values
+            # result.loc[i, df_gws_500.columns] = df_gws_500.values
+            result.loc[i, df_gws_500.columns] = np.nan
             df_gws_2000, _ = get_landuse(dataset_2000['gws'], gws_qml)
-            result.loc[i, df_gws_2000.columns] = df_gws_2000.values
+            # result.loc[i, df_gws_2000.columns] = df_gws_2000.values
+            result.loc[i, df_gws_2000.columns] = np.nan
             print(result.iloc[i])
             pbar()
     return result

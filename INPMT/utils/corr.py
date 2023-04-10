@@ -3,9 +3,9 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from INPMT.utils.utils import format_dataset_output, get_cfg_val
+from INPMT.utils.utils import format_dataset_output
 
-datasets = get_cfg_val("datasets_storage_path")
+datasets = 'H:\\Cours\\M2\\Cours\\HGADU03 - Memoire\\Projet Impact PN Anopheles\\datasets'
 export = os.path.join(datasets, "result")
 result = os.path.join(datasets, "results_urban_profiles.xlsx")
 _, _, output_path = format_dataset_output(dataset=result, name="corr_plot", ext=".png")

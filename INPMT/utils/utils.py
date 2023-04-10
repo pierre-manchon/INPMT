@@ -18,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function for basic processing and miscellaneous cases
-import configparser
 import os
 import unicodedata
 import xml.dom.minidom
@@ -94,12 +93,6 @@ def read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     for item in xml_data.getElementsByTagName(item_type):
         legend.append([item.getAttribute("value"), item.getAttribute("label")])
     return legend
-
-
-def get_cfg_val(value):
-    getcfgparser = configparser.ConfigParser()
-    getcfgparser.read(config_file_path, encoding="utf-8")
-    return getcfgparser.get("config", value)
 
 
 def get_bbox(ds, geom):

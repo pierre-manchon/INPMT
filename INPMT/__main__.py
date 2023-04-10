@@ -25,19 +25,13 @@ from pandas import DataFrame
 
 try:
     from __processing import get_urban_profile
-    from utils.utils import (
-        get_cfg_val,
-    )
 except ImportError:
     from INPMT.__processing import get_urban_profile
-    from INPMT.utils.utils import (
-        get_cfg_val,
-    )
 
 warnings.filterwarnings("ignore")
 
 
-def run() -> DataFrame:
+def run(datasets: str) -> DataFrame:
     """
     Retrieves the datasets path and executes the functions.
     For the countries, i only execute it like that.
@@ -48,8 +42,6 @@ def run() -> DataFrame:
     :return: Nothing
     :rtype: None
     """
-    datasets = get_cfg_val("datasets_storage_path")
-
     # Convert all raster data as xarray DataArrays
     population = rxr.open_rasterio(os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif"))
     landuse = rxr.open_rasterio(os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"))
@@ -74,6 +66,7 @@ def run() -> DataFrame:
     anopheles_kyalo = os.path.join(datasets, "KYALO_anopheles.shp")
 
     profile_villages = get_urban_profile(
+        datasets=datasets,
         villages=anopheles_kyalo,
         parks=national_parks_with_anopheles_kyalo,
         population=population,
