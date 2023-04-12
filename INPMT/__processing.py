@@ -22,7 +22,6 @@ import warnings
 from typing import Any, AnyStr
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 import xarray as xr
 from alive_progress import alive_bar
@@ -34,7 +33,7 @@ try:
         get_pixel_count,
     )
     from utils.utils import (
-        merge_ds,
+        clip,
         read_qml,
         strip,
     )
@@ -43,7 +42,7 @@ except ImportError:
         get_pixel_count,
     )
     from INPMT.utils.utils import (
-        merge_ds,
+        clip,
         read_qml,
         strip,
     )
@@ -238,54 +237,61 @@ def get_urban_profile(
             result.loc[i, "x"] = geom_500.centroid.x
             result.loc[i, "y"] = geom_500.centroid.y
 
-            dataset_500 = merge_ds([population, landuse, ndvi, swi, gws, prevalence], geom_500)
-            dataset_2000 = merge_ds([population, landuse, ndvi, swi, gws, prevalence],geom_2000)
+            population_500 = clip(population, geom_500)
+            landuse_500 = clip(landuse, geom_500)
+            ndvi_500 = clip(ndvi, geom_500)
+            swi_500 = clip(swi, geom_500)
+            gws_500 = clip(gws, geom_500)
+            prevalence_500 = clip(prevalence, geom_500)
+
+            population_2000 = clip(population, geom_2000)
+            landuse_2000 = clip(landuse, geom_2000)
+            ndvi_2000 = clip(ndvi, geom_2000)
+            swi_2000 = clip(swi, geom_2000)
+            gws_2000 = clip(gws, geom_2000)
+            prevalence_2000 = clip(prevalence, geom_2000)
 
             # POPULATION
-            result.loc[i, "POP_500"] = dataset_500['population'].sum(skipna=True).values
-            result.loc[i, "POP_2000"] = dataset_2000['population'].sum(skipna=True).values
+            result.loc[i, "POP_500"] = population_500.sum(skipna=True).values
+            result.loc[i, "POP_2000"] = population_2000.sum(skipna=True).values
 
             # NDVI
             # I divide by 10 000 because Normalized Difference Vegetation
             # Index is usually between -1 and 1.
             # For 500 meters
-            result.loc[i, "NDVI_min_500"] = (dataset_500['ndvi'].min(skipna=True) / 10000).values
-            result.loc[i, "NDVI_mean_500"] = (dataset_500['ndvi'].mean(skipna=True) / 10000).values
-            result.loc[i, "NDVI_max_500"] = (dataset_500['ndvi'].max(skipna=True) / 10000).values
+            result.loc[i, "NDVI_min_500"] = (ndvi_500.min(skipna=True) / 10000).values
+            result.loc[i, "NDVI_mean_500"] = (ndvi_500.mean(skipna=True) / 10000).values
+            result.loc[i, "NDVI_max_500"] = (ndvi_500.max(skipna=True) / 10000).values
             # For 2000 meters
-            result.loc[i, "NDVI_min_2000"] = (dataset_2000['ndvi'].min(skipna=True) / 10000).values
-            result.loc[i, "NDVI_mean_2000"] = (dataset_2000['ndvi'].mean(skipna=True) / 10000).values
-            result.loc[i, "NDVI_max_2000"] = (dataset_2000['ndvi'].max(skipna=True) / 10000).values
+            result.loc[i, "NDVI_min_2000"] = (ndvi_2000.min(skipna=True) / 10000).values
+            result.loc[i, "NDVI_mean_2000"] = (ndvi_2000.mean(skipna=True) / 10000).values
+            result.loc[i, "NDVI_max_2000"] = (ndvi_2000.max(skipna=True) / 10000).values
 
             # SWI
             # https://land.copernicus.eu/global/products/SWI I divide by a 2
             # because SWI data must be between 0 and 100.
-            result.loc[i, "SWI_500"] = (dataset_500['swi'].sum(skipna=True) / 2).values
-            result.loc[i, "SWI_2000"] = (dataset_2000['swi'].sum(skipna=True) / 2).values
+            result.loc[i, "SWI_500"] = (swi_500.sum(skipna=True) / 2).values
+            result.loc[i, "SWI_2000"] = (swi_2000.sum(skipna=True) / 2).values
 
             # PREVALENCE
             # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
             # and 100.
-            result.loc[i, "PREVALENCE_500"] = (dataset_500['prevalence'].sum(skipna=True) * 100).values
-            result.loc[i, "PREVALENCE_2000"] = (dataset_2000['prevalence'].sum(skipna=True) * 100).values
+            result.loc[i, "PREVALENCE_500"] = (prevalence_500.sum(skipna=True) * 100).values
+            result.loc[i, "PREVALENCE_2000"] = (prevalence_2000.sum(skipna=True) * 100).values
 
             # LANDUSE
-            df_hd_500, len_ctr_500 = get_landuse(dataset_500['landuse'], hd_qml)
+            df_hd_500, len_ctr_500 = get_landuse(landuse_500, hd_qml)
             result.loc[i, "HAB_DIV_500"] = len_ctr_500
-            # result.loc[i, df_hd_500.columns] = df_hd_500.values
-            result.loc[i, df_hd_500.columns] = np.nan
-            df_hd_2000, len_ctr_2000 = get_landuse(dataset_2000['landuse'], hd_qml)
+            result.loc[i, df_hd_500.columns] = df_hd_500.values[0]
+            df_hd_2000, len_ctr_2000 = get_landuse(landuse_2000, hd_qml)
             result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
-            # result.loc[i, df_hd_2000.columns] = df_hd_2000.values
-            result.loc[i, df_hd_2000.columns] = np.nan
-            df_gws_500, _ = get_landuse(dataset_500['gws'], gws_qml)
+            result.loc[i, df_hd_2000.columns] = df_hd_2000.values[0]
 
             # GWS
-            # result.loc[i, df_gws_500.columns] = df_gws_500.values
-            result.loc[i, df_gws_500.columns] = np.nan
-            df_gws_2000, _ = get_landuse(dataset_2000['gws'], gws_qml)
-            # result.loc[i, df_gws_2000.columns] = df_gws_2000.values
-            result.loc[i, df_gws_2000.columns] = np.nan
+            df_gws_500, _ = get_landuse(gws_500, gws_qml)
+            result.loc[i, df_gws_500.columns] = df_gws_500.values[0]
+            df_gws_2000, _ = get_landuse(gws_2000, gws_qml)
+            result.loc[i, df_gws_2000.columns] = df_gws_2000.values[0]
             print(result.iloc[i])
             pbar()
     return result

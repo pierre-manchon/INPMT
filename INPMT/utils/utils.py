@@ -26,8 +26,6 @@ from pathlib import Path
 from typing import AnyStr
 from warnings import filterwarnings
 
-import xarray as xr
-
 filterwarnings("ignore")
 config_file_path = 'INPMT/config.cfg'
 
@@ -109,10 +107,6 @@ def get_bbox(ds, geom):
     col_stop = float(ds.sel(y=y_min, method='nearest').y.values)
     return [row_start, row_stop, col_start, col_stop]
 
-def merge_ds(dss, geom):
-    tomerge = []
-    for ds in dss:
-        row_start, row_stop, col_start, col_stop = get_bbox(ds, geom)
-        tomerge.append(ds.sel(x=slice(row_start, row_stop),
-                              y=slice(col_start, col_stop)).chunk())
-    return xr.merge(tomerge)
+def clip(ds, geom):
+    row_start, row_stop, col_start, col_stop = get_bbox(ds, geom)
+    return ds.sel(x=slice(row_start, row_stop), y=slice(col_start, col_stop)).chunk()
