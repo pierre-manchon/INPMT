@@ -212,7 +212,7 @@ def get_urban_profile(
     gws_qml = read_qml(path_qml=os.path.join(datasets, 'GWS_seasonality_AFRICA_reprj3857.qml'), item_type='paletteEntry')
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
-        for i in range(len(gdf_villages[:25])):
+        for i in range(len(gdf_villages)):
             _, village_id = strip(gdf_villages.loc[i, "Full_Name"])
             result.loc[i, "ID"] = village_id
             if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
@@ -292,6 +292,5 @@ def get_urban_profile(
             result.loc[i, df_gws_500.columns] = df_gws_500.values[0]
             df_gws_2000, _ = get_landuse(gws_2000, gws_qml)
             result.loc[i, df_gws_2000.columns] = df_gws_2000.values[0]
-            print(result.iloc[i])
             pbar()
     return result

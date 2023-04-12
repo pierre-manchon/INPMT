@@ -75,5 +75,6 @@ def run(datasets: str) -> DataFrame:
         swi=swi,
         gws=gws,
         prevalence=prevalence)
+    profile_villages.to_csv(os.path.join(datasets, 'profile_villages.csv'))
     print("Jesus was black.")
     return profile_villages
