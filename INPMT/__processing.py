@@ -87,7 +87,7 @@ def get_nearest_park(
 
 def get_landuse(
     dataset: xr.Dataset,
-    qml
+    qml: list
 ) -> tuple[DataFrame, int]:
     """
     Use a shapefile and a raster file to process landuse nature and landuse percentage.
