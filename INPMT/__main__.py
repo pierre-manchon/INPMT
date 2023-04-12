@@ -24,9 +24,9 @@ import rioxarray as rxr
 from pandas import DataFrame
 
 try:
-    from __processing import get_urban_profile
+    from processing import get_urban_profile
 except ImportError:
-    from INPMT.__processing import get_urban_profile
+    from INPMT.processing import get_urban_profile
 
 warnings.filterwarnings("ignore")
 
