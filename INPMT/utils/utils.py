@@ -93,20 +93,10 @@ def read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     return legend
 
 
-def get_bbox(ds, geom):
-    """Clips the subdataset with the geometry.
-    Args:
-        subdataset: A xarray dataset.
-        geom: A shapley geometry object.
-    Returns:
-        The corresponding bbox."""
+def clip(ds, geom):
     x_min, y_min, x_max, y_max = geom.bounds
     row_start = float(ds.sel(x=x_min, method='nearest').x.values)
     col_start = float(ds.sel(y=y_max, method='nearest').y.values)
     row_stop = float(ds.sel(x=x_max, method='nearest').x.values)
     col_stop = float(ds.sel(y=y_min, method='nearest').y.values)
-    return [row_start, row_stop, col_start, col_stop]
-
-def clip(ds, geom):
-    row_start, row_stop, col_start, col_stop = get_bbox(ds, geom)
     return ds.sel(x=slice(row_start, row_stop), y=slice(col_start, col_stop)).chunk()
