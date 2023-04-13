@@ -1,0 +1,49 @@
+package:
+  name: INPMT
+  version: 0.2.2
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: 0
+  script: "python -m pip install . -vv"
+  entry_points:
+    - INPMT = INPMT.__main__.main
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+  run:
+    - python=3.10
+    - pip
+    - alive-progress
+    - fiona
+    - geopandas
+    - libpysal
+    - lxml
+    - matplotlib-base
+    - numpy
+    - pandas
+    - pyproj
+    - pyyaml
+    - rasterio
+    - shapely
+
+  test:
+    imports:
+      - INPMT
+
+about:
+  home: https://github.com/pierre-manchon/INPMT
+  license: GPL v3.0
+  license_file: LICENSE
+  summary: 'Impact of National Parks on Malaria Transmission'
+  description: |
+    Impact of National Parks on Malaria Transmission
+
+extra:
+  recipe-maintainers:
+    - P. Manchon

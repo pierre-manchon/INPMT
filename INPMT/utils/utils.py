@@ -27,7 +27,7 @@ from typing import AnyStr
 from warnings import filterwarnings
 
 filterwarnings("ignore")
-
+config_file_path = 'INPMT/config.cfg'
 
 def format_dataset_output(
     dataset: AnyStr = "", name: AnyStr = "", ext: AnyStr = "", prevent_duplicate=True
@@ -72,7 +72,7 @@ def format_dataset_output(
     return __dataset_name, __ext, __output_path
 
 
-def __strip(text: AnyStr) -> tuple[str, str]:
+def strip(text: AnyStr) -> tuple[str, str]:
     """
     https://stackoverflow.com/a/44433664/12258568
 
@@ -85,9 +85,18 @@ def __strip(text: AnyStr) -> tuple[str, str]:
     return str(text), str(text).replace(" ", "_")
 
 
-def __read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
+def read_qml(path_qml: AnyStr, item_type: AnyStr) -> list:
     xml_data = xml.dom.minidom.parse(path_qml)
     legend = []
     for item in xml_data.getElementsByTagName(item_type):
         legend.append([item.getAttribute("value"), item.getAttribute("label")])
     return legend
+
+
+def clip(ds, geom):
+    x_min, y_min, x_max, y_max = geom.bounds
+    row_start = float(ds.sel(x=x_min, method='nearest').x.values)
+    col_start = float(ds.sel(y=y_max, method='nearest').y.values)
+    row_stop = float(ds.sel(x=x_max, method='nearest').x.values)
+    col_stop = float(ds.sel(y=y_min, method='nearest').y.values)
+    return ds.sel(x=slice(row_start, row_stop), y=slice(col_start, col_stop)).chunk()

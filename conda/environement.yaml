@@ -1,0 +1,21 @@
+name: INPMT
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pip
+  - alive-progress
+  - fiona
+  - geopandas
+  - libpysal
+  - lxml
+  - matplotlib-base
+  - numpy
+  - pandas
+  - pyproj
+  - pyyaml
+  - rasterio
+  - shapely
