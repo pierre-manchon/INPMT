@@ -8,15 +8,10 @@ Impact of National Parks on Malaria Transmission
 
  You can [mail me](mailto:pierre.manchon@pm.me) to get the download link or use data of your own which is trickier (You should provide tour own .qml and make sure the data has the right CRS).
 
-### Installation
-```shell
-conda env create -f environment.yml
-```
-
 ### Run
 ````python
 import INPMT
-df = INPMT.run('path/to/your/datasets)
+df = INPMT.run('path/to/your/datasets')
 ````
 
 ### Code
