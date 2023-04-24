@@ -213,84 +213,87 @@ def get_urban_profile(
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
         for i in range(len(gdf_villages)):
-            _, village_id = strip(gdf_villages.loc[i, "Full_Name"])
-            result.loc[i, "ID"] = village_id
-            if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
-                ano_div = int(gdf_villages.iloc[i].str.count("Y").sum()) + len(other_ano.split(','))
-            else:
-                ano_div = int(gdf_villages.iloc[i].str.count("Y").sum())
-            result.loc[i, "ANO_DIV"] = ano_div
+            try:
+                _, village_id = strip(gdf_villages.loc[i, "Full_Name"])
+                result.loc[i, "ID"] = village_id
+                if (other_ano := gdf_villages.loc[i, 'Other Anop']) is not None:
+                    ano_div = int(gdf_villages.iloc[i].str.count("Y").sum()) + len(other_ano.split(','))
+                else:
+                    ano_div = int(gdf_villages.iloc[i].str.count("Y").sum())
+                result.loc[i, "ANO_DIV"] = ano_div
 
-            # Geometry
-            geom = gdf_villages.loc[i, "geometry"]
-            geom_500 = geom.buffer(buffer_500)
-            geom_2000 = geom.buffer(buffer_2000)
+                # Geometry
+                geom = gdf_villages.loc[i, "geometry"]
+                geom_500 = geom.buffer(buffer_500)
+                geom_2000 = geom.buffer(buffer_2000)
 
-            # Get the minimum distance from the village the park edge border and return the said distance and the
-            # park's name
-            res_dist, loc_np, np_name = get_nearest_park(parks=gdf_parks, geom_villages=geom_2000)
-            result.loc[i, "NP"] = np_name
-            result.loc[i, "loc_NP"] = loc_np
-            result.loc[i, "dist_NP"] = round(res_dist, 3)
+                # Get the minimum distance from the village the park edge border and return the said distance and the
+                # park's name
+                res_dist, loc_np, np_name = get_nearest_park(parks=gdf_parks, geom_villages=geom_2000)
+                result.loc[i, "NP"] = np_name
+                result.loc[i, "loc_NP"] = loc_np
+                result.loc[i, "dist_NP"] = round(res_dist, 3)
 
-            # Coordinates
-            result.loc[i, "x"] = geom_500.centroid.x
-            result.loc[i, "y"] = geom_500.centroid.y
+                # Coordinates
+                result.loc[i, "x"] = geom_500.centroid.x
+                result.loc[i, "y"] = geom_500.centroid.y
 
-            population_500 = clip(population, geom_500)
-            landuse_500 = clip(landuse, geom_500)
-            ndvi_500 = clip(ndvi, geom_500)
-            swi_500 = clip(swi, geom_500)
-            gws_500 = clip(gws, geom_500)
-            prevalence_500 = clip(prevalence, geom_500)
+                population_500 = clip(population, geom_500)
+                landuse_500 = clip(landuse, geom_500)
+                ndvi_500 = clip(ndvi, geom_500)
+                swi_500 = clip(swi, geom_500)
+                gws_500 = clip(gws, geom_500)
+                prevalence_500 = clip(prevalence, geom_500)
 
-            population_2000 = clip(population, geom_2000)
-            landuse_2000 = clip(landuse, geom_2000)
-            ndvi_2000 = clip(ndvi, geom_2000)
-            swi_2000 = clip(swi, geom_2000)
-            gws_2000 = clip(gws, geom_2000)
-            prevalence_2000 = clip(prevalence, geom_2000)
+                population_2000 = clip(population, geom_2000)
+                landuse_2000 = clip(landuse, geom_2000)
+                ndvi_2000 = clip(ndvi, geom_2000)
+                swi_2000 = clip(swi, geom_2000)
+                gws_2000 = clip(gws, geom_2000)
+                prevalence_2000 = clip(prevalence, geom_2000)
 
-            # POPULATION
-            result.loc[i, "POP_500"] = population_500.sum(skipna=True).values
-            result.loc[i, "POP_2000"] = population_2000.sum(skipna=True).values
+                # POPULATION
+                result.loc[i, "POP_500"] = population_500.sum(skipna=True).values
+                result.loc[i, "POP_2000"] = population_2000.sum(skipna=True).values
 
-            # NDVI
-            # I divide by 10 000 because Normalized Difference Vegetation
-            # Index is usually between -1 and 1.
-            # For 500 meters
-            result.loc[i, "NDVI_min_500"] = (ndvi_500.min(skipna=True) / 10000).values
-            result.loc[i, "NDVI_mean_500"] = (ndvi_500.mean(skipna=True) / 10000).values
-            result.loc[i, "NDVI_max_500"] = (ndvi_500.max(skipna=True) / 10000).values
-            # For 2000 meters
-            result.loc[i, "NDVI_min_2000"] = (ndvi_2000.min(skipna=True) / 10000).values
-            result.loc[i, "NDVI_mean_2000"] = (ndvi_2000.mean(skipna=True) / 10000).values
-            result.loc[i, "NDVI_max_2000"] = (ndvi_2000.max(skipna=True) / 10000).values
+                # NDVI
+                # I divide by 10 000 because Normalized Difference Vegetation
+                # Index is usually between -1 and 1.
+                # For 500 meters
+                result.loc[i, "NDVI_min_500"] = (ndvi_500.min(skipna=True) / 10000).values
+                result.loc[i, "NDVI_mean_500"] = (ndvi_500.mean(skipna=True) / 10000).values
+                result.loc[i, "NDVI_max_500"] = (ndvi_500.max(skipna=True) / 10000).values
+                # For 2000 meters
+                result.loc[i, "NDVI_min_2000"] = (ndvi_2000.min(skipna=True) / 10000).values
+                result.loc[i, "NDVI_mean_2000"] = (ndvi_2000.mean(skipna=True) / 10000).values
+                result.loc[i, "NDVI_max_2000"] = (ndvi_2000.max(skipna=True) / 10000).values
 
-            # SWI
-            # https://land.copernicus.eu/global/products/SWI I divide by a 2
-            # because SWI data must be between 0 and 100.
-            result.loc[i, "SWI_500"] = (swi_500.sum(skipna=True) / 2).values
-            result.loc[i, "SWI_2000"] = (swi_2000.sum(skipna=True) / 2).values
+                # SWI
+                # https://land.copernicus.eu/global/products/SWI I divide by a 2
+                # because SWI data must be between 0 and 100.
+                result.loc[i, "SWI_500"] = (swi_500.sum(skipna=True) / 2).values
+                result.loc[i, "SWI_2000"] = (swi_2000.sum(skipna=True) / 2).values
 
-            # PREVALENCE
-            # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
-            # and 100.
-            result.loc[i, "PREVALENCE_500"] = (prevalence_500.sum(skipna=True) * 100).values
-            result.loc[i, "PREVALENCE_2000"] = (prevalence_2000.sum(skipna=True) * 100).values
+                # PREVALENCE
+                # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
+                # and 100.
+                result.loc[i, "PREVALENCE_500"] = (prevalence_500.sum(skipna=True) * 100).values
+                result.loc[i, "PREVALENCE_2000"] = (prevalence_2000.sum(skipna=True) * 100).values
 
-            # LANDUSE
-            df_hd_500, len_ctr_500 = get_landuse(landuse_500, hd_qml)
-            result.loc[i, "HAB_DIV_500"] = len_ctr_500
-            result.loc[i, df_hd_500.columns] = df_hd_500.values[0]
-            df_hd_2000, len_ctr_2000 = get_landuse(landuse_2000, hd_qml)
-            result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
-            result.loc[i, df_hd_2000.columns] = df_hd_2000.values[0]
+                # LANDUSE
+                df_hd_500, len_ctr_500 = get_landuse(landuse_500, hd_qml)
+                result.loc[i, "HAB_DIV_500"] = len_ctr_500
+                result.loc[i, df_hd_500.columns] = df_hd_500.values[0]
+                df_hd_2000, len_ctr_2000 = get_landuse(landuse_2000, hd_qml)
+                result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
+                result.loc[i, df_hd_2000.columns] = df_hd_2000.values[0]
 
-            # GWS
-            df_gws_500, _ = get_landuse(gws_500, gws_qml)
-            result.loc[i, df_gws_500.columns] = df_gws_500.values[0]
-            df_gws_2000, _ = get_landuse(gws_2000, gws_qml)
-            result.loc[i, df_gws_2000.columns] = df_gws_2000.values[0]
+                # GWS
+                df_gws_500, _ = get_landuse(gws_500, gws_qml)
+                result.loc[i, df_gws_500.columns] = df_gws_500.values[0]
+                df_gws_2000, _ = get_landuse(gws_2000, gws_qml)
+                result.loc[i, df_gws_2000.columns] = df_gws_2000.values[0]
+            except IndexError:
+                print(village_id, np_name, geom_2000.wkt)
             pbar()
     return result
