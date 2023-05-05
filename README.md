@@ -1,5 +1,4 @@
 # INPMT [![RELEASE (latest by date)](https://img.shields.io/github/v/release/pierre-manchon/INPMT)](https://github.com/pierre-manchon/INPMT/releases/latest) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5269134.svg)](https://doi.org/10.5281/zenodo.5269134) [![LICENSE](https://img.shields.io/github/license/pierre-manchon/INPMT)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Pre-commit auto-update](https://github.com/pierre-manchon/INPMT/actions/workflows/pre-commit-autoupdate.yml/badge.svg)](https://github.com/pierre-manchon/INPMT/actions/workflows/pre-commit-autoupdate.yml)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f1888eb8938e688ad438/maintainability)](https://codeclimate.com/github/pierre-manchon/INPMT/maintainability)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
