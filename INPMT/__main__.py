@@ -44,8 +44,8 @@ def run(datasets: str) -> DataFrame:
     """
     # Convert all raster data as xarray DataArrays
     population = rxr.open_rasterio(os.path.join(datasets, "POPULATION_AFRICA_100m_reprj3857.tif"))
-    landuse = rxr.open_rasterio(os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.tif"))
-    ndvi = rxr.open_rasterio(os.path.join(datasets, "NDVI_MOD13A1.006__500m_16_days_NDVI_doy2016_aid0001.tif"))
+    landuse = rxr.open_rasterio(os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0_reprj3857.tif"))
+    ndvi = rxr.open_rasterio(os.path.join(datasets, "NDVI_MOD13A1.006__300m_16_days_NDVI_doy2016_aid0001_reprj3857.tif"))
     swi = rxr.open_rasterio(os.path.join(datasets, "SWI_c_gls_SWI10_QL_2016_AFRICA_ASCAT_V3.1.1_reprj3857.tif"))
     gws = rxr.open_rasterio(os.path.join(datasets, "GWS_seasonality_AFRICA_reprj3857.tif"))
     prevalence = rxr.open_rasterio(os.path.join(datasets, "PREVALENCE_2019_Global_PfPR_2016_reprj3857.tif"))
@@ -59,11 +59,8 @@ def run(datasets: str) -> DataFrame:
     prevalence.name = 'prevalence'
 
     # Convert all vector data as a WKT geometry
-    os.path.join(datasets, "IRISH_countries.shp")
-    os.path.join(datasets, "LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0.shp")
-    anopheles_kyalo_in_PAs_buffers = os.path.join(datasets, "KYALO_anopheles_in_PAs_buffers.shp")  # noqa F841
     national_parks_with_anopheles_kyalo = os.path.join(datasets, "NATIONAL_PARKS_WDPA_Africa_anopheles.shp")
-    anopheles_kyalo = os.path.join(datasets, "KYALO_anopheles.shp")
+    anopheles_kyalo = os.path.join(datasets, "KYALO.shp")
 
     profile_villages = get_urban_profile(
         datasets=datasets,

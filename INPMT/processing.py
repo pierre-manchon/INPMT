@@ -208,7 +208,7 @@ def get_urban_profile(
     ]
     result = pd.DataFrame(columns=cols)
         # Retrieve the legend file's path
-    hd_qml = read_qml(path_qml=os.path.join(datasets, 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0-2.qml'), item_type='item')
+    hd_qml = read_qml(path_qml=os.path.join(datasets, 'LANDUSE_ESACCI-LC-L4-LC10-Map-300m-P1Y-2016-v1.0_reprj3857-2.qml'), item_type='item')
     gws_qml = read_qml(path_qml=os.path.join(datasets, 'GWS_seasonality_AFRICA_reprj3857.qml'), item_type='paletteEntry')
     # Create the progress and the temporary directory used to save some temporary files
     with alive_bar(total=len(gdf_villages)) as pbar:
