@@ -275,8 +275,8 @@ def get_urban_profile(
                 # PREVALENCE
                 # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
                 # and 100.
-                result.loc[i, "PREVALENCE_500"] = prevalence_500.sum(skipna=True).values * 100
-                result.loc[i, "PREVALENCE_2000"] = prevalence_2000.sum(skipna=True).values * 100
+                result.loc[i, "PREVALENCE_500"] = prevalence_500.where(prevalence_500 != -9999.).mean(skipna=True).values * 100
+                result.loc[i, "PREVALENCE_2000"] = prevalence_2000.where(prevalence_500 != -9999.).mean(skipna=True).values * 100
                 # LANDUSE
                 df_hd_500, len_ctr_500 = get_landuse(landuse_500, hd_qml)
                 result.loc[i, "HAB_DIV_500"] = len_ctr_500
