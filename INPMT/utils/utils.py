@@ -26,6 +26,8 @@ from pathlib import Path
 from typing import AnyStr
 from warnings import filterwarnings
 
+import numpy as np
+
 filterwarnings("ignore")
 config_file_path = 'INPMT/config.cfg'
 
@@ -99,4 +101,7 @@ def clip(ds, geom):
     col_start = float(ds.sel(y=y_max, method='nearest').y.values)
     row_stop = float(ds.sel(x=x_max, method='nearest').x.values)
     col_stop = float(ds.sel(y=y_min, method='nearest').y.values)
-    return ds.sel(x=slice(row_start, row_stop), y=slice(col_start, col_stop)).chunk()
+    da = ds.sel(x=slice(row_start, row_stop), y=slice(col_start, col_stop)).chunk()
+    # Change dtype to avoid -inf errors on aggregations
+    # https://stackoverflow.com/a/24313860
+    return da.astype(np.float64)
