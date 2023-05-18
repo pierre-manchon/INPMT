@@ -95,11 +95,10 @@ def get_landuse(
     Then I retrieve a number of pixels by values using the Counter object.
     I process the category area and the landuse percentage using the pixel area and the polygon area
 
-    :param legend_filename:
     :param dataset: Path to the dataset file
     :type dataset: AnyStr
-    :param item_type: Type of the item containing labels, values and colors for the legend.
-    :type item_type: AnyStr
+    :param qml: List of qml values
+    :type qml: list
     :return: A DataFrame updated with the processed values
     :rtype: tuple(DataFrame, SupportsInt)
     """
@@ -154,6 +153,8 @@ def get_urban_profile(
     - I read the raster that I cut out then I calculate the percentages of land use and I associate them to the nature
         of these land uses with the ***get_landuse*** function
 
+    :param datasets: Path to the datasets
+    :type datasets: AnyStr
     :param villages: Path to the shapefile
     :type villages: AnyStr
     :param parks: Path to the shapefile
@@ -237,49 +238,45 @@ def get_urban_profile(
                 # Coordinates
                 result.loc[i, "x"] = geom_500.centroid.x
                 result.loc[i, "y"] = geom_500.centroid.y
-
+                # DATASETS
+                # 500
                 population_500 = clip(population, geom_500)
                 landuse_500 = clip(landuse, geom_500)
                 ndvi_500 = clip(ndvi, geom_500)
                 swi_500 = clip(swi, geom_500)
                 gws_500 = clip(gws, geom_500)
                 prevalence_500 = clip(prevalence, geom_500)
-
+                # 2000
                 population_2000 = clip(population, geom_2000)
                 landuse_2000 = clip(landuse, geom_2000)
                 ndvi_2000 = clip(ndvi, geom_2000)
                 swi_2000 = clip(swi, geom_2000)
                 gws_2000 = clip(gws, geom_2000)
                 prevalence_2000 = clip(prevalence, geom_2000)
-
                 # POPULATION
                 result.loc[i, "POP_500"] = population_500.sum(skipna=True).values
                 result.loc[i, "POP_2000"] = population_2000.sum(skipna=True).values
-
                 # NDVI
                 # I divide by 10 000 because Normalized Difference Vegetation
                 # Index is usually between -1 and 1.
                 # For 500 meters
-                result.loc[i, "NDVI_min_500"] = (ndvi_500.min(skipna=True) / 10000).values
-                result.loc[i, "NDVI_mean_500"] = (ndvi_500.mean(skipna=True) / 10000).values
-                result.loc[i, "NDVI_max_500"] = (ndvi_500.max(skipna=True) / 10000).values
+                result.loc[i, "NDVI_min_500"] = ndvi_500.min(skipna=True).values / 10000
+                result.loc[i, "NDVI_mean_500"] = ndvi_500.min(skipna=True).values / 10000
+                result.loc[i, "NDVI_max_500"] = ndvi_500.min(skipna=True).values / 10000
                 # For 2000 meters
-                result.loc[i, "NDVI_min_2000"] = (ndvi_2000.min(skipna=True) / 10000).values
-                result.loc[i, "NDVI_mean_2000"] = (ndvi_2000.mean(skipna=True) / 10000).values
-                result.loc[i, "NDVI_max_2000"] = (ndvi_2000.max(skipna=True) / 10000).values
-
+                result.loc[i, "NDVI_min_2000"] = ndvi_2000.min(skipna=True).values / 10000
+                result.loc[i, "NDVI_mean_2000"] = ndvi_2000.mean(skipna=True).values / 10000
+                result.loc[i, "NDVI_max_2000"] = ndvi_2000.max(skipna=True).values / 10000
                 # SWI
                 # https://land.copernicus.eu/global/products/SWI I divide by a 2
                 # because SWI data must be between 0 and 100.
-                result.loc[i, "SWI_500"] = (swi_500.sum(skipna=True) / 2).values
-                result.loc[i, "SWI_2000"] = (swi_2000.sum(skipna=True) / 2).values
-
+                result.loc[i, "SWI_500"] = swi_500.sum(skipna=True).values / 2
+                result.loc[i, "SWI_2000"] = swi_2000.sum(skipna=True).values / 2
                 # PREVALENCE
                 # https://malariaatlas.org/explorer/#/ I multiply by 100 because PREVALENCE is a percentage between 0
                 # and 100.
-                result.loc[i, "PREVALENCE_500"] = (prevalence_500.sum(skipna=True) * 100).values
-                result.loc[i, "PREVALENCE_2000"] = (prevalence_2000.sum(skipna=True) * 100).values
-
+                result.loc[i, "PREVALENCE_500"] = prevalence_500.sum(skipna=True).values * 100
+                result.loc[i, "PREVALENCE_2000"] = prevalence_2000.sum(skipna=True).values * 100
                 # LANDUSE
                 df_hd_500, len_ctr_500 = get_landuse(landuse_500, hd_qml)
                 result.loc[i, "HAB_DIV_500"] = len_ctr_500
@@ -287,7 +284,6 @@ def get_urban_profile(
                 df_hd_2000, len_ctr_2000 = get_landuse(landuse_2000, hd_qml)
                 result.loc[i, "HAB_DIV_2000"] = len_ctr_2000
                 result.loc[i, df_hd_2000.columns] = df_hd_2000.values[0]
-
                 # GWS
                 df_gws_500, _ = get_landuse(gws_500, gws_qml)
                 result.loc[i, df_gws_500.columns] = df_gws_500.values[0]
